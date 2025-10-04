@@ -1,0 +1,41 @@
+academic-certificates/node_modules/
+academic-certificates/.next/
+academic-certificates/.env.local
+academic-certificates/.vercel/
+academic-certificates/vercel.json
+academic-certificates/out/
+academic-certificates/build/
+academic-certificates/dist/
+academic-certificates/node_modules
+academic-certificates/.pnp
+academic-certificates/.pnp.*
+academic-certificates/.yarn/*
+academic-certificates/.yarn/patches
+academic-certificates/.yarn/plugins
+academic-certificates/.yarn/releases
+academic-certificates/.yarn/versions
+
+# testing
+academic-certificates/coverage
+
+
+# misc
+academic-certificates/.DS_Store
+academic-certificates/*.pem
+
+# debug
+academic-certificates/npm-debug.log*
+academic-certificates/yarn-debug.log*
+academic-certificates/yarn-error.log*
+academic-certificates/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+academic-certificates/.env*.local
+academic-certificates/.env
+
+# vercel
+academic-certificates/.vercel
+
+# typescript
+academic-certificates/*.tsbuildinfo
+academic-certificates/next-env.d.ts
