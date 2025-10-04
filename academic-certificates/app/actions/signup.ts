@@ -1,0 +1,94 @@
+"use server";
+import { createHash, randomBytes } from "crypto";
+import { createClient } from '@/lib/supabase/server';
+
+export async function hashPasswordDeterministic(password: string) {
+    return createHash("sha256").update(password).digest("hex");
+}
+
+import { generateWallet, generateSecretKey } from '@stacks/wallet-sdk';
+import { privateKeyToAddress } from '@stacks/transactions';
+
+function logAddressesFromPrivateKey(privateKey: string) {
+    // Compressed private key (64 or 66 characters)
+
+    // For mainnet
+    const mainnetAddress = privateKeyToAddress(
+        privateKey,
+        "mainnet"
+    );
+
+    // For testnet
+    const testnetAddress = privateKeyToAddress(
+        privateKey,
+        "testnet"
+    );
+
+    console.log('Mainnet:', mainnetAddress);
+    console.log('Testnet:', testnetAddress);
+    return { mainnetAddress, testnetAddress };
+}
+async function createWalletFromSeed() {
+    const secretKey = generateSecretKey();
+
+    const wallet = await generateWallet({
+        secretKey,
+        password: 'optional-encryption-password',
+    });
+
+    // Get the first account's address
+    const account = wallet.accounts[0];
+    console.log(account)
+    //console.log('Address:', account.address);
+    console.log('Private key:', account.stxPrivateKey);
+    const result = logAddressesFromPrivateKey(account.stxPrivateKey);
+    return {
+        privateKey: account.stxPrivateKey,
+        publicKey: account.stxPublicKey,
+        address: result.testnetAddress
+    };
+}
+
+
+export async function signup(formdata: FormData | { email: string; password: string; role: string }) {
+    try {
+        // Generar wallet de Stacks para el nuevo usuario
+        const wallet = await createWalletFromSeed();
+
+        const supabase = await createClient();
+
+        const email =
+            typeof formdata === "object" && "get" in formdata
+                ? formdata.get("email") as string
+                : (formdata as { email: string }).email;
+        const role =
+            typeof formdata === "object" && "get" in formdata
+                ? formdata.get("role") as string
+                : (formdata as { role: string }).role;
+
+        const { data, error } = await supabase.from('users').insert({
+            email,
+            role,
+            public_key: wallet.publicKey,
+            private_key: wallet.privateKey,
+            stacks_address: wallet.address
+        });
+
+        if (error) {
+            console.error('Error inserting user:', error);
+            return { success: false, error: error.message };
+        }
+
+        return {
+            success: true,
+            wallet: {
+                address: wallet.address,
+                publicKey: wallet.publicKey
+                // Note: No enviamos la private key al cliente por seguridad
+            }
+        };
+    } catch (error) {
+        console.error('Error during signup:', error);
+        return { success: false, error: 'Failed to create user account' };
+    }
+}
