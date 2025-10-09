@@ -28,7 +28,7 @@ export default async function AcademyPage() {
                     Academia
                 </h1>
                 <p className="text-muted-foreground">
-                    Emite certificados verificables para tus estudiantes
+                    Emite certificados verificables para tus estudiantes!
                 </p>
             </div>
 
