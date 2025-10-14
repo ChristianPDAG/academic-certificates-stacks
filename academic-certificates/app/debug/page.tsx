@@ -81,7 +81,7 @@ export default function DebugPage() {
     const testSpecificCertificate = async (certId: string) => {
         const id = parseInt(certId);
         if (isNaN(id)) return;
-        
+
         setLoading(true);
         try {
             const result = await getCertificateClient(id);
@@ -94,7 +94,7 @@ export default function DebugPage() {
 
     const testSchoolInfo = async (schoolAddress: string) => {
         if (!schoolAddress.trim()) return;
-        
+
         setLoading(true);
         try {
             const result = await getSchoolInfoClient(schoolAddress.trim());
@@ -107,7 +107,7 @@ export default function DebugPage() {
 
     const testSchoolCertificates = async (schoolAddress: string) => {
         if (!schoolAddress.trim()) return;
-        
+
         setLoading(true);
         try {
             const result = await getSchoolCertificatesClient(schoolAddress.trim());
@@ -127,7 +127,7 @@ export default function DebugPage() {
             addResult("Total de certificados del sistema - ERROR", error);
         }
         setLoading(false);
-    };    return (
+    }; return (
         <div className="container mx-auto px-4 py-8 max-w-6xl">
             <h1 className="text-3xl font-bold mb-8">🔧 Debug del Smart Contract</h1>
 

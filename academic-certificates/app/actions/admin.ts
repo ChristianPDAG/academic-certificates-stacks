@@ -226,3 +226,30 @@ export async function getSystemStats(): Promise<AdminStats> {
         throw new Error(`Error al obtener estadísticas del sistema: ${error}`);
     }
 }
+
+/**
+ * Obtiene la lista de usuarios con role "academy" desde Supabase
+ * Retorna: email, name, stacks_address, role, created_at
+ */
+export async function getAcademyUsers() {
+    try {
+        const { createClient } = await import('@/lib/supabase/server');
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from('users')
+            .select('email, nombre, stacks_address, role, created_at')
+            .eq('role', 'academy')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching academy users:', error);
+            throw new Error(`Error al obtener academias: ${error.message}`);
+        }
+
+        return data || [];
+    } catch (error) {
+        console.error('Error in getAcademyUsers:', error);
+        throw new Error(`Error al obtener academias: ${error}`);
+    }
+}
