@@ -8,6 +8,7 @@ import {
     principalCV,
     uintCV,
     cvToJSON,
+    cvToValue,
     fetchCallReadOnlyFunction,
 } from '@stacks/transactions';
 import { STACKS_TESTNET, STACKS_MAINNET } from '@stacks/network';
@@ -168,7 +169,22 @@ export async function getSchoolInfoClient(schoolPrincipal: string) {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        // Usar cvToValue para convertir directamente a valores JavaScript
+        const schoolData = cvToValue(result);
+
+        console.log("School data from contract:", schoolData);
+
+        // Si schoolData existe, retornar en el formato esperado
+        if (schoolData) {
+            return {
+                value: {
+                    'school-name': schoolData['school-name'],
+                    'active': schoolData.active
+                }
+            };
+        }
+
+        return null;
     } catch (error) {
         console.error('Error getting school info:', error);
         throw new Error(`Error al obtener información de la academia: ${error}`);
@@ -189,7 +205,8 @@ export async function getSuperAdminClient() {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        const adminValue = cvToValue(result);
+        return { value: adminValue };
     } catch (error) {
         console.error('Error getting super admin:', error);
         throw new Error(`Error al obtener el super administrador: ${error}`);
@@ -210,7 +227,8 @@ export async function getTotalCertificatesClient() {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        const totalValue = cvToValue(result);
+        return { value: totalValue };
     } catch (error) {
         console.error('Error getting total certificates:', error);
         throw new Error(`Error al obtener el total de certificados: ${error}`);
@@ -231,7 +249,8 @@ export async function getSchoolCertificatesClient(schoolPrincipal: string) {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        const certificatesValue = cvToValue(result);
+        return { value: certificatesValue };
     } catch (error) {
         console.error('Error getting school certificates:', error);
         throw new Error(`Error al obtener certificados de la academia: ${error}`);
@@ -252,7 +271,8 @@ export async function getCertificateClient(certId: number) {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        const certificateValue = cvToValue(result);
+        return { value: certificateValue };
     } catch (error) {
         console.error('Error getting certificate:', error);
         throw new Error(`Error al obtener certificado: ${error}`);
@@ -273,7 +293,8 @@ export async function getStudentCertificatesClient(studentWallet: string) {
             senderAddress: CONTRACT_ADDRESS,
         });
 
-        return cvToJSON(result);
+        const certificatesValue = cvToValue(result);
+        return { value: certificatesValue };
     } catch (error) {
         console.error('Error getting student certificates:', error);
         throw new Error(`Error al obtener certificados del estudiante: ${error}`);
@@ -322,5 +343,81 @@ export async function getSystemStatsClient(): Promise<AdminStats> {
     } catch (error) {
         console.error('Error getting system stats:', error);
         throw new Error(`Error al obtener estadísticas del sistema: ${error}`);
+    }
+}
+
+/**
+ * Transfiere STX a una dirección específica
+ * @param recipientAddress - Dirección del destinatario
+ * @param amountSTX - Cantidad en STX (se convertirá a microSTX internamente)
+ */
+export async function transferSTXClient(
+    recipientAddress: string,
+    amountSTX: number
+): Promise<any> {
+    try {
+        const { makeSTXTokenTransfer } = await import('@stacks/transactions');
+        const { openSTXTransfer } = await import('@stacks/connect');
+
+        // Convertir STX a microSTX (1 STX = 1,000,000 microSTX)
+        const amountMicroSTX = BigInt(Math.floor(amountSTX * 1_000_000));
+
+        const txOptions = {
+            recipient: recipientAddress,
+            amount: amountMicroSTX,
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            onFinish: (data: any) => {
+                console.log('STX Transfer submitted:', data);
+            },
+            onCancel: () => {
+                console.log('STX Transfer cancelled');
+            },
+        };
+
+        return await openSTXTransfer(txOptions);
+    } catch (error) {
+        console.error('Error transferring STX:', error);
+        throw new Error(`Error al transferir STX: ${error}`);
+    }
+}
+
+/**
+ * Obtiene la URL de la API según la red configurada
+ */
+function getApiUrl(): string {
+    // NETWORK es StacksTestnet o StacksMainnet
+    if (process.env.NEXT_PUBLIC_NETWORK === 'mainnet') {
+        return 'https://api.mainnet.hiro.so';
+    }
+    return 'https://api.testnet.hiro.so';
+}
+
+/**
+ * Obtiene el balance STX de una dirección específica
+ * @param address - Dirección de Stacks a consultar
+ * @returns Balance en STX (no microSTX)
+ */
+export async function getAddressBalanceClient(address: string): Promise<number> {
+    try {
+        const apiUrl = getApiUrl();
+        const url = `${apiUrl}/extended/v1/address/${address}/balances`;
+
+        console.log(`Consultando balance para: ${address}`);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Error fetching balance: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const microSTX = BigInt(data.stx.balance || '0');
+        const stx = Number(microSTX) / 1_000_000;
+
+        console.log(`Balance de ${address}: ${stx} STX`);
+        return stx;
+    } catch (error) {
+        console.error("Error getting address balance:", error);
+        return 0;
     }
 }
