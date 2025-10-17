@@ -15,6 +15,9 @@ export const config = {
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Match all request paths except common static files, images and video files
+    // (this keeps requests to /videos/*.mp4 out of the auth middleware so they
+    // are served directly from the `public` folder and don't redirect to login).
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|ogg|mov)$).*)",
   ],
 };
