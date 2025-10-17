@@ -13,7 +13,7 @@ import {
 const About = () => {
   return (
     <section id="about" className="w-full relative">
-      <div className="bg-[url('/bg-nodes-1.svg')] w-full h-full bg-cover bg-center absolute bottom-0 left-0 opacity-50 dark:opacity-20 -z-10" />
+      <div className="bg-[url('/img/bg-nodes-1.svg')] w-full h-full bg-cover bg-center absolute bottom-0 left-0 opacity-50 dark:opacity-20 -z-10" />
 
       <div className="py-20 container mx-auto max-w-7xl z-10">
         <div className="flex flex-col lg:flex-row py-12 z-10">

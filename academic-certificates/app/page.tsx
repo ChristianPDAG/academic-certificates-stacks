@@ -1,4 +1,5 @@
 import Hero from "@/components/home/Hero";
+import Validator from "@/components/home/Validator";
 import Advantages from "@/components/home/Advantages";
 import { Metadata, Viewport } from "next";
 import About from "@/components/home/About";
@@ -53,6 +54,7 @@ export default function Home() {
   return (
     <main className="relative flex dark:bg-black-100 justify-center items-center flex-col overflow-hidden mx-auto z-0">
       <Hero />
+      <Validator />
       <Advantages />
       <About />
     </main>
