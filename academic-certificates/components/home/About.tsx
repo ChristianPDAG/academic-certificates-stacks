@@ -48,7 +48,7 @@ const About = () => {
                   <div className="flex flex-1 w-full rounded-lg mt-4 overflow-hidden">
                     <Image
                       src={"/img/1-image.png"}
-                      alt="Tecnología Oval Campus"
+                      alt="Tecnología "
                       fill
                     />
                   </div>

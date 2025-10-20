@@ -1,4 +1,4 @@
-import PublicExplorer from "@/components/public-explorer";
+import PublicExplorer from "@/components/public/public-explorer";
 
 export default function ExplorerPage() {
     return <PublicExplorer />;

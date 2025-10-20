@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 import { School, Users, Settings, Eye } from "lucide-react";
 
 interface NavigationProps {

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { InfoIcon, Settings } from "lucide-react";
-import { AdminContent } from "@/components/admin-content";
+import { AdminContent } from "@/components/academy/admin-content";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -13,17 +13,10 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-6">
+    <main className="relative min-h-screen w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 mt-20">
       {/* Header */}
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          Panel de Administración - Gestión de Certificados Académicos
-        </div>
-      </div>
-
       {/* Title */}
-      <div className="flex flex-col gap-2 items-start">
+      <div className="flex flex-col gap-2 items-start mb-4">
         <h1 className="font-bold text-3xl mb-2 flex items-center gap-2">
           <Settings className="h-8 w-8" />
           Administrador del Sistema
@@ -35,6 +28,6 @@ export default async function AdminPage() {
 
       {/* Main Content with Wallet Integration */}
       <AdminContent userClaims={data.claims} />
-    </div>
+    </main>
   );
 }

@@ -2,7 +2,7 @@
 
 import { StacksProvider } from "@/lib/stacks-provider";
 import { WalletConnection } from "@/components/wallet-connection";
-import { AdminDashboard } from "@/components/admin-dashboard";
+import { AdminDashboard } from "@/components/academy/admin-dashboard";
 
 interface AdminContentProps {
     userClaims: any;
