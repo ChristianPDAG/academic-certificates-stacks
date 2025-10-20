@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,9 +59,14 @@ export function SignUpForm({
         },
       });
       console.log(data, email, role, name);
-      const result = await signup({ id: data?.user.id, email, password, role, nombre: name });
 
       if (error) throw error;
+      if (!data?.user?.id) {
+        throw new Error("Sign up failed: no user returned");
+      }
+
+      await signup({ id: data.user.id, email, password, role, nombre: name });
+
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -123,13 +135,15 @@ export function SignUpForm({
                 <div className="flex items-center">
                   <Label htmlFor="role">Role</Label>
                 </div>
-                <Input
-                  id="role"
-                  type="text"
-                  required
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                />
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="student">Student</SelectItem>
+                    <SelectItem value="academy">Academy</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>

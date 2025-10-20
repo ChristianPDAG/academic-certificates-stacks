@@ -4,7 +4,7 @@ import { FloatingNavClient } from "./navbar-client";
 export default async function FloatingNav() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
-  const user = (data?.claims as { email?: string } | null) ?? null;
+  const user = (data?.claims.user_metadata as { email?: string; role?: string } | null) ?? null;
 
   const hasEnvVars =
     !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -13,6 +13,7 @@ export default async function FloatingNav() {
   return (
     <FloatingNavClient
       userEmail={user?.email ?? null}
+      userRole={user?.role ?? null}
       hasEnvVars={hasEnvVars}
     />
   );
