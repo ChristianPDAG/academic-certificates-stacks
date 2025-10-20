@@ -9,9 +9,9 @@ import { IconMenu2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
-import { LogoutButton } from "@/components/logout-button"; // ← Debe ser client-safe
-import { Navigation } from "@/components/navigation-fixed"; // tu menú de usuario
-import { EnvVarWarning } from "@/components/env-var-warning";
+import { LogoutButton } from "@/components/auth/logout-button"; // ← Debe ser client-safe
+import { Navigation } from "@/components/navigation/navigation-fixed"; // tu menú de usuario
+
 
 type Props = {
   userEmail: string | null;
@@ -43,24 +43,19 @@ export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
       <nav className="py-2.5 flex justify-between items-center">
         <div className="flex items-center gap-x-5">
           <Link href="/" className="w-[100px]">
-            <Image src="/logos/oval.png" alt="logo" width={50} height={30} />
+            <Image src="/logos/logo.png" alt="logo" width={50} height={30} />
           </Link>
         </div>
 
         <div className="flex items-center gap-x-2">
           {/* Theme switcher siempre visible */}
-          <ThemeSwitcher />
+        
 
           {/* Bloque auth */}
-          {!hasEnvVars ? (
-            <EnvVarWarning />
-          ) : userEmail ? (
+          { userEmail ? (
             // Usuario logeado
             <div className="hidden lg:flex items-center gap-4">
               <Navigation user={{ email: userEmail }} />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {userEmail}
-              </span>
               <LogoutButton />
             </div>
           ) : (
@@ -120,6 +115,8 @@ export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
               </MenuItems>
             </Menu>
           </div>
+
+            <ThemeSwitcher />
         </div>
       </nav>
     </header>
