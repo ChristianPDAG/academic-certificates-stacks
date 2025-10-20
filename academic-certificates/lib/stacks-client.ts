@@ -178,7 +178,7 @@ export async function getSchoolInfoClient(schoolPrincipal: string) {
         if (schoolData) {
             return {
                 value: {
-                    'school-name': schoolData['school-name'],
+                    'school-name': schoolData.value['school-name'].value,
                     'active': schoolData.active
                 }
             };

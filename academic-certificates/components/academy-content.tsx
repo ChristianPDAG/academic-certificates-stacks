@@ -25,8 +25,10 @@ import {
 } from "lucide-react";
 
 type TransactionStatus = "idle" | "loading" | "success" | "error" | "insufficient-funds";
-
-export function AcademyContent(id: string) {
+interface AcademyContentProps {
+    id: string;
+}
+export function AcademyContent({ id }: AcademyContentProps) {
     const [studentEmail, setStudentEmail] = useState("");
     const [studentId, setStudentId] = useState("");
     const [course, setCourse] = useState("");
