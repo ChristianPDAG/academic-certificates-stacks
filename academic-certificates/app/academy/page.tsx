@@ -33,7 +33,7 @@ export default async function AcademyPage() {
             </div>
 
             {/* Main Content with Wallet Integration */}
-            <AcademyContent />
+            <AcademyContent id={data?.claims.sub} />
         </div>
     );
 }
