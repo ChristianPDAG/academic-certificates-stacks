@@ -7,78 +7,98 @@ import Link from "next/link";
 
 const Validator = () => {
   return (
-    <section className="relative w-full">
-      <div className="bg-[url('/img/bg-waves-3.svg')] w-full h-full bg-cover bg-center absolute top-0 left-0 opacity-15 dark:opacity-15 -z-10" />
+    <section className="relative w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+      {/* Fondo decorativo con opacidad diferente por tema (que sí se ve en ambos) */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[url('/img/bg-waves-3.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
+        {/* degradado sutil para mejorar legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white dark:from-neutral-950/60 dark:to-neutral-950" />
+      </div>
 
-      <div className="container mx-auto max-w-7xl z-10 py-20 px-4 lg:px-0">
-        <div className="flex flex-col lg:flex-row items-center gap-8">
+      <div className="container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0">
+        <div className="flex flex-col lg:flex-row items-center gap-10">
+          {/* Texto */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center">
             <motion.h2
-              className="text-5xl lg:text-6xl font-bold mb-6 text-center lg:text-left"
-              initial={"offScreen"}
-              whileInView={"onScreen"}
-              viewport={{ once: true }}
-              variants={slideInFromBottom({ delay: 0.2 })}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-center lg:text-left"
+              initial="offScreen"
+              whileInView="onScreen"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={slideInFromBottom({ delay: 0.1 })}
             >
-              Valida tu <span className="text-[#00A1FF]">Certificado</span>
+              Valida tu{" "}
+              <span className="text-sky-500 dark:text-sky-400">Certificado</span>
             </motion.h2>
+
             <motion.p
-              className="text-lg lg:text-2xl text-neutral-600 dark:text-neutral-300 mb-8 text-center lg:text-left"
-              initial={"offScreen"}
-              whileInView={"onScreen"}
-              viewport={{ once: true }}
-              variants={slideInFromBottom({ delay: 0.4 })}
+              className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 mb-8 text-center lg:text-left"
+              initial="offScreen"
+              whileInView="onScreen"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={slideInFromBottom({ delay: 0.25 })}
             >
-              Verifica la autenticidad de cualquier certificado emitido en nuestra plataforma. 
-              Solo necesitas el ID del certificado para consultar toda su información en la blockchain.
+              Verifica la autenticidad de cualquier certificado emitido en nuestra
+              plataforma. Solo necesitas el ID del certificado para consultar toda
+              su información en la blockchain.
             </motion.p>
+
             <motion.div
               className="flex gap-4 justify-center lg:justify-start"
-              initial={"offScreen"}
-              whileInView={"onScreen"}
-              viewport={{ once: true }}
-              variants={slideInFromBottom({ delay: 0.6 })}
+              initial="offScreen"
+              whileInView="onScreen"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={slideInFromBottom({ delay: 0.4 })}
             >
               <Link
                 href="/validator"
-                className="px-8 py-4 bg-[#00A1FF] hover:bg-[#0081CC] text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-white bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
               >
                 Validar Certificado
               </Link>
               <Link
                 href="/explorer"
-                className="px-8 py-4 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-100 font-semibold rounded-lg transition-all duration-300"
+                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700 transition-all duration-300"
               >
                 Explorar
               </Link>
             </motion.div>
           </div>
 
+          {/* Tarjetas */}
           <div className="w-full lg:w-1/2 flex justify-center">
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
-              initial={"offScreen"}
-              whileInView={"onScreen"}
-              viewport={{ once: true }}
-              variants={slideInFromLeft({ delay: 0.8 })}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
+              initial="offScreen"
+              whileInView="onScreen"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={slideInFromLeft({ delay: 0.5 })}
             >
-              <div className="flex flex-col items-center p-8 bg-white/20 dark:bg-black-200/20 backdrop-blur-sm rounded-xl border border-neutral-300 dark:border-neutral-800 hover:border-[#00A1FF] transition-all duration-300">
-                <IconShieldCheck size={60} color="#00A1FF" className="mb-4" />
-                <h3 className="text-xl font-bold mb-2 text-neutral-800 dark:text-neutral-100">
+              {/* Card 1 */}
+              <div className="flex flex-col items-center p-6 md:p-8 rounded-xl border backdrop-blur-sm
+                              bg-white/70 border-neutral-200 hover:border-sky-400
+                              dark:bg-neutral-900/60 dark:border-neutral-800 dark:hover:border-sky-500
+                              transition-colors">
+                {/* Tabler usa currentColor si no pasas 'color' */}
+                <IconShieldCheck size={60} className="mb-4 text-sky-500 dark:text-sky-400" />
+                <h3 className="text-lg md:text-xl font-bold mb-2">
                   Verificación Inmutable
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
-                  Los datos se almacenan de forma permanente en la blockchain
+                  Los datos se almacenan de forma permanente en la blockchain.
                 </p>
               </div>
 
-              <div className="flex flex-col items-center p-8 bg-white/20 dark:bg-black-200/20 backdrop-blur-sm rounded-xl border border-neutral-300 dark:border-neutral-800 hover:border-[#00A1FF] transition-all duration-300">
-                <IconCertificate size={60} color="#00A1FF" className="mb-4" />
-                <h3 className="text-xl font-bold mb-2 text-neutral-800 dark:text-neutral-100">
+              {/* Card 2 */}
+              <div className="flex flex-col items-center p-6 md:p-8 rounded-xl border backdrop-blur-sm
+                              bg-white/70 border-neutral-200 hover:border-sky-400
+                              dark:bg-neutral-900/60 dark:border-neutral-800 dark:hover:border-sky-500
+                              transition-colors">
+                <IconCertificate size={60} className="mb-4 text-sky-500 dark:text-sky-400" />
+                <h3 className="text-lg md:text-xl font-bold mb-2">
                   Acceso Público
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
-                  Cualquier persona puede verificar la autenticidad
+                  Cualquier persona puede verificar la autenticidad.
                 </p>
               </div>
             </motion.div>
