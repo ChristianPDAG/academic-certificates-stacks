@@ -116,6 +116,23 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
             network: params.network
         });
         console.log(result);
+        if ('error' in result) {
+            console.error("🚨 [callContract] Error al enviar la transacción:", result.error);
+            console.error("🔍 [callContract] Razón del error:", result.reason);
+
+            // Lanzar un error específico para fondos insuficientes
+            if (result.reason === "NotEnoughFunds" || result.error === "transaction rejected") {
+                const error = new Error("NotEnoughFunds");
+                (error as any).reason = result.reason;
+                (error as any).originalError = result.error;
+                throw error;
+            }
+
+            // Para otros errores, lanzar un error genérico
+            const error = new Error(result.error || "Error desconocido en la transacción");
+            (error as any).reason = result.reason;
+            throw error;
+        }
         console.log("🎉 [callContract] Transacción enviada exitosamente!");
         console.log("🆔 [callContract] Transaction ID:", result.txid);
 
@@ -184,9 +201,9 @@ export function createAcademicCertificateArgs(
     console.log("  📖 Course:", course);
     console.log("  📊 Grade:", grade);
     console.log("  👤 Student Wallet:", studentWallet);
-
+    const idStudent = studentId.toString();
     return [
-        stringAsciiCV(studentId),
+        stringAsciiCV(idStudent),
         stringAsciiCV(course),
         stringAsciiCV(grade),
         standardPrincipalCV(studentWallet)
@@ -200,7 +217,7 @@ export async function signAcademicCertificate(
     grade: string,
     studentWallet: string,
     privateKey: string
-): Promise<void> {
+): Promise<{ success: boolean; txid: string; urlTransaction: string }> {
     console.log("🎓 [signAcademicCertificate] === FIRMANDO CERTIFICADO ACADÉMICO ===");
 
     const functionArgs = createAcademicCertificateArgs(studentId, course, grade, studentWallet);
@@ -215,16 +232,19 @@ export async function signAcademicCertificate(
             privateKey: privateKey,
             network: STACKS_TESTNET
         });
-
+        const txid = result.txid;
+        const urlTransaction = `https://explorer.hiro.so/txid/${txid}?chain=testnet`;
         console.log("🏆 [signAcademicCertificate] ¡ÉXITO! Certificado firmado");
         console.log("🔗 [signAcademicCertificate] ID de transacción:", result.txid);
-        console.log("🌐 [signAcademicCertificate] Ver en explorador: https://explorer.hiro.so/txid/" + result.txid + "?chain=testnet");
-
+        console.log("🌐 [signAcademicCertificate] Ver en explorador:", urlTransaction);
+        return { success: true, txid, urlTransaction };
     } catch (error) {
         console.error("💥 [signAcademicCertificate] ¡ERROR! Fallo al firmar certificado:", error);
         if (error instanceof Error) {
             console.error("📝 [signAcademicCertificate] Mensaje de error:", error.message);
         }
+        // Re-lanzar el error para que sea manejado por el componente
+        throw error;
     }
 }
 
