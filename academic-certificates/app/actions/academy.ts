@@ -1,14 +1,18 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 
-export async function getAcademyCredentials(id: string) {
+export async function getAcademyCredentials(id: string): Promise<{
+    stacksAddress: string;
+    privateKey: string;
+}> {
+    console.log(id)
     const supabase = await createClient();
-    console.log("Fetching academy credentials for ID:", id.id);
-    const { data, error } = await supabase
+    console.log("Fetching academy credentials for ID:", id);
+    const { data, error }: { data: any; error: any; } = await supabase
         .from("users")
         .select("private_key,stacks_address ")
         .eq("role", "academy")
-        .eq("id_user", id.id)
+        .eq("id_user", id)
         .maybeSingle();
     console.log(data);
     if (error) {

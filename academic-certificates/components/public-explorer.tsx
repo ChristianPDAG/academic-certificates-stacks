@@ -30,9 +30,18 @@ import {
     type CertificateDetails,
     type SchoolInfo,
 } from "@/lib/stacks-client";
+import { getStudentWallet } from "@/app/actions/academy";
 
 interface Certificate extends CertificateDetails {
     id: number;
+}
+type certificateResultType = {
+    id: number;
+    'school-id': { type: string; value: string };
+    'student-id': { type: string; value: string };
+    course: { type: string; value: string };
+    grade: { type: string; value: string };
+    'student-wallet': { type: string; value: string };
 }
 
 export default function PublicExplorer() {
@@ -43,12 +52,13 @@ export default function PublicExplorer() {
 
     // Estados para búsquedas
     const [certificateId, setCertificateId] = useState("");
+    const [studentEmail, setStudentEmail] = useState("");
     const [studentWallet, setStudentWallet] = useState("");
     const [schoolWallet, setSchoolWallet] = useState("");
 
     // Estados para resultados
-    const [certificateResult, setCertificateResult] = useState<Certificate | null>(null);
-    const [studentCertificates, setStudentCertificates] = useState<Certificate[]>([]);
+    const [certificateResult, setCertificateResult] = useState<certificateResultType | null>(null);
+    const [studentCertificates, setStudentCertificates] = useState<certificateResultType[]>([]);
     const [schoolCertificates, setSchoolCertificates] = useState<Certificate[]>([]);
     const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
 
@@ -56,11 +66,42 @@ export default function PublicExplorer() {
     const [searchingCert, setSearchingCert] = useState(false);
     const [searchingStudent, setSearchingStudent] = useState(false);
     const [searchingSchool, setSearchingSchool] = useState(false);
+    const [loadingWallet, setLoadingWallet] = useState(false);
 
     // Cargar estadísticas generales al inicio
     useEffect(() => {
         loadSystemStats();
     }, []);
+
+    // Debounce para la búsqueda de wallet
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (studentEmail && studentEmail.includes('@') && studentEmail.includes('.')) {
+                fetchStudentWallet(studentEmail);
+            } else if (studentEmail === '') {
+                setStudentWallet("");
+            }
+        }, 500); // Esperar 500ms después de que el usuario deje de escribir
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [studentEmail]);
+
+    const fetchStudentWallet = async (email: string) => {
+        setLoadingWallet(true);
+        try {
+            const result = await getStudentWallet(email);
+            if (result && result.stacks_address) {
+                setStudentWallet(result.stacks_address);
+            } else {
+                setStudentWallet("");
+            }
+        } catch (error) {
+            console.error('Error fetching student wallet:', error);
+            setStudentWallet("");
+        } finally {
+            setLoadingWallet(false);
+        }
+    };
 
     const loadSystemStats = async () => {
         try {
@@ -80,6 +121,8 @@ export default function PublicExplorer() {
         }
     };
 
+
+
     const searchCertificateById = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -95,9 +138,13 @@ export default function PublicExplorer() {
             const result = await getCertificateClient(parseInt(certificateId));
 
             if (result.value) {
+                const data = result.value.value as certificateResultType;
+
+                console.log('Certificate found:', data);
+                const { id: dataId, ...dataRest } = data;
                 setCertificateResult({
-                    id: parseInt(certificateId),
-                    ...result.value
+                    id: typeof dataId === 'number' ? dataId : parseInt(certificateId),
+                    ...dataRest
                 });
             } else {
                 alert('Certificado no encontrado');
@@ -110,11 +157,15 @@ export default function PublicExplorer() {
         }
     };
 
+    const handleEmailChange = async (email: string) => {
+        setStudentEmail(email);
+    };
+
     const searchStudentCertificates = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!studentWallet.trim()) {
-            alert('Por favor ingresa una dirección de estudiante');
+            alert('Por favor ingresa un email válido para obtener la dirección del estudiante');
             return;
         }
 
@@ -123,16 +174,24 @@ export default function PublicExplorer() {
             setStudentCertificates([]);
 
             const result = await getStudentCertificatesClient(studentWallet);
+            const data = result.value.value['certificate-ids'].value as Record<string, any>;
+            console.log(data);
+            if (result.value && result.value.value['certificate-ids']) {
+                //const certIds = result.value['certificate-ids'];
+                const rawCertIds = result.value.value['certificate-ids'].value;
+                console.log('Raw cert IDs:', rawCertIds);
 
-            if (result.value && result.value['certificate-ids']) {
-                const certIds = result.value['certificate-ids'];
+                // Extraer solo los valores numéricos
+                const certIds = rawCertIds.map((item: any) => parseInt(item.value));
+                console.log('Parsed cert IDs:', certIds);
 
                 // Obtener detalles de cada certificado
                 const certificatePromises = certIds.map(async (id: number) => {
                     const certDetails = await getCertificateClient(id);
+                    const certData = certDetails.value.value as Record<string, any>;
                     return {
                         id,
-                        ...certDetails.value
+                        ...certData
                     };
                 });
 
@@ -165,6 +224,7 @@ export default function PublicExplorer() {
                 getSchoolInfoClient(schoolWallet),
                 getSchoolCertificatesClient(schoolWallet)
             ]);
+            console.log('School Info Result:', schoolInfoResult);
 
             if (schoolInfoResult?.value) {
                 setSchoolInfo(schoolInfoResult.value);
@@ -193,54 +253,61 @@ export default function PublicExplorer() {
         }
     };
 
-    const CertificateCard = ({ certificate }: { certificate: Certificate }) => (
-        <Card className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border-2 border-neutral-200 dark:border-neutral-700 hover:border-[#00A1FF]/50 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                        <CardTitle className="text-lg text-neutral-900 dark:text-white mb-2">
-                            {certificate.course}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1 text-neutral-600 dark:text-neutral-400">
-                            <GraduationCap className="h-4 w-4" />
-                            Estudiante: {certificate['student-id']}
-                        </CardDescription>
-                    </div>
-                    <Badge className="bg-[#00A1FF] text-white hover:bg-[#0081CC]">
-                        #{certificate.id}
-                    </Badge>
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 rounded-xl border border-green-200 dark:border-green-900/50">
-                    <span className="text-sm font-semibold text-green-800 dark:text-green-200">Calificación:</span>
-                    <span className="font-bold text-green-600 dark:text-green-400 text-2xl">
-                        {certificate.grade}
-                    </span>
-                </div>
+    const CertificateCard = ({ certificate }: { certificate: Certificate | certificateResultType }) => {
+        const getVal = (v: any) => {
+            if (v === null || v === undefined) return "";
+            return (typeof v === "object" && "value" in v) ? v.value : v;
+        };
 
-                <div className="space-y-3">
-                    <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
-                        <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 block mb-2">
-                            Academia:
+        return (
+            <Card className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border-2 border-neutral-200 dark:border-neutral-700 hover:border-[#00A1FF]/50 hover:shadow-xl transition-all duration-300">
+                <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <CardTitle className="text-lg text-neutral-900 dark:text-white mb-2">
+                                {getVal(certificate?.course)}
+                            </CardTitle>
+                            <CardDescription className="flex items-center gap-2 mt-1 text-neutral-600 dark:text-neutral-400">
+                                <GraduationCap className="h-4 w-4" />
+                                Estudiante: {getVal(certificate?.['student-id'])}
+                            </CardDescription>
+                        </div>
+                        <Badge className="bg-[#00A1FF] text-white hover:bg-[#0081CC]">
+                            #{certificate.id}
+                        </Badge>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 rounded-xl border border-green-200 dark:border-green-900/50">
+                        <span className="text-sm font-semibold text-green-800 dark:text-green-200">Calificación:</span>
+                        <span className="font-bold text-green-600 dark:text-green-400 text-2xl">
+                            {getVal(certificate?.grade)}
                         </span>
-                        <p className="text-xs font-mono bg-white dark:bg-neutral-900 p-2 rounded-lg break-all text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700">
-                            {certificate['school-id']}
-                        </p>
                     </div>
 
-                    <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
-                        <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 block mb-2">
-                            Estudiante:
-                        </span>
-                        <p className="text-xs font-mono bg-white dark:bg-neutral-900 p-2 rounded-lg break-all text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700">
-                            {certificate['student-wallet']}
-                        </p>
+                    <div className="space-y-3">
+                        <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 block mb-2">
+                                Academia:
+                            </span>
+                            <p className="text-xs font-mono bg-white dark:bg-neutral-900 p-2 rounded-lg break-all text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700">
+                                {getVal(certificate?.['school-id'])}
+                            </p>
+                        </div>
+
+                        <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 block mb-2">
+                                Estudiante:
+                            </span>
+                            <p className="text-xs font-mono bg-white dark:bg-neutral-900 p-2 rounded-lg break-all text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-700">
+                                {getVal(certificate?.['student-wallet'])}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
-    );
+                </CardContent>
+            </Card>
+        );
+    };
 
     return (
         <main className="relative flex bg-white dark:bg-black-100 justify-center items-center flex-col overflow-hidden mx-auto min-h-screen">
@@ -360,9 +427,9 @@ export default function PublicExplorer() {
                                         className="mt-2 bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-700 focus:border-[#00A1FF] focus:ring-4 focus:ring-[#00A1FF]/20 text-neutral-900 dark:text-neutral-100"
                                     />
                                 </div>
-                                <Button 
-                                    type="submit" 
-                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300" 
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                                     disabled={searchingCert}
                                 >
                                     {searchingCert ? (
@@ -404,21 +471,51 @@ export default function PublicExplorer() {
                         <CardContent>
                             <form onSubmit={searchStudentCertificates} className="space-y-4">
                                 <div>
-                                    <Label htmlFor="studentAddr" className="text-neutral-800 dark:text-neutral-200 font-semibold">
-                                        Dirección del Estudiante
+                                    <Label htmlFor="studentEmail" className="text-neutral-800 dark:text-neutral-200 font-semibold">
+                                        Email del Estudiante (opcional)
                                     </Label>
                                     <Input
-                                        id="studentAddr"
-                                        placeholder="ST1PQHQKV0..."
-                                        value={studentWallet}
-                                        onChange={(e) => setStudentWallet(e.target.value)}
-                                        className="mt-2 font-mono text-sm bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-700 focus:border-[#00A1FF] focus:ring-4 focus:ring-[#00A1FF]/20 text-neutral-900 dark:text-neutral-100"
+                                        id="studentEmail"
+                                        type="email"
+                                        placeholder="ejemplo@dominio.com"
+                                        value={studentEmail}
+                                        onChange={(e) => handleEmailChange(e.target.value)}
+                                        className="mt-2 bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-700 focus:border-[#00A1FF] focus:ring-4 focus:ring-[#00A1FF]/20 text-neutral-900 dark:text-neutral-100"
                                     />
+
+                                    <Label htmlFor="studentAddr" className="text-neutral-800 dark:text-neutral-200 font-semibold mt-4 block">
+                                        Dirección del Estudiante
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="studentAddr"
+                                            placeholder="ST1PQHQKV0..."
+                                            value={studentWallet}
+                                            onChange={(e) => setStudentWallet(e.target.value)}
+                                            disabled={loadingWallet}
+                                            className="mt-2 font-mono text-sm bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-700 focus:border-[#00A1FF] focus:ring-4 focus:ring-[#00A1FF]/20 text-neutral-900 dark:text-neutral-100 disabled:opacity-50"
+                                        />
+                                        {loadingWallet && (
+                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 mt-1">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00A1FF]"></div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {studentEmail && !loadingWallet && !studentWallet && (
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                            ⚠️ No se encontró un estudiante con este email
+                                        </p>
+                                    )}
+                                    {studentWallet && !loadingWallet && (
+                                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                                            {studentEmail ? "✓ Dirección encontrada" : ''}
+                                        </p>
+                                    )}
                                 </div>
-                                <Button 
-                                    type="submit" 
-                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300" 
-                                    disabled={searchingStudent}
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                    disabled={searchingStudent || loadingWallet || !studentWallet}
                                 >
                                     {searchingStudent ? (
                                         <>
@@ -444,10 +541,12 @@ export default function PublicExplorer() {
                                             <div key={cert.id} className="border-2 border-neutral-200 dark:border-neutral-700 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-800/50 hover:border-[#00A1FF]/50 transition-all">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div>
-                                                        <h5 className="font-semibold text-sm text-neutral-900 dark:text-white">{cert.course}</h5>
+                                                        <h5 className="font-semibold text-sm text-neutral-900 dark:text-white">{cert?.course?.value}</h5>
                                                         <p className="text-xs text-neutral-600 dark:text-neutral-400">#{cert.id}</p>
                                                     </div>
-                                                    <Badge className="bg-[#00A1FF] text-white">{cert.grade}</Badge>
+                                                    <Badge className="bg-[#00A1FF] text-white">
+                                                        {cert?.grade?.value}
+                                                    </Badge>
                                                 </div>
                                             </div>
                                         ))}
@@ -484,9 +583,9 @@ export default function PublicExplorer() {
                                         className="mt-2 font-mono text-sm bg-white dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-700 focus:border-[#00A1FF] focus:ring-4 focus:ring-[#00A1FF]/20 text-neutral-900 dark:text-neutral-100"
                                     />
                                 </div>
-                                <Button 
-                                    type="submit" 
-                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300" 
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-[#00A1FF] to-[#0081CC] hover:from-[#0081CC] hover:to-[#0066A3] text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                                     disabled={searchingSchool}
                                 >
                                     {searchingSchool ? (
@@ -514,7 +613,9 @@ export default function PublicExplorer() {
                                                 variant={schoolInfo.active ? "default" : "secondary"}
                                                 className={schoolInfo.active ? "bg-green-500 text-white hover:bg-green-600" : ""}
                                             >
-                                                {schoolInfo.active ? "✓ Activa" : "✗ Inactiva"}
+                                                ✓ Activa
+
+                                                {/*schoolInfo.active ? "✓ Activa" : "✗ Inactiva"*/}
                                             </Badge>
                                         </div>
                                     )}
@@ -537,7 +638,9 @@ export default function PublicExplorer() {
                                                             <div className="text-right">
                                                                 <Badge variant="outline" className="mb-1">#{cert.id}</Badge>
                                                                 <p className="text-xs text-green-600 dark:text-green-400 font-semibold">
-                                                                    {cert.grade}
+                                                                    {(cert.grade && typeof cert.grade === 'object' && 'value' in cert.grade)
+                                                                        ? (cert.grade as any).value
+                                                                        : cert.grade}
                                                                 </p>
                                                             </div>
                                                         </div>
