@@ -79,7 +79,7 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
 
     try {
         // Obtener la dirección del sender desde la clave privada
-        const senderAddress: string = getAddressFromPrivateKey(params.privateKey);
+        const senderAddress: string = getAddressFromPrivateKey(params.privateKey, params.network);
         console.log("🔑 [callContract] Dirección del sender:", senderAddress);
 
         // Obtener el nonce actual
@@ -127,7 +127,7 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
 }
 
 // Función de conveniencia usando las constantes por defecto
-export async function signContractCall(): Promise<void> {
+export async function signContractCall(stacksAddress: string, privateKey: string,): Promise<void> {
     console.log("🎬 [signContractCall] === INICIANDO PROCESO DE FIRMA Y ENVÍO ===");
     console.log("🏗️ [signContractCall] Preparando argumentos del contrato...");
 
@@ -159,7 +159,8 @@ export async function signContractCall(): Promise<void> {
             "ST2J9KX",
             "Intro to Clarity",
             "A",
-            "ST1HSZWVTBCEQN3MSXVKBS8PABEZ9AH6PX8ZF5RR8"
+            "ST1HSZWVTBCEQN3MSXVKBS8PABEZ9AH6PX8ZF5RR8",
+            privateKey
         );
 
     } catch (error) {
@@ -197,7 +198,8 @@ export async function signAcademicCertificate(
     studentId: string,
     course: string,
     grade: string,
-    studentWallet: string
+    studentWallet: string,
+    privateKey: string
 ): Promise<void> {
     console.log("🎓 [signAcademicCertificate] === FIRMANDO CERTIFICADO ACADÉMICO ===");
 
@@ -210,7 +212,7 @@ export async function signAcademicCertificate(
             contractName: CONTRACT_NAME,
             functionName: FUNCTION_NAME,
             functionArgs: functionArgs,
-            privateKey: PRIVATE_KEY_HEX,
+            privateKey: privateKey,
             network: STACKS_TESTNET
         });
 

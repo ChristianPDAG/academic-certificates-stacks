@@ -50,28 +50,21 @@ async function createWalletFromSeed() {
 }
 
 
-export async function signup(formdata: FormData | { email: string; password: string; role: string }) {
+export async function signup({ id, email, password, role, nombre }: { id: string, email: string, password: string, role: string, nombre: string }) {
     try {
         // Generar wallet de Stacks para el nuevo usuario
         const wallet = await createWalletFromSeed();
 
         const supabase = await createClient();
 
-        const email =
-            typeof formdata === "object" && "get" in formdata
-                ? formdata.get("email") as string
-                : (formdata as { email: string }).email;
-        const role =
-            typeof formdata === "object" && "get" in formdata
-                ? formdata.get("role") as string
-                : (formdata as { role: string }).role;
-
         const { data, error } = await supabase.from('users').insert({
             email,
             role,
             public_key: wallet.publicKey,
             private_key: wallet.privateKey,
-            stacks_address: wallet.address
+            stacks_address: wallet.address,
+            nombre,
+            id_user: id
         });
 
         if (error) {
