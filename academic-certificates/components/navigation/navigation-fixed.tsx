@@ -17,7 +17,8 @@ export function Navigation({ user }: NavigationProps) {
         {
             href: "/",
             label: "Inicio",
-            icon: null
+            icon: null,
+            public: true
         },
         {
             href: "/explorer",
@@ -27,29 +28,52 @@ export function Navigation({ user }: NavigationProps) {
             public: true
         },
         {
+            href: "/validator",
+            label: "Validador",
+            icon: null,
+            description: "Validar certificados",
+            public: true
+        },
+        {
             href: "/academy",
             label: "Academia",
             icon: School,
-            description: "Emitir certificados"
+            description: "Emitir certificados",
+            roles: ["academy", "admin"]
         },
         {
             href: "/student",
             label: "Estudiante",
             icon: Users,
-            description: "Ver mis certificados"
+            description: "Ver mis certificados",
+            roles: ["student", "admin"]
         },
         {
             href: "/admin",
             label: "Admin",
             icon: Settings,
-            description: "Gestionar sistema"
+            description: "Gestionar sistema",
+            roles: ["admin"]
         }
     ];
 
-    // Filtrar elementos según si el usuario está logueado o no
-    const visibleItems = user
-        ? navItems
-        : navItems.filter(item => item.public || item.href === "/" || item.href === "/explorer");
+    // Obtener el rol del usuario
+    const userRole = user?.role;
+
+    // Filtrar elementos según si el usuario está logueado y su rol
+    const visibleItems = navItems.filter(item => {
+        // Mostrar items públicos siempre
+        if (item.public) return true;
+
+        // Si no hay usuario, solo mostrar items públicos
+        if (!user) return false;
+
+        // Si el item no tiene roles definidos, no mostrarlo (ya que no es público)
+        if (!item.roles) return false;
+
+        // Mostrar si el rol del usuario está en la lista de roles permitidos
+        return item.roles.includes(userRole);
+    });
 
     return (
         <nav className="flex items-center gap-2">

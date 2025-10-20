@@ -15,10 +15,11 @@ import { Navigation } from "@/components/navigation/navigation-fixed"; // tu men
 
 type Props = {
   userEmail: string | null;
+  userRole: string | null;
   hasEnvVars: boolean;
 };
 
-export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
+export function FloatingNavClient({ userEmail, userRole, hasEnvVars }: Props) {
   const { scrollYProgress } = useScroll();
   const [visible, setVisible] = useState(true);
 
@@ -31,9 +32,8 @@ export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
 
   return (
     <header
-      className={`container mx-auto max-w-7xl px-4 fixed top-3 inset-x-0 z-40 rounded-lg border border-black/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] bg-white/90 dark:bg-[#111928]/50 transition-all ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none"
-      }`}
+      className={`container mx-auto max-w-7xl px-4 fixed top-3 inset-x-0 z-40 rounded-lg border border-black/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] bg-white/90 dark:bg-[#111928]/50 transition-all ${visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none"
+        }`}
       style={{
         backdropFilter: "blur(8px) saturate(180%)",
         borderRadius: "12px",
@@ -49,26 +49,27 @@ export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
 
         <div className="flex items-center gap-x-2">
           {/* Theme switcher siempre visible */}
-        
+
 
           {/* Bloque auth */}
-          { userEmail ? (
-            // Usuario logeado
-            <div className="hidden lg:flex items-center gap-4">
-              <Navigation user={{ email: userEmail }} />
+          <div className="hidden lg:flex items-center gap-4">
+            <Navigation user={userEmail ? { email: userEmail, role: userRole } : null} />
+
+            {userEmail ? (
+              // Usuario logeado
               <LogoutButton />
-            </div>
-          ) : (
-            // No logeado
-            <div className="hidden lg:flex items-center gap-2">
-              <Button asChild size="sm" variant="outline">
-                <Link href="/auth/login">Sign in</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/auth/sign-up">Sign up</Link>
-              </Button>
-            </div>
-          )}
+            ) : (
+              // No logeado
+              <div className="flex items-center gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/auth/login">Sign in</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/auth/sign-up">Sign up</Link>
+                </Button>
+              </div>
+            )}
+          </div>
 
           {/* Menú móvil */}
           <div className="flex lg:hidden">
@@ -91,32 +92,12 @@ export function FloatingNavClient({ userEmail, hasEnvVars }: Props) {
 
                 <div className="my-1 h-px bg-black/10" />
 
-                {!hasEnvVars ? (
-                  <div className="px-3 py-2">
-                    <EnvVarWarning />
-                  </div>
-                ) : userEmail ? (
-                  <div className="px-3 py-1.5 flex items-center justify-between gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-300 truncate">
-                      {userEmail}
-                    </span>
-                    <LogoutButton />
-                  </div>
-                ) : (
-                  <div className="px-3 py-1.5 flex gap-2">
-                    <Button asChild size="sm" variant="outline" className="w-full">
-                      <Link href="/auth/login">Sign in</Link>
-                    </Button>
-                    <Button asChild size="sm" className="w-full">
-                      <Link href="/auth/sign-up">Sign up</Link>
-                    </Button>
-                  </div>
-                )}
+
               </MenuItems>
             </Menu>
           </div>
 
-            <ThemeSwitcher />
+          <ThemeSwitcher />
         </div>
       </nav>
     </header>

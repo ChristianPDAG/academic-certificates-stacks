@@ -43,16 +43,73 @@ export const metadata: Metadata = {
   },
 };
 
+interface ValidationResult {
+  isValid: boolean;
+  txData?: any;
+  error?: string;
+}
+
 export default function ValidatorComponent() {
   const [certificateId, setCertificateId] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+
+  const EXPECTED_CONTRACT_ID = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV.nft";
 
   const handleValidate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!certificateId.trim()) return;
+
     setIsSearching(true);
-    // TODO: Lógica real de validación
-    setTimeout(() => setIsSearching(false), 1500);
+    setValidationResult(null);
+
+    try {
+      // Consultar la API de Hiro para verificar la transacción
+      const response = await fetch(
+        `https://api.testnet.hiro.so/extended/v1/tx/${certificateId.trim()}`
+      );
+
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        const txData = await response.json();
+        console.log('Transaction data:', txData);
+        console.log('Contract call:', txData.contract_call);
+        console.log('Function name:', txData.contract_call?.function_name);
+        console.log('Contract ID:', txData.contract_call?.contract_id);
+
+        // Validar que sea del contrato correcto
+        const contractId = txData.contract_call?.contract_id;
+        if (contractId !== EXPECTED_CONTRACT_ID) {
+          setValidationResult({
+            isValid: false,
+            error: `Esta transacción no pertenece al contrato de certificados esperado. Contrato encontrado: ${contractId || 'N/A'}`
+          });
+          return;
+        }
+
+        setValidationResult({
+          isValid: true,
+          txData: txData
+        });
+      } else {
+        const errorData = await response.json();
+        console.log('Error data:', errorData);
+
+        setValidationResult({
+          isValid: false,
+          error: 'Certificado no encontrado en la blockchain'
+        });
+      }
+    } catch (error) {
+      console.error('Error validating certificate:', error);
+      setValidationResult({
+        isValid: false,
+        error: 'Error al consultar la blockchain. Por favor, intenta nuevamente.'
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -158,7 +215,96 @@ export default function ValidatorComponent() {
             </button>
           </form>
 
-          {/* Info “Cómo funciona” */}
+          {/* Resultado de la validación */}
+          {validationResult && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className={`mt-6 rounded-xl border p-5 md:p-6 ${validationResult.isValid
+                ? 'bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50'
+                : 'bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50'
+                }`}
+            >
+              {validationResult.isValid ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <IconShieldCheck size={28} className="text-green-600 dark:text-green-400" />
+                    <h3 className="text-lg md:text-xl font-bold text-green-900 dark:text-green-200">
+                      ✓ Certificado Válido
+                    </h3>
+                  </div>
+
+                  <p className="text-sm md:text-base text-green-800 dark:text-green-300 mb-4">
+                    Este certificado existe en la blockchain de Stacks y es auténtico.
+                  </p>
+
+                  {validationResult.txData && (
+                    <div className="space-y-2 text-sm text-green-800 dark:text-green-300 mb-4">
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold">Estado:</span>
+                        <span className="font-mono">{validationResult.txData.tx_status}</span>
+                      </div>
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold">Tipo:</span>
+                        <span className="font-mono">{validationResult.txData.tx_type}</span>
+                      </div>
+                      {validationResult.txData.contract_call?.function_name && (
+                        <div className="flex flex-col md:flex-row md:gap-2">
+                          <span className="font-semibold">Función del Contrato:</span>
+                          <span className="font-mono">{validationResult.txData.contract_call.function_name}</span>
+                        </div>
+                      )}
+                      {validationResult.txData.contract_call?.contract_id && (
+                        <div className="flex flex-col md:flex-row md:gap-2">
+                          <span className="font-semibold">Contrato:</span>
+                          <span className="font-mono text-xs break-all">{validationResult.txData.contract_call.contract_id}</span>
+                        </div>
+                      )}
+                      {validationResult.txData.block_height && (
+                        <div className="flex flex-col md:flex-row md:gap-2">
+                          <span className="font-semibold">Bloque:</span>
+                          <span className="font-mono">{validationResult.txData.block_height}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <a
+                    href={`https://explorer.hiro.so/txid/${certificateId.trim()}?chain=testnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-white font-semibold text-sm md:text-base
+                               bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg
+                               transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    <IconShieldCheck size={20} />
+                    Ver en Blockchain Explorer
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <svg className="w-7 h-7 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h3 className="text-lg md:text-xl font-bold text-red-900 dark:text-red-200">
+                      ✗ Certificado No Válido
+                    </h3>
+                  </div>
+
+                  <p className="text-sm md:text-base text-red-800 dark:text-red-300">
+                    {validationResult.error || 'No se encontró ningún certificado con este ID en la blockchain.'}
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Info "Cómo funciona" */}
           <div className="mt-8 rounded-xl border p-5 md:p-6
                           bg-gradient-to-br from-blue-50/70 to-blue-100/60 border-blue-200
                           dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-800/50">
