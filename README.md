@@ -40,7 +40,7 @@ El código del frontend se encuentra en el directorio `academic-certificates/`.
 * **Instalación**:
     ```bash
     cd academic-certificates
-    npm install # o yarn install / pnpm install
+    pnpm install # o yarn install / npm install
     ```
 * **Variables de Entorno**:
     * Renombra `.env.example` a `.env.local`.
@@ -48,7 +48,7 @@ El código del frontend se encuentra en el directorio `academic-certificates/`.
     * Configura las variables del contrato de Stacks (`NEXT_PUBLIC_CONTRACT_ADDRESS`, `NEXT_PUBLIC_CONTRACT_NAME`, `NEXT_PUBLIC_NETWORK`) con los detalles de tu despliegue.
 * **Ejecución**:
     ```bash
-    npm run dev # o yarn dev / pnpm dev
+    pnpm run dev # o yarn dev / npm dev
     ```
     La aplicación estará disponible en `http://localhost:3000`.
 
