@@ -1,5 +1,5 @@
 "use server";
-import { createHash, randomBytes } from "crypto";
+import { createHash } from "crypto";
 import { createClient } from '@/lib/supabase/server';
 
 export async function hashPasswordDeterministic(password: string) {
@@ -50,14 +50,14 @@ async function createWalletFromSeed() {
 }
 
 
-export async function signup({ id, email, password, role, nombre }: { id: string, email: string, password: string, role: string, nombre: string }) {
+export async function signup({ id, email, role, nombre }: { id: string, email: string, role: string, nombre: string }) {
     try {
         // Generar wallet de Stacks para el nuevo usuario
         const wallet = await createWalletFromSeed();
 
         const supabase = await createClient();
 
-        const { data, error } = await supabase.from('users').insert({
+        const { error } = await supabase.from('users').insert({
             email,
             role,
             public_key: wallet.publicKey,

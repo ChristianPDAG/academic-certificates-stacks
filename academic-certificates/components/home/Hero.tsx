@@ -1,20 +1,11 @@
 "use client";
 
-import { useState } from "react";
 
 import { motion } from "framer-motion";
 import { slideInFromBottom, slideInFromLeft } from "@/utils/motion";
 
 const Hero = () => {
-  let [isOpen, setIsOpen] = useState(false);
 
-  function open() {
-    setIsOpen(true);
-  }
-
-  function close() {
-    setIsOpen(false);
-  }
 
   return (
     <div className="min-h-screen relative w-full">

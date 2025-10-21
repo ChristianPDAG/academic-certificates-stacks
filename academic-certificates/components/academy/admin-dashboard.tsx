@@ -24,14 +24,12 @@ import {
 } from "@/components/ui/dialog";
 import {
     School,
-    Users,
     Award,
     Plus,
     Settings,
     UserCheck,
     AlertCircle,
     CheckCircle,
-    XCircle,
     Mail,
     Link as LinkIcon,
     Calendar
@@ -42,8 +40,6 @@ import {
     deactivateSchoolClient,
     changeSuperAdminClient,
     getSchoolInfoClient,
-    getSuperAdminClient,
-    getTotalCertificatesClient,
     getSystemStatsClient,
     transferSTXClient,
     getAddressBalanceClient,
@@ -52,9 +48,6 @@ import {
 } from "@/lib/stacks-client";
 import { getAcademyUsers } from "@/app/actions/admin";
 
-interface AdminDashboardProps {
-    userClaims: any;
-}
 
 interface SchoolData extends SchoolInfo {
     principal: string;
@@ -68,10 +61,9 @@ interface AcademyUser {
     created_at: string;
 }
 
-export function AdminDashboard({ userClaims }: AdminDashboardProps) {
-    const { userAddress, isSignedIn } = useStacks();
+export function AdminDashboard() {
+    const { userAddress } = useStacks();
     const [stats, setStats] = useState<AdminStats | null>(null);
-    const [schools, setSchools] = useState<SchoolData[]>([]);
     const [loading, setLoading] = useState(true);
     const [newSchoolPrincipal, setNewSchoolPrincipal] = useState("");
     const [newSchoolName, setNewSchoolName] = useState("");

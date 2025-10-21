@@ -23,7 +23,6 @@ import {
   Shield,
   BookOpen,
   Hash,
-  Eye,
 } from "lucide-react";
 import {
   getCertificateClient,
@@ -349,7 +348,7 @@ export default function PublicExplorer() {
           viewport={{ once: true, amount: 0.4 }}
           variants={slideInFromBottom({ delay: 0.1 })}
         >
-         
+
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
             Explorador{" "}
             <span className="text-sky-500 dark:text-sky-400">Público</span>

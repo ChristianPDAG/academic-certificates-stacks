@@ -35,7 +35,6 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
 
     useEffect(() => {
         loadStudentData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user.email]);
 
     const loadStudentData = async () => {

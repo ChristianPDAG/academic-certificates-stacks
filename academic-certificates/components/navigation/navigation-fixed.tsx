@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
-import { School, Users, Settings, Eye } from "lucide-react";
+import { School, Users, Settings } from "lucide-react";
 
 interface NavigationProps {
     user?: any;
@@ -12,7 +11,6 @@ interface NavigationProps {
 
 export function Navigation({ user, className }: NavigationProps & { className?: string }) {
     const pathname = usePathname();
-    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 1024 : false;
 
     const navItems = [
         {
@@ -85,14 +83,13 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
                 {visibleItems.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                     const Icon = item.icon;
-                    
+
                     return (
-                        <Link 
-                            key={item.href} 
-                            href={item.href} 
-                            className={`flex items-center gap-2 px-2 py-1.5 text-sm/6 rounded ${
-                                isActive ? "bg-black/5 dark:bg-white/10" : "hover:bg-black/5 dark:hover:bg-white/10"
-                            }`}
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center gap-2 px-2 py-1.5 text-sm/6 rounded ${isActive ? "bg-black/5 dark:bg-white/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+                                }`}
                         >
                             {Icon && <Icon className="h-4 w-4" />}
                             {item.label}

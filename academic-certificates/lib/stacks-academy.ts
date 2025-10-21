@@ -12,17 +12,10 @@ import {
 
 // *** ADVERTENCIA: Esta clave privada debe estar en un entorno seguro (server-side) ***
 // ⚠️ En producción, mover esto al servidor y usar API routes
-const PRIVATE_KEY_HEX: string = process.env.NEXT_PUBLIC_PRIVATE_KEY_HEX || "no-hay-usuario";
 const CONTRACT_ADDRESS: string = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "sin-contrato";
 const CONTRACT_NAME: string = process.env.NEXT_PUBLIC_CONTRACT_NAME || "nft";
 const FUNCTION_NAME: string = process.env.NEXT_PUBLIC_CERTIFICATE_FUNCTION_NAME || "sin-funcion";
 
-// Log de debugging para verificar las variables
-console.log("🔧 [Config] Variables de entorno cargadas:");
-console.log("  📍 CONTRACT_ADDRESS:", CONTRACT_ADDRESS);
-console.log("  📜 CONTRACT_NAME:", CONTRACT_NAME);
-console.log("  🔧 FUNCTION_NAME:", FUNCTION_NAME);
-console.log("  🔑 PRIVATE_KEY_HEX:", PRIVATE_KEY_HEX ? "✅ Cargada" : "❌ No encontrada");
 
 // Interfaces para mejorar el tipado
 interface ContractCallParams {
@@ -40,7 +33,7 @@ interface AccountInfo {
 }
 
 // Función auxiliar para obtener el nonce de una cuenta
-async function getAccountNonce(address: string, network: StacksNetwork): Promise<number> {
+async function getAccountNonce(address: string): Promise<number> {
     console.log("🔍 [getAccountNonce] Iniciando obtención de nonce para:", address);
 
     try {
@@ -84,7 +77,7 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
 
         // Obtener el nonce actual
         console.log("🔄 [callContract] Obteniendo nonce actual...");
-        const nonce: number = await getAccountNonce(senderAddress, params.network);
+        const nonce: number = await getAccountNonce(senderAddress);
         console.log("📝 [callContract] Nonce a usar:", nonce);
 
         // Usar los argumentos que se pasan como parámetros
@@ -123,14 +116,14 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
             // Lanzar un error específico para fondos insuficientes
             if (result.reason === "NotEnoughFunds" || result.error === "transaction rejected") {
                 const error = new Error("NotEnoughFunds");
-                (error as any).reason = result.reason;
-                (error as any).originalError = result.error;
+                (error as any).reason = result.reason; // 
+                (error as any).originalError = result.error; // 
                 throw error;
             }
 
             // Para otros errores, lanzar un error genérico
             const error = new Error(result.error || "Error desconocido en la transacción");
-            (error as any).reason = result.reason;
+            (error as any).reason = result.reason; // 
             throw error;
         }
         console.log("🎉 [callContract] Transacción enviada exitosamente!");
@@ -140,52 +133,6 @@ export async function callContract(params: ContractCallParams): Promise<TxBroadc
     } catch (error) {
         console.error("❌ [callContract] Error en callContract:", error);
         throw error;
-    }
-}
-
-// Función de conveniencia usando las constantes por defecto
-export async function signContractCall(stacksAddress: string, privateKey: string,): Promise<void> {
-    console.log("🎬 [signContractCall] === INICIANDO PROCESO DE FIRMA Y ENVÍO ===");
-    console.log("🏗️ [signContractCall] Preparando argumentos del contrato...");
-
-    // Convertir los argumentos a tipos de Clarity
-    const functionArgs: ClarityValue[] = [
-        stringAsciiCV("ST2J9KX"),                                    // student-id
-        stringAsciiCV("Intro to Clarity"),                           // course
-        stringAsciiCV("A"),                                          // grade
-        standardPrincipalCV("ST1HSZWVTBCEQN3MSXVKBS8PABEZ9AH6PX8ZF5RR8")  // student-wallet
-    ];
-
-    console.log("📦 [signContractCall] Argumentos preparados:", {
-        arg1: "string-ascii 'ST2J9KX'",
-        arg2: "string-ascii 'Intro to Clarity'",
-        arg3: "string-ascii 'A'",
-        arg4: "principal 'ST1HSZWVTBCEQN3MSXVKBS8PABEZ9AH6PX8ZF5RR8'"
-    });
-
-    console.log("🎯 [signContractCall] Configuración del contrato:");
-    console.log("  📍 Dirección:", CONTRACT_ADDRESS);
-    console.log("  📜 Nombre:", CONTRACT_NAME);
-    console.log("  🔧 Función:", FUNCTION_NAME);
-
-    try {
-        console.log("🚀 [signContractCall] Llamando a callContract...");
-
-        // Usar la nueva función de certificado académico con datos de ejemplo
-        await signAcademicCertificate(
-            "ST2J9KX",
-            "Intro to Clarity",
-            "A",
-            "ST1HSZWVTBCEQN3MSXVKBS8PABEZ9AH6PX8ZF5RR8",
-            privateKey
-        );
-
-    } catch (error) {
-        console.error("💥 [signContractCall] ¡ERROR! Fallo en signContractCall:", error);
-        if (error instanceof Error) {
-            console.error("📝 [signContractCall] Mensaje de error:", error.message);
-            console.error("🔍 [signContractCall] Stack trace:", error.stack);
-        }
     }
 }
 
@@ -251,6 +198,3 @@ export async function signAcademicCertificate(
 // Exportar funciones de utilidad
 export { getAccountNonce };
 export { stringAsciiCV, uintCV, standardPrincipalCV };
-
-// Para ejecutar la función (descomentarizar cuando sea necesario)
-// signContractCall();
