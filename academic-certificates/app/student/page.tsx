@@ -9,6 +9,9 @@ export default async function StudentPage() {
   if (error || !data?.claims) {
     redirect("/auth/login");
   }
-
-  return <StudentDashboard user={data.claims} />;
+  const dataUser = {
+    id: data.claims.sub,
+    email: data.claims.email,
+  }
+  return <StudentDashboard user={dataUser} />;
 }
