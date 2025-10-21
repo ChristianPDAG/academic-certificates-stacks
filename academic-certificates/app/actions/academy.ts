@@ -6,16 +6,13 @@ export async function getAcademyCredentials(id: string): Promise<{
     privateKey: string;
     name: string;
 }> {
-    console.log(id)
     const supabase = await createClient();
-    console.log("Fetching academy credentials for ID:", id);
     const { data, error }: { data: any; error: any; } = await supabase
         .from("users")
         .select("private_key,stacks_address, nombre ")
         .eq("role", "academy")
         .eq("id_user", id)
         .maybeSingle();
-    console.log(data);
     if (error) {
         throw new Error(error.message);
     }

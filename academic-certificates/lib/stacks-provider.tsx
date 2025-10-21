@@ -89,7 +89,7 @@ export function useStacks() {
 
 // Hook personalizado para transacciones
 export function useStacksTransaction() {
-    const { userSession, isSignedIn, userAddress } = useStacks();
+    const { isSignedIn, userAddress } = useStacks();
 
     const executeTransaction = async (txOptions: any) => {
         if (!isSignedIn || !userAddress) {

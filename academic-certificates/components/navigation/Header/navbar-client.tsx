@@ -16,10 +16,9 @@ import { Navigation } from "@/components/navigation/navigation-fixed"; // tu men
 type Props = {
   userEmail: string | null;
   userRole: string | null;
-  hasEnvVars: boolean;
 };
 
-export function FloatingNavClient({ userEmail, userRole, hasEnvVars }: Props) {
+export function FloatingNavClient({ userEmail, userRole }: Props) {
   const { scrollYProgress } = useScroll();
   const [visible, setVisible] = useState(true);
 
@@ -91,9 +90,9 @@ export function FloatingNavClient({ userEmail, userRole, hasEnvVars }: Props) {
                 {/* Agregar elementos de navegación en móvil */}
                 <div className="py-1 space-y-1">
                   {/* Mostrar los enlaces de navegación */}
-                  <Navigation 
-                    user={userEmail ? { email: userEmail, role: userRole } : null} 
-                    className="MenuItems" 
+                  <Navigation
+                    user={userEmail ? { email: userEmail, role: userRole } : null}
+                    className="MenuItems"
                   />
                 </div>
 

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon, School } from "lucide-react";
 import { AcademyContent } from "@/components/academy/academy-content";
 
 export default async function AcademyPage() {

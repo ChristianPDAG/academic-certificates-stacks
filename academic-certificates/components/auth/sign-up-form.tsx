@@ -65,7 +65,7 @@ export function SignUpForm({
         throw new Error("Sign up failed: no user returned");
       }
 
-      await signup({ id: data.user.id, email, password, role, nombre: name });
+      await signup({ id: data.user.id, email, role, nombre: name });
 
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { AdminContent } from "@/components/academy/admin-content";
 
 export default async function AdminPage() {
@@ -27,7 +27,7 @@ export default async function AdminPage() {
       </div>
 
       {/* Main Content with Wallet Integration */}
-      <AdminContent userClaims={data.claims} />
+      <AdminContent />
     </main>
   );
 }

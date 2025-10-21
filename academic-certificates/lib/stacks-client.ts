@@ -7,17 +7,12 @@ import {
     stringAsciiCV,
     principalCV,
     uintCV,
-    cvToJSON,
     cvToValue,
     fetchCallReadOnlyFunction,
 } from '@stacks/transactions';
 import { STACKS_TESTNET, STACKS_MAINNET } from '@stacks/network';
 
-// Configuración del contrato - DEBES CAMBIAR ESTOS VALORES
-// Para obtener estos valores:
-// 1. Despliega el contrato nft.clar usando Clarinet o Hiro Platform
-// 2. Usa la dirección donde se desplegó el contrato
-// 3. Asegúrate de usar la red correcta (testnet/mainnet)
+
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV";
 const CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME || "nft";
@@ -356,7 +351,6 @@ export async function transferSTXClient(
     amountSTX: number
 ): Promise<any> {
     try {
-        const { makeSTXTokenTransfer } = await import('@stacks/transactions');
         const { openSTXTransfer } = await import('@stacks/connect');
 
         // Convertir STX a microSTX (1 STX = 1,000,000 microSTX)
