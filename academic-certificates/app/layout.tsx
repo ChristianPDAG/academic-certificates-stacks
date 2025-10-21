@@ -2,6 +2,7 @@ import Footer from "@/components/navigation/Footer";
 import FloatingNav from "@/components/navigation/Header";
 import { Providers } from "./providers";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 export default function RootLayout({
   children,
@@ -17,6 +18,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
