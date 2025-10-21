@@ -38,13 +38,10 @@ async function createWalletFromSeed() {
 
     // Get the first account's address
     const account = wallet.accounts[0];
-    console.log(account)
     //console.log('Address:', account.address);
-    console.log('Private key:', account.stxPrivateKey);
     const result = logAddressesFromPrivateKey(account.stxPrivateKey);
     return {
         privateKey: account.stxPrivateKey,
-        publicKey: account.stxPublicKey,
         address: result.testnetAddress
     };
 }
@@ -60,7 +57,6 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
         const { error } = await supabase.from('users').insert({
             email,
             role,
-            public_key: wallet.publicKey,
             private_key: wallet.privateKey,
             stacks_address: wallet.address,
             nombre,
@@ -76,7 +72,6 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
             success: true,
             wallet: {
                 address: wallet.address,
-                publicKey: wallet.publicKey
                 // Note: No enviamos la private key al cliente por seguridad
             }
         };
