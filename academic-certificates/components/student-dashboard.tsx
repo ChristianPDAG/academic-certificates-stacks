@@ -1,405 +1,242 @@
 "use client";
 
+import React from "react";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Award, GraduationCap, Loader2, AlertCircle } from "lucide-react";
+import { getStudentWallet } from "@/app/actions/academy";
 import {
-    Award,
-    Users,
-    BookOpen,
-    Search,
-    ExternalLink,
-    Wallet,
-    AlertCircle,
-    CheckCircle,
-    GraduationCap,
-    Eye
-} from "lucide-react";
-import {
-    getStudentCertificatesClient,
     getCertificateClient,
-    type CertificatesList,
-    type CertificateDetails,
+    getStudentCertificatesClient,
 } from "@/lib/stacks-client";
-import { createClient } from "@/lib/supabase/client";
-
-interface StudentCertificate extends CertificateDetails {
-    id: number;
-}
 
 interface StudentDashboardProps {
-    user: any;
+    user: {
+        id: string;
+        email: string;
+    };
+}
+
+interface CertificateResultType {
+    id: number;
+    "school-id": { type: string; value: string };
+    "student-id": { type: string; value: string };
+    course: { type: string; value: string };
+    grade: { type: string; value: string };
+    "student-wallet": { type: string; value: string };
 }
 
 export default function StudentDashboard({ user }: StudentDashboardProps) {
-    const [certificates, setCertificates] = useState<StudentCertificate[]>([]);
+    const [certificates, setCertificates] = useState<CertificateResultType[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchAddress, setSearchAddress] = useState("");
-    const [userStacksAddress, setUserStacksAddress] = useState<string | null>(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [searchedCertificates, setSearchedCertificates] = useState<StudentCertificate[]>([]);
+    const [stacksAddress, setStacksAddress] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
-    // Load user's stacks address from profile
     useEffect(() => {
-        loadUserProfile();
-    }, []);
+        loadStudentData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user.email]);
 
-    const loadUserProfile = async () => {
-        try {
-            const supabase = createClient();
-
-            // Intentar obtener el stacks_address del perfil del usuario
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('stacks_address')
-                .eq('id', user.id)
-                .single();
-
-            if (profile?.stacks_address) {
-                setUserStacksAddress(profile.stacks_address);
-                loadCertificatesForAddress(profile.stacks_address);
-            } else {
-                setLoading(false);
-            }
-        } catch (error) {
-            console.error('Error loading user profile:', error);
-            setLoading(false);
-        }
-    };
-
-    const loadCertificatesForAddress = async (address: string) => {
+    const loadStudentData = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            // Get student certificates
-            const certificatesData = await getStudentCertificatesClient(address);
+            const studentData = await getStudentWallet(user.email);
 
-            if (certificatesData && certificatesData.value && certificatesData.value['certificate-ids']) {
-                const certIds = certificatesData.value['certificate-ids'];
+            if (!studentData?.stacks_address) {
+                setError("No se encontró una dirección de Stacks asociada a tu cuenta");
+                setLoading(false);
+                return;
+            }
 
-                // Get details for each certificate
-                const certificatePromises = certIds.map(async (id: number) => {
-                    const certDetails = await getCertificateClient(id);
-                    return {
-                        id,
-                        ...certDetails.value
-                    };
-                });
+            setStacksAddress(studentData.stacks_address);
 
-                const certificates = await Promise.all(certificatePromises);
-                setCertificates(certificates.filter((cert: any) => cert.course)); // Filter out null results
+            const result = await getStudentCertificatesClient(studentData.stacks_address);
+
+            if (result.value && result.value.value?.["certificate-ids"]) {
+                const rawIds = result.value.value["certificate-ids"].value;
+                const certIds = rawIds.map((i: any) => parseInt(i.value, 10));
+
+                const certificateDetails = await Promise.all(
+                    certIds.map(async (id: number) => {
+                        const certDetails = await getCertificateClient(id);
+                        const certData = certDetails.value.value as Record<string, any>;
+                        return { id, ...certData };
+                    })
+                );
+
+                setCertificates(certificateDetails.filter((c: any) => c.course));
             } else {
                 setCertificates([]);
             }
-        } catch (error) {
-            console.error('Error loading certificates:', error);
-            setError(error instanceof Error ? error.message : 'Error al cargar certificados');
-            setCertificates([]);
+        } catch (err) {
+            console.error("Error loading student data:", err);
+            setError(err instanceof Error ? err.message : "Error al cargar los datos del estudiante");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSearchCertificates = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const getVal = (v: any): string =>
+        v && typeof v === "object" && "value" in v ? v.value : v ?? "";
 
-        if (!searchAddress.trim()) {
-            alert('Por favor ingresa una dirección de Stacks');
-            return;
-        }
-
-        try {
-            setIsSearching(true);
-            setError(null);
-
-            // Get student certificates for searched address
-            const certificatesData = await getStudentCertificatesClient(searchAddress);
-
-            if (certificatesData && certificatesData.value && certificatesData.value['certificate-ids']) {
-                const certIds = certificatesData.value['certificate-ids'];
-
-                // Get details for each certificate
-                const certificatePromises = certIds.map(async (id: number) => {
-                    const certDetails = await getCertificateClient(id);
-                    return {
-                        id,
-                        ...certDetails.value
-                    };
-                });
-
-                const certificates = await Promise.all(certificatePromises);
-                setSearchedCertificates(certificates.filter((cert: any) => cert.course));
-            } else {
-                setSearchedCertificates([]);
-            }
-        } catch (error) {
-            console.error('Error searching certificates:', error);
-            setError(error instanceof Error ? error.message : 'Error al buscar certificados');
-            setSearchedCertificates([]);
-        } finally {
-            setIsSearching(false);
-        }
-    };
-
-    const saveStacksAddress = async () => {
-        if (!searchAddress.trim()) {
-            alert('Por favor ingresa una dirección válida');
-            return;
-        }
-
-        try {
-            const supabase = createClient();
-
-            const { error } = await supabase
-                .from('profiles')
-                .upsert({
-                    id: user.id,
-                    stacks_address: searchAddress,
-                    updated_at: new Date().toISOString()
-                });
-
-            if (error) throw error;
-
-            setUserStacksAddress(searchAddress);
-            setCertificates(searchedCertificates);
-            alert('Dirección de Stacks guardada exitosamente!');
-        } catch (error) {
-            console.error('Error saving stacks address:', error);
-            alert('Error al guardar la dirección de Stacks');
-        }
-    };
-
-    const CertificateCard = ({ certificate }: { certificate: StudentCertificate }) => (
-        <Card className="hover:shadow-lg transition-shadow">
+    const CertificateCard = ({ certificate }: { certificate: CertificateResultType }) => (
+        <Card
+            className="rounded-2xl border backdrop-blur-xl transition-all duration-300
+                       bg-white/80 border-neutral-200 hover:border-sky-500/50 hover:shadow-xl
+                       dark:bg-neutral-900/70 dark:border-neutral-800 dark:hover:border-sky-500/60"
+        >
             <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle className="text-lg">{certificate.course}</CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1">
-                            <GraduationCap className="h-4 w-4" />
-                            ID: {certificate['student-id']}
+                <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1">
+                        <CardTitle className="text-lg mb-1">
+                            {getVal(certificate.course)}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2">
+                            <GraduationCap className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                            ID: {getVal(certificate["student-id"])}
                         </CardDescription>
                     </div>
-                    <Badge variant="secondary">
+                    <Badge className="bg-sky-500 text-white hover:bg-sky-600">
                         #{certificate.id}
                     </Badge>
                 </div>
             </CardHeader>
-            <CardContent>
-                <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Calificación:</span>
-                        <span className="font-semibold text-green-600 text-lg">
-                            {certificate.grade}
-                        </span>
-                    </div>
+            <CardContent className="space-y-4">
+                <div
+                    className="flex justify-between items-center p-3 rounded-xl border
+                              bg-gradient-to-br from-green-50 to-green-100 border-green-200
+                              dark:from-green-950/50 dark:to-green-900/30 dark:border-green-900/50"
+                >
+                    <span className="text-sm font-semibold text-green-800 dark:text-green-200">
+                        Calificación:
+                    </span>
+                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {getVal(certificate.grade)}
+                    </span>
+                </div>
 
-                    <div className="space-y-1">
-                        <span className="text-sm text-gray-600">Emitido por:</span>
-                        <p className="text-xs font-mono bg-gray-100 p-2 rounded break-all">
-                            {certificate['school-id']}
+                <div className="grid gap-3">
+                    <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
+                        <span className="text-sm font-semibold block mb-2">Academia</span>
+                        <p
+                            className="text-xs font-mono rounded-lg p-2 break-all border
+                                      bg-white border-neutral-200 text-neutral-900
+                                      dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100"
+                        >
+                            {getVal(certificate["school-id"])}
                         </p>
                     </div>
-
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                            // Aquí se podría abrir un modal con más detalles o link al explorador de blockchain
-                            window.open(`https://explorer.stacks.co/txid/${certificate.id}?chain=testnet`, '_blank');
-                        }}
-                    >
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Ver en Blockchain
-                    </Button>
                 </div>
             </CardContent>
         </Card>
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-            <div className="container mx-auto p-6">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <GraduationCap className="h-8 w-8 text-green-600" />
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">
-                                Panel de Estudiante
-                            </h1>
-                            <p className="text-gray-600">Consulta y verifica tus certificados académicos</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            <Users className="h-3 w-3 mr-1" />
-                            {user.email}
-                        </Badge>
-                        {userStacksAddress && (
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                <Wallet className="h-3 w-3 mr-1" />
-                                Wallet conectada
-                            </Badge>
-                        )}
+        <div className="flex-1 w-full flex flex-col gap-6 mt-20">
+            <div className="rounded-2xl border backdrop-blur-xl p-6
+                          bg-white/80 border-neutral-200
+                          dark:bg-neutral-900/70 dark:border-neutral-800">
+                <div className="flex items-center gap-3 mb-2">
+                    <GraduationCap className="h-8 w-8 text-sky-500 dark:text-sky-400" />
+                    <div>
+                        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                            ¡Bienvenido, {user.email.split("@")[0]}!
+                        </h1>
+                        <p className="text-neutral-600 dark:text-neutral-400">
+                            Aquí puedes consultar tus certificados académicos
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                {/* Search Section */}
-                <Card className="mb-8">
+            {stacksAddress && (
+                <Card className="rounded-2xl border backdrop-blur-xl
+                               bg-white/80 border-neutral-200
+                               dark:bg-neutral-900/70 dark:border-neutral-800">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Search className="h-5 w-5" />
-                            Buscar Certificados
-                        </CardTitle>
-                        <CardDescription>
-                            {!userStacksAddress
-                                ? "Ingresa tu dirección de Stacks para ver tus certificados"
-                                : "Busca certificados por dirección de Stacks"
-                            }
-                        </CardDescription>
+                        <CardTitle className="text-base">Tu dirección de Stacks</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSearchCertificates} className="space-y-4">
-                            <div>
-                                <Label htmlFor="stacksAddress">Dirección de Stacks</Label>
-                                <Input
-                                    id="stacksAddress"
-                                    placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
-                                    value={searchAddress}
-                                    onChange={(e) => setSearchAddress(e.target.value)}
-                                    className="font-mono text-sm"
-                                />
-                            </div>
-
-                            <div className="flex gap-2">
-                                <Button
-                                    type="submit"
-                                    disabled={isSearching}
-                                    className="flex-1"
-                                >
-                                    {isSearching ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                            Buscando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Search className="h-4 w-4 mr-2" />
-                                            Buscar Certificados
-                                        </>
-                                    )}
-                                </Button>
-
-                                {!userStacksAddress && searchedCertificates.length > 0 && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={saveStacksAddress}
-                                    >
-                                        Guardar como mi dirección
-                                    </Button>
-                                )}
-                            </div>
-                        </form>
-
-                        {error && (
-                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4 text-red-600" />
-                                <p className="text-red-700 text-sm">{error}</p>
-                            </div>
-                        )}
+                        <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
+                            <p className="text-sm font-mono rounded-lg p-2 break-all border
+                                        bg-white border-neutral-200 text-neutral-900
+                                        dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
+                                {stacksAddress}
+                            </p>
+                        </div>
                     </CardContent>
                 </Card>
+            )}
 
-                {/* My Certificates Section */}
-                {userStacksAddress && (
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <Award className="h-6 w-6 text-green-600" />
-                            Mis Certificados
-                            {certificates.length > 0 && (
-                                <Badge variant="secondary">{certificates.length}</Badge>
-                            )}
-                        </h2>
+            <div>
+                <div className="flex items-center gap-2 mb-6">
+                    <Award className="h-6 w-6 text-sky-500 dark:text-sky-400" />
+                    <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                        Mis Certificados
+                    </h2>
+                    {certificates.length > 0 && (
+                        <Badge className="bg-sky-500 text-white">
+                            {certificates.length}
+                        </Badge>
+                    )}
+                </div>
 
-                        {loading ? (
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="text-center">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-                                        <p className="text-gray-600">Cargando tus certificados...</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : certificates.length === 0 ? (
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <div className="text-center py-8 text-gray-500">
-                                        <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                        <p className="mb-2">No tienes certificados aún</p>
-                                        <p className="text-sm">Los certificados emitidos a tu dirección aparecerán aquí</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {certificates.map((certificate) => (
-                                    <CertificateCard
-                                        key={certificate.id}
-                                        certificate={certificate}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Search Results Section */}
-                {searchedCertificates.length > 0 && (
-                    <div>
-                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <Eye className="h-6 w-6 text-blue-600" />
-                            Resultados de Búsqueda
-                            <Badge variant="secondary">{searchedCertificates.length}</Badge>
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {searchedCertificates.map((certificate) => (
-                                <CertificateCard
-                                    key={certificate.id}
-                                    certificate={certificate}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Help Section */}
-                {!userStacksAddress && searchedCertificates.length === 0 && !loading && (
-                    <Card className="bg-blue-50 border-blue-200">
+                {loading ? (
+                    <Card className="rounded-2xl border backdrop-blur-xl
+                                   bg-white/80 border-neutral-200
+                                   dark:bg-neutral-900/70 dark:border-neutral-800">
                         <CardContent className="pt-6">
-                            <div className="flex items-start gap-3">
-                                <BookOpen className="h-6 w-6 text-blue-600 mt-1" />
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 className="h-12 w-12 animate-spin text-sky-500 dark:text-sky-400 mb-4" />
+                                <p className="text-neutral-600 dark:text-neutral-400">
+                                    Cargando tus certificados...
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : error ? (
+                    <Card className="rounded-2xl border backdrop-blur-xl
+                                   bg-red-50/80 border-red-200
+                                   dark:bg-red-950/30 dark:border-red-900">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                                 <div>
-                                    <h3 className="font-semibold text-blue-900 mb-2">¿Cómo encontrar mi dirección de Stacks?</h3>
-                                    <div className="text-sm text-blue-800 space-y-2">
-                                        <p>• Si tienes Stacks Wallet, tu dirección está en la pantalla principal</p>
-                                        <p>• Si no tienes wallet, pregunta a tu academia por tu dirección</p>
-                                        <p>• Los certificados se almacenan automáticamente en tu dirección cuando son emitidos</p>
-                                        <p>• Puedes usar cualquier dirección válida de Stacks para buscar certificados públicos</p>
-                                    </div>
+                                    <p className="font-semibold text-red-900 dark:text-red-200">
+                                        Error al cargar certificados
+                                    </p>
+                                    <p className="text-sm text-red-700 dark:text-red-300">
+                                        {error}
+                                    </p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
+                ) : certificates.length === 0 ? (
+                    <Card className="rounded-2xl border backdrop-blur-xl
+                                   bg-white/80 border-neutral-200
+                                   dark:bg-neutral-900/70 dark:border-neutral-800">
+                        <CardContent className="pt-6">
+                            <div className="flex flex-col items-center justify-center py-12 text-neutral-500 dark:text-neutral-400">
+                                <Award className="h-16 w-16 mb-4 opacity-50" />
+                                <p className="text-lg font-semibold mb-2">
+                                    No tienes certificados aún
+                                </p>
+                                <p className="text-sm text-center max-w-md">
+                                    Los certificados emitidos a tu dirección aparecerán aquí
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {certificates.map((certificate) => (
+                            <CertificateCard key={certificate.id} certificate={certificate} />
+                        ))}
+                    </div>
                 )}
             </div>
         </div>

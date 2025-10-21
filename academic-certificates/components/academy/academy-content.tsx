@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
 import { signAcademicCertificate } from "@/lib/stacks-academy";
@@ -23,6 +23,7 @@ import {
   Star,
   AlertTriangle,
   Loader2,
+  School,
 } from "lucide-react";
 
 type TransactionStatus = "idle" | "loading" | "success" | "error" | "insufficient-funds";
@@ -32,6 +33,11 @@ interface AcademyContentProps {
 }
 
 export function AcademyContent({ id }: AcademyContentProps) {
+  // ─── Academy state ───────────────────────────────────────────────────
+  const [academyStacksAddress, setAcademyStacksAddress] = useState<string>("");
+  const [academyName, setAcademyName] = useState<string>("");
+  const [isLoadingAcademy, setIsLoadingAcademy] = useState(true);
+
   // ─── Form state ──────────────────────────────────────────────────────
   const [studentEmail, setStudentEmail] = useState("");
   const [studentId, setStudentId] = useState("");
@@ -45,6 +51,24 @@ export function AcademyContent({ id }: AcademyContentProps) {
   const [urlTransaction, setUrlTransaction] = useState("");
   const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // ─── Load academy credentials ────────────────────────────────────────
+  useEffect(() => {
+    const loadAcademyData = async () => {
+      try {
+        setIsLoadingAcademy(true);
+        const credentials = await getAcademyCredentials(id);
+        setAcademyStacksAddress(credentials.stacksAddress);
+        setAcademyName(credentials.name);
+      } catch (error) {
+        console.error("Error loading academy data:", error);
+      } finally {
+        setIsLoadingAcademy(false);
+      }
+    };
+
+    loadAcademyData();
+  }, [id]);
 
   const canSubmit =
     studentEmail.trim() &&
@@ -122,6 +146,43 @@ export function AcademyContent({ id }: AcademyContentProps) {
       </div>
 
       <div className="container mx-auto max-w-6xl px-4 lg:px-0 py-16 md:py-20">
+        {/* Sección de Bienvenida */}
+        {!isLoadingAcademy && academyStacksAddress && (
+          <motion.div
+            className="mb-8"
+            initial="offScreen"
+            whileInView="onScreen"
+            viewport={{ once: true, amount: 0.4 }}
+            variants={slideInFromBottom({ delay: 0.05 })}
+          >
+            <div className="rounded-2xl border backdrop-blur-xl p-6
+                          bg-white/80 border-neutral-200
+                          dark:bg-neutral-900/70 dark:border-neutral-800">
+              <div className="flex items-center gap-3 mb-2">
+                <School className="h-8 w-8 text-sky-500 dark:text-sky-400" />
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    Bienvenida, {academyName || "Academia"}
+                  </h2>
+                  <p className="text-neutral-600 dark:text-neutral-400">
+                    Administra y emite certificados académicos verificables
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Label className="text-sm font-semibold mb-2 block">Tu dirección de Stacks</Label>
+                <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
+                  <p className="text-sm font-mono rounded-lg p-2 break-all border
+                              bg-white border-neutral-200 text-neutral-900
+                              dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
+                    {academyStacksAddress}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Header */}
         <motion.div
           className="text-center mb-12"
