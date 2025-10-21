@@ -58,11 +58,11 @@ export const metadata: Metadata = {
     title: "Explorador Público de Certificados | Certifikurs",
     description:
       "Explora y verifica certificados académicos públicos en la blockchain de Stacks. Consulta información de academias, estudiantes y certificados.",
-    url: "https://ovalcampus.com/explorer",
+    url: "https://certifikurs.vercel.app/explorer",
     siteName: "Certifikurs",
     images: [
       {
-        url: "https://ovalcampus.com/og-banner.jpg",
+        url: "https://certifikurs.vercel.app/og-banner.jpg",
         width: 1200,
         height: 630,
         alt: "Certifikurs - Explorador Público de certificados",
@@ -76,10 +76,10 @@ export const metadata: Metadata = {
     title: "Explorador Público de Certificados | Certifikurs",
     description:
       "Consulta y verifica certificados académicos públicos en la blockchain de Stacks. Plataforma segura y transparente.",
-    creator: "@OvalCampusInc",
+    creator: "@Certifikurs",
     images: [
       {
-        url: "https://ovalcampus.com/tc-banner.jpg",
+        url: "https://certifikurs.vercel.app/tc-banner.jpg",
         width: 1200,
         height: 675,
         alt: "Certifikurs - Explorador Público de certificados",

@@ -12,11 +12,11 @@ export const metadata: Metadata = {
     title: "Certifikurs — Validación de cursos en blockchain",
     description:
       "Valida certificados académicos con Certifikurs: emisión en la blockchain de Stacks y verificación instantánea. Plataforma desarrollada por .",
-    url: "https://ovalcampus.com",
+    url: "https://certifikurs.vercel.app",
     siteName: "",
     images: [
       {
-        url: "https://ovalcampus.com/og-banner.jpg",
+        url: "https://certifikurs.vercel.app/og-banner.jpg",
         width: 1200,
         height: 630,
         alt: "Certifikurs by ",
@@ -31,10 +31,10 @@ export const metadata: Metadata = {
     title: "Certifikurs — Validación de cursos en blockchain",
     description:
       "Certifikurs: valida y gestiona certificados académicos en la blockchain de Stacks. Plataforma de  potenciada por IA.",
-    creator: "@OvalCampusInc",
+    creator: "@Certifikurs",
     images: [
       {
-        url: "https://ovalcampus.com/tc-banner.jpg",
+        url: "https://certifikurs.vercel.app/tc-banner.jpg",
         width: 1200,
         height: 675,
         alt: "Certifikurs by ",
