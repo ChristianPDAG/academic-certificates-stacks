@@ -10,8 +10,9 @@ interface NavigationProps {
     user?: any;
 }
 
-export function Navigation({ user }: NavigationProps) {
+export function Navigation({ user, className }: NavigationProps & { className?: string }) {
     const pathname = usePathname();
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 1024 : false;
 
     const navItems = [
         {
@@ -23,7 +24,6 @@ export function Navigation({ user }: NavigationProps) {
         {
             href: "/explorer",
             label: "Explorador",
-            icon: Eye,
             description: "Consultar certificados públicos",
             public: true
         },
@@ -75,8 +75,37 @@ export function Navigation({ user }: NavigationProps) {
         return item.roles.includes(userRole);
     });
 
+    // Determinar si estamos en un menú móvil o en el menú principal
+    const isMenuItems = className?.includes("MenuItems");
+
+    if (isMenuItems) {
+        // Versión móvil (dentro de MenuItems)
+        return (
+            <div className={`flex flex-col gap-1 ${className || ''}`}>
+                {visibleItems.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                    const Icon = item.icon;
+                    
+                    return (
+                        <Link 
+                            key={item.href} 
+                            href={item.href} 
+                            className={`flex items-center gap-2 px-2 py-1.5 text-sm/6 rounded ${
+                                isActive ? "bg-black/5 dark:bg-white/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+                            }`}
+                        >
+                            {Icon && <Icon className="h-4 w-4" />}
+                            {item.label}
+                        </Link>
+                    );
+                })}
+            </div>
+        );
+    }
+
+    // Versión de escritorio (menú normal)
     return (
-        <nav className="flex items-center gap-2">
+        <nav className={`flex items-center gap-2 ${className || ''}`}>
             {visibleItems.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 const Icon = item.icon;

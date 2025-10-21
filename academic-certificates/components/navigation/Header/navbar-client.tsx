@@ -88,11 +88,40 @@ export function FloatingNavClient({ userEmail, userRole, hasEnvVars }: Props) {
                   border: "1px solid rgba(255, 255, 255, 0.125)",
                 }}
               >
-
+                {/* Agregar elementos de navegación en móvil */}
+                <div className="py-1 space-y-1">
+                  {/* Mostrar los enlaces de navegación */}
+                  <Navigation 
+                    user={userEmail ? { email: userEmail, role: userRole } : null} 
+                    className="MenuItems" 
+                  />
+                </div>
 
                 <div className="my-1 h-px bg-black/10" />
 
-
+                {/* Opciones de autenticación */}
+                <div className="py-1">
+                  {userEmail ? (
+                    // Usuario logeado (móvil)
+                    <MenuItem>
+                      <LogoutButton className="w-full text-left px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10" />
+                    </MenuItem>
+                  ) : (
+                    // No logeado (móvil)
+                    <>
+                      <MenuItem>
+                        <Link href="/auth/login" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
+                          Sign in
+                        </Link>
+                      </MenuItem>
+                      <MenuItem>
+                        <Link href="/auth/sign-up" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
+                          Sign up
+                        </Link>
+                      </MenuItem>
+                    </>
+                  )}
+                </div>
               </MenuItems>
             </Menu>
           </div>
