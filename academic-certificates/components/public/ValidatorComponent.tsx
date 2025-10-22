@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
@@ -83,7 +83,6 @@ export default function ValidatorComponent() {
 
     // Microtask: asegura que el setState anterior se aplique antes de validar
     Promise.resolve().then(() => validateById(clean));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   /** Valida llamando a la API de Hiro por TXID */
@@ -115,7 +114,7 @@ export default function ValidatorComponent() {
         try {
           const errorData = await response.json();
           console.log("Error data:", errorData);
-        } catch {}
+        } catch { }
         setValidationResult({
           isValid: false,
           error: "Certificado no encontrado en la blockchain",
@@ -245,11 +244,10 @@ export default function ValidatorComponent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className={`mt-6 rounded-xl border p-5 md:p-6 ${
-                validationResult.isValid
-                  ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
-                  : "bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50"
-              }`}
+              className={`mt-6 rounded-xl border p-5 md:p-6 ${validationResult.isValid
+                ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
+                : "bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50"
+                }`}
             >
               {validationResult.isValid ? (
                 <div>
