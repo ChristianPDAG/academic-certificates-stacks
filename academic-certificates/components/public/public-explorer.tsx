@@ -348,7 +348,6 @@ export default function PublicExplorer() {
           viewport={{ once: true, amount: 0.4 }}
           variants={slideInFromBottom({ delay: 0.1 })}
         >
-
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
             Explorador{" "}
             <span className="text-sky-500 dark:text-sky-400">Público</span>
@@ -422,80 +421,15 @@ export default function PublicExplorer() {
           </Card>
         </motion.div>
 
-        {/* Búsquedas */}
+        {/* Búsquedas (UNA COLUMNA, ORDEN PERSONALIZADO) */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"
+          className="grid grid-cols-1 gap-8 mb-12"
           initial="offScreen"
           whileInView="onScreen"
           viewport={{ once: true, amount: 0.35 }}
           variants={slideInFromBottom({ delay: 0.3 })}
         >
-          {/* Certificado por ID */}
-          <Card
-            className="rounded-2xl border backdrop-blur-xl
-                           bg-white/80 border-neutral-200 hover:shadow-xl
-                           dark:bg-neutral-900/70 dark:border-neutral-800"
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-sky-500/10">
-                  <Hash className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                </div>
-                Buscar por ID
-              </CardTitle>
-              <CardDescription>
-                Busca un certificado específico por su número de ID.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={searchCertificateById} className="space-y-4">
-                <div>
-                  <Label htmlFor="certId" className="font-semibold">
-                    ID del Certificado
-                  </Label>
-                  <Input
-                    id="certId"
-                    type="number"
-                    min="1"
-                    placeholder="Ej: 1"
-                    value={certificateId}
-                    onChange={(e) => setCertificateId(e.target.value)}
-                    className="mt-2 border-2 bg-white text-neutral-900
-                               border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20
-                               dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={searchingCert}
-                  className="w-full font-bold text-white
-                             bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl
-                             transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50"
-                >
-                  {searchingCert ? (
-                    <>
-                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                      Buscando...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="mr-2 h-4 w-4" />
-                      Buscar
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              {certificateResult && (
-                <div className="mt-6">
-                  <h4 className="font-semibold mb-3">Resultado</h4>
-                  <CertificateCard certificate={certificateResult} />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Certificados de estudiante */}
+          {/* 1) Certificados de Estudiante */}
           <Card
             className="rounded-2xl border backdrop-blur-xl
                            bg-white/80 border-neutral-200 hover:shadow-xl
@@ -620,7 +554,7 @@ export default function PublicExplorer() {
             </CardContent>
           </Card>
 
-          {/* Datos de Academia */}
+          {/* 2) Datos de Academia */}
           <Card
             className="rounded-2xl border backdrop-blur-xl
                            bg-white/80 border-neutral-200 hover:shadow-xl
@@ -734,6 +668,71 @@ export default function PublicExplorer() {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 3) Buscar por ID */}
+          <Card
+            className="rounded-2xl border backdrop-blur-xl
+                           bg-white/80 border-neutral-200 hover:shadow-xl
+                           dark:bg-neutral-900/70 dark:border-neutral-800"
+          >
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-sky-500/10">
+                  <Hash className="h-5 w-5 text-sky-500 dark:text-sky-400" />
+                </div>
+                Buscar por ID
+              </CardTitle>
+              <CardDescription>
+                Busca un certificado específico por su número de ID.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={searchCertificateById} className="space-y-4">
+                <div>
+                  <Label htmlFor="certId" className="font-semibold">
+                    ID del Certificado
+                  </Label>
+                  <Input
+                    id="certId"
+                    type="number"
+                    min="1"
+                    placeholder="Ej: 1"
+                    value={certificateId}
+                    onChange={(e) => setCertificateId(e.target.value)}
+                    className="mt-2 border-2 bg-white text-neutral-900
+                               border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20
+                               dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={searchingCert}
+                  className="w-full font-bold text-white
+                             bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl
+                             transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50"
+                >
+                  {searchingCert ? (
+                    <>
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                      Buscando...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="mr-2 h-4 w-4" />
+                      Buscar
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              {certificateResult && (
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-3">Resultado</h4>
+                  <CertificateCard certificate={certificateResult} />
                 </div>
               )}
             </CardContent>

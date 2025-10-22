@@ -1,5 +1,7 @@
+"use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
 import { IconSearch, IconCertificate, IconShieldCheck } from "@tabler/icons-react";
@@ -54,62 +56,89 @@ export default function ValidatorComponent() {
   const [isSearching, setIsSearching] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
 
+  const searchParams = useSearchParams();
+
+  // ⚠️ Cambia a tu contrato real si lo mueves a mainnet o cambia el nombre
   const EXPECTED_CONTRACT_ID = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV.nft";
 
-  const handleValidate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!certificateId.trim()) return;
+  /** 
+   * Toma el primer TXID válido si viene "pegado dos veces" u otros ruidos.
+   * Patrón: 0x + 64 hex (66 caracteres en total)
+   */
+  const sanitizeTxId = (raw: string) => {
+    if (!raw) return "";
+    const m = raw.match(/0x[a-fA-F0-9]{64}/);
+    return (m ? m[0] : raw.trim()).toLowerCase();
+  };
+
+  /** Cuando el componente monta, si hay ?id= en la URL, autocompleta y valida */
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (!id) return;
+
+    const clean = sanitizeTxId(id);
+    if (!clean) return;
+
+    setCertificateId(clean);
+
+    // Microtask: asegura que el setState anterior se aplique antes de validar
+    Promise.resolve().then(() => validateById(clean));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  /** Valida llamando a la API de Hiro por TXID */
+  const validateById = async (txid: string) => {
+    if (!txid) return;
 
     setIsSearching(true);
     setValidationResult(null);
 
     try {
-      // Consultar la API de Hiro para verificar la transacción
       const response = await fetch(
-        `https://api.testnet.hiro.so/extended/v1/tx/${certificateId.trim()}`
+        `https://api.testnet.hiro.so/extended/v1/tx/${txid}`
       );
-
-      console.log('Response status:', response.status);
 
       if (response.ok) {
         const txData = await response.json();
-        console.log('Transaction data:', txData);
-        console.log('Contract call:', txData.contract_call);
-        console.log('Function name:', txData.contract_call?.function_name);
-        console.log('Contract ID:', txData.contract_call?.contract_id);
 
-        // Validar que sea del contrato correcto
-        const contractId = txData.contract_call?.contract_id;
+        const contractId = txData?.contract_call?.contract_id;
         if (contractId !== EXPECTED_CONTRACT_ID) {
           setValidationResult({
             isValid: false,
-            error: `Esta transacción no pertenece al contrato de certificados esperado. Contrato encontrado: ${contractId || 'N/A'}`
+            error: `Esta transacción no pertenece al contrato de certificados esperado. Contrato encontrado: ${contractId || "N/A"}`,
           });
-          return;
+        } else {
+          setValidationResult({ isValid: true, txData });
         }
-
-        setValidationResult({
-          isValid: true,
-          txData: txData
-        });
       } else {
-        const errorData = await response.json();
-        console.log('Error data:', errorData);
-
+        // Intenta leer cuerpo para logs (opcional)
+        try {
+          const errorData = await response.json();
+          console.log("Error data:", errorData);
+        } catch {}
         setValidationResult({
           isValid: false,
-          error: 'Certificado no encontrado en la blockchain'
+          error: "Certificado no encontrado en la blockchain",
         });
       }
     } catch (error) {
-      console.error('Error validating certificate:', error);
+      console.error("Error validating certificate:", error);
       setValidationResult({
         isValid: false,
-        error: 'Error al consultar la blockchain. Por favor, intenta nuevamente.'
+        error: "Error al consultar la blockchain. Por favor, intenta nuevamente.",
       });
     } finally {
       setIsSearching(false);
     }
+  };
+
+  /** Submit del formulario (cuando el usuario escribe y pulsa validar) */
+  const handleValidate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const txid = sanitizeTxId(certificateId);
+    if (!txid) return;
+    setCertificateId(txid); // normaliza lo que vea el usuario
+    await validateById(txid);
   };
 
   return (
@@ -130,10 +159,7 @@ export default function ValidatorComponent() {
           variants={slideInFromBottom({ delay: 0.1 })}
         >
           <div className="flex justify-center mb-6">
-            <div className="p-6 rounded-full border-2 shadow-sm
-                            bg-gradient-to-br from-sky-500/20 to-sky-500/10
-                            border-sky-500/30">
-              {/* Tabler hereda color por clase */}
+            <div className="p-6 rounded-full border-2 shadow-sm bg-gradient-to-br from-sky-500/20 to-sky-500/10 border-sky-500/30">
               <IconCertificate size={64} className="text-sky-500 dark:text-sky-400" strokeWidth={1.5} />
             </div>
           </div>
@@ -148,9 +174,7 @@ export default function ValidatorComponent() {
 
         {/* Card principal (glass) */}
         <motion.div
-          className="rounded-2xl border backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10
-                     bg-white/80 border-neutral-200
-                     dark:bg-neutral-900/70 dark:border-neutral-800"
+          className="rounded-2xl border backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800"
           initial="offScreen"
           whileInView="onScreen"
           viewport={{ once: true, amount: 0.35 }}
@@ -171,7 +195,7 @@ export default function ValidatorComponent() {
                   type="text"
                   value={certificateId}
                   onChange={(e) => setCertificateId(e.target.value)}
-                  placeholder="Ej: CERT-2025-ABC123"
+                  placeholder="Ej: 0x3a78e7... (txid Stacks)"
                   disabled={isSearching}
                   className="w-full rounded-xl px-5 md:px-6 py-3.5 md:py-4 pr-12 text-[15px] md:text-lg
                              bg-white text-neutral-900 placeholder:text-neutral-400
@@ -221,10 +245,11 @@ export default function ValidatorComponent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className={`mt-6 rounded-xl border p-5 md:p-6 ${validationResult.isValid
-                ? 'bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50'
-                : 'bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50'
-                }`}
+              className={`mt-6 rounded-xl border p-5 md:p-6 ${
+                validationResult.isValid
+                  ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
+                  : "bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50"
+              }`}
             >
               {validationResult.isValid ? (
                 <div>
@@ -258,7 +283,9 @@ export default function ValidatorComponent() {
                       {validationResult.txData.contract_call?.contract_id && (
                         <div className="flex flex-col md:flex-row md:gap-2">
                           <span className="font-semibold">Contrato:</span>
-                          <span className="font-mono text-xs break-all">{validationResult.txData.contract_call.contract_id}</span>
+                          <span className="font-mono text-xs break-all">
+                            {validationResult.txData.contract_call.contract_id}
+                          </span>
                         </div>
                       )}
                       {validationResult.txData.block_height && (
@@ -297,7 +324,7 @@ export default function ValidatorComponent() {
                   </div>
 
                   <p className="text-sm md:text-base text-red-800 dark:text-red-300">
-                    {validationResult.error || 'No se encontró ningún certificado con este ID en la blockchain.'}
+                    {validationResult.error || "No se encontró ningún certificado con este ID en la blockchain."}
                   </p>
                 </div>
               )}
@@ -305,9 +332,7 @@ export default function ValidatorComponent() {
           )}
 
           {/* Info "Cómo funciona" */}
-          <div className="mt-8 rounded-xl border p-5 md:p-6
-                          bg-gradient-to-br from-blue-50/70 to-blue-100/60 border-blue-200
-                          dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-800/50">
+          <div className="mt-8 rounded-xl border p-5 md:p-6 bg-gradient-to-br from-blue-50/70 to-blue-100/60 border-blue-200 dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-800/50">
             <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-bold text-blue-900 dark:text-blue-200">
               <IconCertificate size={22} />
               ¿Cómo funciona la validación?
