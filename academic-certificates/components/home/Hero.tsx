@@ -41,8 +41,8 @@ const Hero = () => {
                 viewport={{ once: true }}
                 variants={slideInFromBottom({ delay: 0.4 })}
               >
-                Blockchain Course Validation <br />
-                <span className="text-[#00A1FF]">potenciado por la AI</span>
+                El Fin de los Certificados Falsos <br />
+                <span className="text-[#00A1FF]">Confianza Instantánea</span>
               </motion.h1>
 
               <motion.p
@@ -52,8 +52,7 @@ const Hero = () => {
                 viewport={{ once: true }}
                 variants={slideInFromBottom({ delay: 0.6 })}
               >
-                ¡Bienvenido a un nuevo inicio, donde la innovación el blockchain y la
-                inteligencia artificial se unen para transformar el futuro!
+                Conectamos instituciones, estudiantes y empresas con una fuente única de la verdad. <b>Protege tu prestigio, demuestra tu valor, contrata con certeza.</b>
               </motion.p>
 
               <motion.a
