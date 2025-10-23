@@ -3,6 +3,7 @@
 Este proyecto implementa un sistema descentralizado para la emisión y verificación de certificados académicos utilizando la blockchain de **Stacks**. Permite a instituciones educativas (academias) registrar certificados que los estudiantes pueden almacenar y verificar públicamente.
 
 Contrato: `https://explorer.hiro.so/txid/ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV.nft?chain=testnet`
+
 Aplicación Web: `https://certifikurs.vercel.app`
 
 ## ✨ Características Principales
