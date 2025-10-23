@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { slideInFromBottom, slideInFromLeft } from "@/utils/motion";
-import { IconQuestionMark, IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
+import { slideInFromBottom } from "@/utils/motion";
+import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function FAQTeaser() {
@@ -27,7 +27,7 @@ export default function FAQTeaser() {
   return (
     <section className="relative w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       {/* Fondo SIEMPRE visible, sin bloquear clics */}
-              <div className="absolute inset-0 bg-[url('/img/bg-nodes-2.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
+      <div className="absolute inset-0 bg-[url('/img/bg-nodes-2.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
 
       {/* Contenido va ENCIMA del fondo */}
       <div className="relative z-10 container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0">
@@ -86,17 +86,15 @@ export default function FAQTeaser() {
                 return (
                   <div
                     key={idx}
-                    className={`rounded-xl border transition-colors ${
-                      open
+                    className={`rounded-xl border transition-colors ${open
                         ? "bg-white/80 border-sky-300 shadow-lg dark:bg-neutral-900/70 dark:border-sky-800/60"
                         : "bg-white/70 border-neutral-200 dark:bg-neutral-900/60 dark:border-neutral-800"
-                    }`}
+                      }`}
                   >
                     <button
                       onClick={() => setOpenIdx(open ? null : idx)}
-                      className={`w-full px-5 py-4 md:px-6 md:py-5 flex items-start justify-between gap-4 rounded-lg transition-colors ${
-                        open ? "bg-sky-50/50 dark:bg-sky-900/10" : "hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
-                      }`}
+                      className={`w-full px-5 py-4 md:px-6 md:py-5 flex items-start justify-between gap-4 rounded-lg transition-colors ${open ? "bg-sky-50/50 dark:bg-sky-900/10" : "hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
+                        }`}
                       aria-expanded={open}
                       aria-controls={`faq-mini-${idx}`}
                     >
@@ -111,9 +109,8 @@ export default function FAQTeaser() {
 
                     <div
                       id={`faq-mini-${idx}`}
-                      className={`px-5 md:px-6 pb-5 md:pb-6 text-neutral-700 dark:text-neutral-300 transition-[max-height,opacity] duration-300 ease-out ${
-                        open ? "opacity-100" : "opacity-0 max-h-0 overflow-hidden"
-                      }`}
+                      className={`px-5 md:px-6 pb-5 md:pb-6 text-neutral-700 dark:text-neutral-300 transition-[max-height,opacity] duration-300 ease-out ${open ? "opacity-100" : "opacity-0 max-h-0 overflow-hidden"
+                        }`}
                     >
                       <p className="text-sm md:text-base leading-relaxed">{item.a}</p>
 
