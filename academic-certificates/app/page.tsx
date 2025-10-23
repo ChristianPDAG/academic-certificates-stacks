@@ -3,6 +3,7 @@ import Validator from "@/components/home/Validator";
 import Advantages from "@/components/home/Advantages";
 import { Metadata, Viewport } from "next";
 import About from "@/components/home/About";
+import FAQSection from "@/components/home/FAQSection";
 
 export const metadata: Metadata = {
   title: "Certifikurs — Validación de cursos en blockchain | ",
@@ -55,6 +56,7 @@ export default function Home() {
     <main className="relative flex dark:bg-black-100 justify-center items-center flex-col overflow-hidden mx-auto z-0">
       <Hero />
       <Validator />
+      <FAQSection />
       <Advantages />
       <About />
     </main>

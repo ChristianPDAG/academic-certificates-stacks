@@ -9,11 +9,7 @@ const Validator = () => {
   return (
     <section className="relative w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       {/* Fondo decorativo con opacidad diferente por tema (que sí se ve en ambos) */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[url('/img/bg-waves-3.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
-        {/* degradado sutil para mejorar legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white dark:from-neutral-950/60 dark:to-neutral-950" />
-      </div>
 
       <div className="container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0">
         <div className="flex flex-col lg:flex-row items-center gap-10">
@@ -51,15 +47,17 @@ const Validator = () => {
             >
               <Link
                 href="/validator"
-                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-white bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-white bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-2 border-sky-500 hover:border-sky-600 relative overflow-hidden group"
               >
-                Validar Certificado
+                <span className="relative z-10">Validar Certificado</span>
+                <span className="absolute inset-0 bg-sky-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
               </Link>
               <Link
                 href="/explorer"
-                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700 transition-all duration-300"
+                className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700 transition-all duration-300 border-2 border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 relative overflow-hidden group"
               >
-                Explorar
+                <span className="relative z-10">Explorar</span>
+                <span className="absolute inset-0 bg-sky-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               </Link>
             </motion.div>
           </div>
