@@ -52,6 +52,62 @@ El código del frontend se encuentra en el directorio `academic-certificates/`.
     ```
     La aplicación estará disponible en `http://localhost:3000`.
 
+## 🚀 Demo en Vivo y Cuentas de Prueba
+Puedes ver nuestro Demo oficial en el siguiente link `https://www.youtube.com/watch?v=D4ApowgES-M`
+Puedes probar la aplicación en vivo en el siguiente enlace. Para facilitar la exploración de los diferentes roles, puedes utilizar las siguientes credenciales y datos de prueba.
+
+**Sitio Web:** `certifikurs.vercel.app`
+
+
+### 1. ¿Deseas emitir un certificado? (Rol Academia)
+
+Usa esta cuenta para probar el flujo de creación de certificados. Ya cuenta con autorización del administrador y fondos de prueba (STX) para las transacciones.
+
+* **Email:** `academy@test.cl`
+* **Contraseña:** `123456`
+
+**Pasos:**
+1.  Inicia sesión con estas credenciales.
+2.  Ve al "Panel de Academia" y completa el formulario para emitir un nuevo certificado.
+
+
+### 2. ¿Deseas visualizar certificados? (Rol Estudiante)
+
+Puedes crear tu propia cuenta o usar una de prueba.
+
+* **Opción A (Cuenta de prueba):**
+    * **Email:** `christiantest@student.cl`
+    * **Contraseña:** `123456`
+    * **Instrucciones:** Inicia sesión y ve al "Panel de Estudiante" para ver los certificados ya asociados.
+
+* **Opción B (Tu propia cuenta):**
+    1.  Regístrate con tu propio email y el rol de "Estudiante".
+    2.  Usa la cuenta de **Academia** (del punto 1) para emitirte un certificado usando el correo con el que te haz registrado como estudiante.
+    3.  Vuelve a tu cuenta de estudiante y podrás ver el certificado que acabas de recibir.
+
+
+### 3. ¿Quieres conocer el panel de Administrador?
+
+Con esta cuenta podrás *visualizar* la interfaz del administrador, pero no podrás ejecutar acciones, ya que estas están restringidas solo a la wallet del Super Administrador.
+
+* **Email:** `test@testadmin.com`
+* **Contraseña:** `123456`
+
+
+### 4. Exploración Pública
+
+Puedes usar el explorador público (`/explorer`) sin iniciar sesión para verificar la data en la blockchain.
+
+* **Verificar por ID de Certificado:**
+    * Prueba buscando un ID entre `1` y `12`.
+* **Buscar por Email de Estudiante:**
+    * Usa el email: `christiantest@student.cl` o el que te hayas creado.
+* **Buscar por Wallet de Academia:**
+    * Usa la dirección: `ST32F1KRYMZJXMSNTDZB69EVG8RNKAYAV16VJ4J1H`
+* **Ver una transacción de ejemplo:** (`/validator`)
+    * Puedes analizar esta transacción en el validador oficial de nuestra web: `0x3a78e75d02546a78d2c0e55d720ae8a6eb020df4eaa650485160884252564eaf`
+      
+
 ## ⚙️ Uso del Sistema
 
 La aplicación web tiene diferentes secciones según el rol del usuario:
@@ -72,6 +128,10 @@ La aplicación web tiene diferentes secciones según el rol del usuario:
     * Permite registrar nuevas academias, desactivarlas y ver estadísticas del sistema.
     * Permite cambiar la dirección del super administrador.
     * Permite fondear (enviar STX) a las wallets de las academias para cubrir las tasas de transacción.
+5.  **Validador Público (`validator`)**:
+    * Permite a cualquier persona validar un certificado por el ID de la transacción.
+    * Muestra un botón que redirige directamente a la transacción en el Explorador de Stacks.
+
 
 ## 📄 Contrato Inteligente (`nft.clar`)
 
