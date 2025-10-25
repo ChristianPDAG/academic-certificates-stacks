@@ -110,7 +110,7 @@ export default function ValidatorComponent() {
       } else {
         // Intenta leer cuerpo para logs (opcional)
         try {
-          const errorData = await response.json();
+          await response.json();
         } catch { }
         setValidationResult({
           isValid: false,

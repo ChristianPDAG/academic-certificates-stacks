@@ -34,7 +34,6 @@ import {
     Link as LinkIcon,
     Calendar
 } from "lucide-react";
-import { useStacks } from "@/lib/stacks-provider";
 import {
     registerSchoolClient,
     deactivateSchoolClient,
@@ -62,7 +61,6 @@ interface AcademyUser {
 }
 
 export function AdminDashboard() {
-    const { userAddress } = useStacks();
     const [stats, setStats] = useState<AdminStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [newSchoolPrincipal, setNewSchoolPrincipal] = useState("");
@@ -200,7 +198,7 @@ export function AdminDashboard() {
             setIsSubmitting(true);
 
             // 1. Registrar academia en contrato
-            const resultRegister = await registerSchoolClient(newSchoolPrincipal, newSchoolName);
+            await registerSchoolClient(newSchoolPrincipal, newSchoolName);
 
             // 2. Transferir STX si está habilitado
             if (shouldFundAcademy && fundingAmount > 0) {
@@ -208,7 +206,7 @@ export function AdminDashboard() {
                 // Pequeño delay para que la primera transacción se procese
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                const resultTransfer = await transferSTXClient(
+                await transferSTXClient(
                     newSchoolPrincipal,
                     fundingAmount
                 );
@@ -250,7 +248,7 @@ export function AdminDashboard() {
 
         try {
             setIsSubmitting(true);
-          
+
             await deactivateSchoolClient(schoolPrincipal);
             alert("Academia desactivada exitosamente");
 
