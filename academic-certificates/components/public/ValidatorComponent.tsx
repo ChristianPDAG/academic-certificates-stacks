@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
-import { slideInFromBottom } from "@/utils/motion";
 import { IconSearch, IconCertificate, IconShieldCheck } from "@tabler/icons-react";
 import { Metadata } from "next";
 
@@ -113,7 +111,6 @@ export default function ValidatorComponent() {
         // Intenta leer cuerpo para logs (opcional)
         try {
           const errorData = await response.json();
-          console.log("Error data:", errorData);
         } catch { }
         setValidationResult({
           isValid: false,
@@ -150,13 +147,7 @@ export default function ValidatorComponent() {
 
       <div className="container mx-auto max-w-4xl py-16 md:py-20 px-4 lg:px-0">
         {/* Header */}
-        <motion.div
-          className="text-center mb-10 md:mb-12"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={slideInFromBottom({ delay: 0.1 })}
-        >
+        <div className="text-center mb-10 md:mb-12">
           <div className="flex justify-center mb-6">
             <div className="p-6 rounded-full border-2 shadow-sm bg-gradient-to-br from-sky-500/20 to-sky-500/10 border-sky-500/30">
               <IconCertificate size={64} className="text-sky-500 dark:text-sky-400" strokeWidth={1.5} />
@@ -169,16 +160,10 @@ export default function ValidatorComponent() {
           <p className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
             Verifica la autenticidad de cualquier certificado emitido en nuestra plataforma. Solo necesitas el ID del certificado.
           </p>
-        </motion.div>
+        </div>
 
         {/* Card principal (glass) */}
-        <motion.div
-          className="rounded-2xl border backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.35 }}
-          variants={slideInFromBottom({ delay: 0.25 })}
-        >
+        <div className="rounded-2xl border backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800">
           <form onSubmit={handleValidate} className="space-y-6">
             <div>
               <label
@@ -240,10 +225,7 @@ export default function ValidatorComponent() {
 
           {/* Resultado de la validación */}
           {validationResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+            <div
               className={`mt-6 rounded-xl border p-5 md:p-6 ${validationResult.isValid
                 ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
                 : "bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50"
@@ -326,7 +308,7 @@ export default function ValidatorComponent() {
                   </p>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {/* Info "Cómo funciona" */}
@@ -354,16 +336,10 @@ export default function ValidatorComponent() {
               </li>
             </ul>
           </div>
-        </motion.div>
+        </div>
 
         {/* CTA inferior */}
-        <motion.div
-          className="mt-10 text-center"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={slideInFromBottom({ delay: 0.45 })}
-        >
+        <div className="mt-10 text-center">
           <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400">
             ¿No tienes un certificado?{" "}
             <a
@@ -373,7 +349,7 @@ export default function ValidatorComponent() {
               Explora certificados públicos →
             </a>
           </p>
-        </motion.div>
+        </div>
       </div>
     </main>
   );

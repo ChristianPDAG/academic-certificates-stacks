@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { slideInFromBottom } from "@/utils/motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -341,13 +339,7 @@ export default function PublicExplorer() {
 
       <div className="container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0 mt-10">
         {/* Header */}
-        <motion.div
-          className="text-center mb-12"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={slideInFromBottom({ delay: 0.1 })}
-        >
+        <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
             Explorador{" "}
             <span className="text-sky-500 dark:text-sky-400">Público</span>
@@ -356,16 +348,10 @@ export default function PublicExplorer() {
             Consulta y verifica certificados académicos almacenados en la
             blockchain de Stacks.
           </p>
-        </motion.div>
+        </div>
 
         {/* Stats */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.35 }}
-          variants={slideInFromBottom({ delay: 0.2 })}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Card
             className="rounded-2xl border backdrop-blur-xl
                            bg-white/80 border-neutral-200 hover:border-sky-500/50
@@ -419,16 +405,10 @@ export default function PublicExplorer() {
               </p>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Búsquedas (UNA COLUMNA, ORDEN PERSONALIZADO) */}
-        <motion.div
-          className="grid grid-cols-1 gap-8 mb-12"
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.35 }}
-          variants={slideInFromBottom({ delay: 0.3 })}
-        >
+        <div className="grid grid-cols-1 gap-8 mb-12">
           {/* 1) Certificados de Estudiante */}
           <Card
             className="rounded-2xl border backdrop-blur-xl
@@ -737,15 +717,10 @@ export default function PublicExplorer() {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Info */}
-        <motion.div
-          initial="offScreen"
-          whileInView="onScreen"
-          viewport={{ once: true, amount: 0.35 }}
-          variants={slideInFromBottom({ delay: 0.4 })}
-        >
+        <div>
           <Card
             className="border-2 shadow-xl
                            bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200
@@ -809,7 +784,7 @@ export default function PublicExplorer() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     </main>
   );

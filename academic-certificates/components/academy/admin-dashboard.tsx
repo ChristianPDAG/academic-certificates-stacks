@@ -198,21 +198,12 @@ export function AdminDashboard() {
 
         try {
             setIsSubmitting(true);
-            console.log("Iniciando registro de academia:", {
-                newSchoolPrincipal,
-                newSchoolName,
-                userAddress,
-                fundingAmount,
-                shouldFundAcademy
-            });
 
             // 1. Registrar academia en contrato
             const resultRegister = await registerSchoolClient(newSchoolPrincipal, newSchoolName);
-            console.log("Academia registrada:", resultRegister);
 
             // 2. Transferir STX si está habilitado
             if (shouldFundAcademy && fundingAmount > 0) {
-                console.log(`Transfiriendo ${fundingAmount} STX a ${newSchoolPrincipal}`);
 
                 // Pequeño delay para que la primera transacción se procese
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -221,7 +212,6 @@ export function AdminDashboard() {
                     newSchoolPrincipal,
                     fundingAmount
                 );
-                console.log("STX transferidos:", resultTransfer);
 
                 alert(
                     `✅ Academia registrada exitosamente!\n\n` +
@@ -248,7 +238,6 @@ export function AdminDashboard() {
                 loadSystemStats();
             }, 2000);
         } catch (error) {
-            console.error("Error registering school:", error);
             alert(`❌ Error al registrar academia: ${error}`);
         } finally {
             setIsSubmitting(false);
@@ -261,7 +250,7 @@ export function AdminDashboard() {
 
         try {
             setIsSubmitting(true);
-            console.log("Desactivando academia:", schoolPrincipal);
+          
             await deactivateSchoolClient(schoolPrincipal);
             alert("Academia desactivada exitosamente");
 
@@ -537,7 +526,6 @@ export function AdminDashboard() {
                                             <>
                                                 {(() => {
                                                     const balance = academyBalances.get(searchResult.principal) || 0;
-                                                    console.log("Balance de la academia:", balance);
                                                     {/* Considerando que cada certificado cuesta 0.0005 STX, calcula */ }
                                                     const certCost = 0.0005;
                                                     const estimatedCerts = Math.floor(balance / certCost);
