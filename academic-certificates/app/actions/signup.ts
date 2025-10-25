@@ -24,8 +24,6 @@ function logAddressesFromPrivateKey(privateKey: string) {
         "testnet"
     );
 
-    console.log('Mainnet:', mainnetAddress);
-    console.log('Testnet:', testnetAddress);
     return { mainnetAddress, testnetAddress };
 }
 async function createWalletFromSeed() {
@@ -38,7 +36,6 @@ async function createWalletFromSeed() {
 
     // Get the first account's address
     const account = wallet.accounts[0];
-    //console.log('Address:', account.address);
     const result = logAddressesFromPrivateKey(account.stxPrivateKey);
     return {
         privateKey: account.stxPrivateKey,

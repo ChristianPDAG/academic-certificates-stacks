@@ -58,7 +58,6 @@ export function SignUpForm({
           data: { role: role, name: name },
         },
       });
-      console.log(data, email, role, name);
 
       if (error) throw error;
       if (!data?.user?.id) {

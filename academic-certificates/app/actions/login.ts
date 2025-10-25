@@ -8,6 +8,5 @@ export async function login() {
     if (!user) throw new Error("User not found");
     const { data, error: userFetchError } = await supabase.from('users').select().eq('email', user.email).single();
     if (userFetchError) throw userFetchError;
-    console.log("Logged in user:", data.email);
     return data;
 }

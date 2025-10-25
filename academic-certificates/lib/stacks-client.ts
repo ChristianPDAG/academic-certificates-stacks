@@ -38,12 +38,7 @@ export async function registerSchoolClient(
             network: NETWORK,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
-            onFinish: (data: any) => {
-                console.log('Transaction submitted:', data);
-            },
-            onCancel: () => {
-                console.log('Transaction cancelled');
-            },
+ 
         };
 
         return await openContractCall(txOptions);
@@ -67,12 +62,7 @@ export async function deactivateSchoolClient(schoolPrincipal: string) {
             network: NETWORK,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
-            onFinish: (data: any) => {
-                console.log('Transaction submitted:', data);
-            },
-            onCancel: () => {
-                console.log('Transaction cancelled');
-            },
+
         };
 
         return await openContractCall(txOptions);
@@ -96,12 +86,7 @@ export async function changeSuperAdminClient(newAdminAddress: string) {
             network: NETWORK,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
-            onFinish: (data: any) => {
-                console.log('Transaction submitted:', data);
-            },
-            onCancel: () => {
-                console.log('Transaction cancelled');
-            },
+
         };
 
         return await openContractCall(txOptions);
@@ -135,12 +120,7 @@ export async function issueCertificateClient(
             network: NETWORK,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
-            onFinish: (data: any) => {
-                console.log('Certificate transaction submitted:', data);
-            },
-            onCancel: () => {
-                console.log('Certificate transaction cancelled');
-            },
+
         };
 
         return await openContractCall(txOptions);
@@ -166,8 +146,6 @@ export async function getSchoolInfoClient(schoolPrincipal: string) {
 
         // Usar cvToValue para convertir directamente a valores JavaScript
         const schoolData = cvToValue(result);
-
-        console.log("School data from contract:", schoolData);
 
         // Si schoolData existe, retornar en el formato esperado
         if (schoolData) {
@@ -361,12 +339,7 @@ export async function transferSTXClient(
             amount: amountMicroSTX,
             network: NETWORK,
             anchorMode: AnchorMode.Any,
-            onFinish: (data: any) => {
-                console.log('STX Transfer submitted:', data);
-            },
-            onCancel: () => {
-                console.log('STX Transfer cancelled');
-            },
+
         };
 
         return await openSTXTransfer(txOptions);
@@ -397,7 +370,6 @@ export async function getAddressBalanceClient(address: string): Promise<number> 
         const apiUrl = getApiUrl();
         const url = `${apiUrl}/extended/v1/address/${address}/balances`;
 
-        console.log(`Consultando balance para: ${address}`);
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -407,8 +379,6 @@ export async function getAddressBalanceClient(address: string): Promise<number> 
         const data = await response.json();
         const microSTX = BigInt(data.stx.balance || '0');
         const stx = Number(microSTX) / 1_000_000;
-
-        console.log(`Balance de ${address}: ${stx} STX`);
         return stx;
     } catch (error) {
         console.error("Error getting address balance:", error);
