@@ -13,7 +13,29 @@ const nextConfig: NextConfig = {
   // Compresión
   compress: true,
 
-  webpack: (config, { isServer }) => {
+  // Headers de caché para recursos estáticos
+  async headers() {
+    return [
+      {
+        source: '/videos/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/img/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  }, webpack: (config, { isServer }) => {
     // Desactivar webpack optimizaciones que pueden causar problemas con Stacks.js
     config.resolve.fallback = {
       ...config.resolve.fallback,
