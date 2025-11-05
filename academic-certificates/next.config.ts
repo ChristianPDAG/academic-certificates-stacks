@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
+  // Optimizaciones de producción
+  reactStrictMode: true,
+  swcMinify: true,
+
+  // Optimización de imágenes y videos
+  experimental: {
+    optimizePackageImports: ['framer-motion', '@supabase/supabase-js'],
+  },
+
+  // Compresión
+  compress: true,
+
+  webpack: (config, { isServer }) => {
     // Desactivar webpack optimizaciones que pueden causar problemas con Stacks.js
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -9,6 +21,32 @@ const nextConfig: NextConfig = {
       net: false,
       tls: false,
     };
+
+    // Optimización de bundle size
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          // Separar framer-motion en su propio chunk
+          framerMotion: {
+            name: 'framer-motion',
+            test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+            priority: 40,
+            reuseExistingChunk: true,
+          },
+          // Vendor chunk para otras librerías
+          vendor: {
+            name: 'vendor',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
+
     return config;
   },
 };
