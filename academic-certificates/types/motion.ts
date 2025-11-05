@@ -1,3 +1,3 @@
 export interface Motion {
-  delay: number;
+    delay: number;
 }

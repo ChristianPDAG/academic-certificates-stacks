@@ -1,9 +1,27 @@
+import dynamic from 'next/dynamic';
 import Hero from "@/components/home/Hero";
-import Validator from "@/components/home/Validator";
-import Advantages from "@/components/home/Advantages";
 import { Metadata, Viewport } from "next";
-import About from "@/components/home/About";
-import FAQSection from "@/components/home/FAQSection";
+
+// Lazy load de componentes que están fuera del viewport inicial
+const Validator = dynamic(() => import("@/components/home/Validator"), {
+  loading: () => <div className="min-h-screen" />,
+  ssr: true,
+});
+
+const Advantages = dynamic(() => import("@/components/home/Advantages"), {
+  loading: () => <div className="min-h-screen" />,
+  ssr: true,
+});
+
+const About = dynamic(() => import("@/components/home/About"), {
+  loading: () => <div className="min-h-screen" />,
+  ssr: true,
+});
+
+const FAQSection = dynamic(() => import("@/components/home/FAQSection"), {
+  loading: () => <div className="min-h-screen" />,
+  ssr: true,
+});
 
 export const metadata: Metadata = {
   title: "Certifikurs — Validación de cursos en blockchain | ",

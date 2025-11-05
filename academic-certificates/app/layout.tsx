@@ -4,6 +4,10 @@ import { Providers } from "./providers";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
 
+export const metadata = {
+  metadataBase: new URL('https://certifikurs.vercel.app'),
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -11,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="es">
-      <head />
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vercel.com" />
+      </head>
       <body className="">
         <Providers>
           <FloatingNav />
