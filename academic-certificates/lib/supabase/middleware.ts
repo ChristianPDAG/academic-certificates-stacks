@@ -7,9 +7,9 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  // If the env vars are not set, skip middleware check. You can remove this
-  // once you setup the project.
+  // If the env vars are not set, skip middleware check
   if (!hasEnvVars) {
+    console.warn('Supabase env vars not set, skipping auth middleware');
     return supabaseResponse;
   }
 
@@ -39,30 +39,23 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
+  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  try {
+    // Use getUser instead of getClaims for better performance
+    const { data: { user }, error } = await supabase.auth.getUser();
 
-  // Define public routes that don't require authentication
-  const publicRoutes = [
-    "/",
-    "/login",
-    "/auth",
-    "/validator",
-    "/explorer",
-    "/faq"
-  ];
-
-  const isPublicRoute = publicRoutes.some((route) =>
-    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + "/")
-  );
-
-  if (!user && !isPublicRoute) {
-    // no user, potentially respond by redirecting the user to the login page
+    if (error || !user) {
+      // No user, redirect to login page
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      url.searchParams.set('redirectedFrom', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+  } catch (error) {
+    console.error('Auth error in middleware:', error);
+    // On error, redirect to login
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
