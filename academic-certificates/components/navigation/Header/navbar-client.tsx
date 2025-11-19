@@ -60,11 +60,14 @@ export function FloatingNavClient({ userEmail, userRole }: Props) {
             ) : (
               // No logeado
               <div className="flex items-center gap-2">
+                <Button asChild size="sm" variant="secondary">
+                  <Link href="/auth/sign-up-academy">Soy una Academia</Link>
+                </Button>
                 <Button asChild size="sm" variant="outline">
-                  <Link href="/auth/login">Sign in</Link>
+                  <Link href="/auth/login">Iniciar sesión</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/auth/sign-up">Sign up</Link>
+                  <Link href="/auth/sign-up">Registrarse</Link>
                 </Button>
               </div>
             )}
@@ -108,14 +111,19 @@ export function FloatingNavClient({ userEmail, userRole }: Props) {
                   ) : (
                     // No logeado (móvil)
                     <>
+                    <MenuItem>
+                      <Link href="/auth/sign-up-academy" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
+                        Soy una Academia
+                      </Link>
+                    </MenuItem>
                       <MenuItem>
                         <Link href="/auth/login" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
-                          Sign in
+                          Iniciar sesión
                         </Link>
                       </MenuItem>
                       <MenuItem>
                         <Link href="/auth/sign-up" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
-                          Sign up
+                          Registrarse
                         </Link>
                       </MenuItem>
                     </>

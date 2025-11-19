@@ -26,7 +26,7 @@ const FAQSection = dynamic(() => import("@/components/home/FAQSection"), {
 export const metadata: Metadata = {
   title: "Certifikurs — Validación de cursos en blockchain | ",
   description:
-    "Certifikurs: valida y almacena certificados académicos en la blockchain de Stacks. Plataforma de  potenciada por IA para emitir, verificar y gestionar certificados de forma segura.",
+    "Certifikurs: valida y almacena certificados académicos en la blockchain de Stacks. Plataforma para emitir, verificar y gestionar certificados de forma segura.",
   openGraph: {
     title: "Certifikurs — Validación de cursos en blockchain",
     description:

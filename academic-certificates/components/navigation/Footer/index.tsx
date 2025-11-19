@@ -86,7 +86,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="inline-flex lg:flex items-center gap-2 text-base">
                 <IconMail size={22} className="text-foreground" />
-                <span className="text-foreground">contact@certifikurs.com</span>
+                <span className="text-foreground">certifikurs@gmail.com</span>
               </li>
             </ul>
           </div>
