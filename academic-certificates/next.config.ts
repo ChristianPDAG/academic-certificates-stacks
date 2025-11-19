@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Optimizaciones de producción
   reactStrictMode: true,
-  swcMinify: true,
 
   // Optimización de imágenes y videos
   experimental: {

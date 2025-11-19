@@ -8,6 +8,7 @@ export async function hashPasswordDeterministic(password: string) {
 
 import { generateWallet, generateSecretKey } from '@stacks/wallet-sdk';
 import { privateKeyToAddress } from '@stacks/transactions';
+import { encryptPrivateKey } from "@/utils/cryptoUtils";
 
 function logAddressesFromPrivateKey(privateKey: string) {
     // Compressed private key (64 or 66 characters)
@@ -50,11 +51,11 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
         const wallet = await createWalletFromSeed();
 
         const supabase = await createClient();
-
+        const encryptedPrivateKey = encryptPrivateKey(wallet.privateKey);
         const { error } = await supabase.from('users').insert({
             email,
             role,
-            private_key: wallet.privateKey,
+            private_key: encryptedPrivateKey,
             stacks_address: wallet.address,
             nombre,
             id_user: id

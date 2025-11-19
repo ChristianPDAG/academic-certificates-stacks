@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
+import { decryptPrivateKey } from "@/utils/cryptoUtils";
 
 export async function getAcademyCredentials(id: string): Promise<{
     stacksAddress: string;
@@ -9,7 +10,7 @@ export async function getAcademyCredentials(id: string): Promise<{
     const supabase = await createClient();
     const { data, error }: { data: any; error: any; } = await supabase
         .from("users")
-        .select("private_key,stacks_address, nombre ")
+        .select("private_key, stacks_address, nombre ")
         .eq("role", "academy")
         .eq("id_user", id)
         .maybeSingle();
@@ -17,7 +18,8 @@ export async function getAcademyCredentials(id: string): Promise<{
         throw new Error(error.message);
     }
 
-    return { stacksAddress: data.stacks_address, privateKey: data.private_key, name: data.nombre };
+    const decryptedPrivateKey = decryptPrivateKey(data.private_key);
+    return { stacksAddress: data.stacks_address, privateKey: decryptedPrivateKey, name: data.nombre };
 }
 
 export async function getStudentWallet(email: string) {
