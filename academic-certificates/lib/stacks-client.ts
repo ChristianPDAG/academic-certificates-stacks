@@ -38,7 +38,7 @@ export async function registerSchoolClient(
             network: NETWORK,
             anchorMode: AnchorMode.Any,
             postConditionMode: PostConditionMode.Allow,
- 
+
         };
 
         return await openContractCall(txOptions);
@@ -383,5 +383,441 @@ export async function getAddressBalanceClient(address: string): Promise<number> 
     } catch (error) {
         console.error("Error getting address balance:", error);
         return 0;
+    }
+}
+
+// ========================================
+// FUNCIONES PARA EL CONTRATO REGISTRY
+// ========================================
+
+const REGISTRY_CONTRACT_ADDRESS = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV";
+const REGISTRY_CONTRACT_NAME = "registry";
+
+/**
+ * Establece el manager activo en el registry (Cliente)
+ * Solo el super-admin puede ejecutar esta función
+ */
+export async function setActiveManagerClient(newManager: string) {
+    try {
+        const txOptions = {
+            contractAddress: REGISTRY_CONTRACT_ADDRESS,
+            contractName: REGISTRY_CONTRACT_NAME,
+            functionName: 'set-active-manager',
+            functionArgs: [principalCV(newManager)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error setting active manager:', error);
+        throw new Error(`Error al establecer el manager activo: ${error}`);
+    }
+}
+
+/**
+ * Obtiene el manager activo del registry (Read-only)
+ */
+export async function getActiveManagerClient(): Promise<string> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: REGISTRY_CONTRACT_ADDRESS,
+            contractName: REGISTRY_CONTRACT_NAME,
+            functionName: 'get-active-manager',
+            functionArgs: [],
+            network: NETWORK,
+            senderAddress: REGISTRY_CONTRACT_ADDRESS,
+        });
+        console.log("Result from getActiveManagerClient:", result);
+        const managerPrincipal = cvToValue(result);
+        console.log("Decoded manager principal:", managerPrincipal);
+        return managerPrincipal || "";
+    } catch (error) {
+        console.error("Error getting active manager:", error);
+        throw new Error(`Error al obtener el manager activo: ${error}`);
+    }
+}
+
+/**
+ * Cambia el super administrador del registry (Cliente)
+ * Solo el super-admin actual puede ejecutar esta función
+ */
+export async function changeSuperAdminRegistryClient(newAdmin: string) {
+    try {
+        const txOptions = {
+            contractAddress: REGISTRY_CONTRACT_ADDRESS,
+            contractName: REGISTRY_CONTRACT_NAME,
+            functionName: 'change-super-admin',
+            functionArgs: [principalCV(newAdmin)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error changing super admin in registry:', error);
+        throw new Error(`Error al cambiar el super admin del registry: ${error}`);
+    }
+}
+
+/**
+ * Obtiene el super admin del registry (Read-only)
+ */
+export async function getSuperAdminRegistryClient(): Promise<string> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: REGISTRY_CONTRACT_ADDRESS,
+            contractName: REGISTRY_CONTRACT_NAME,
+            functionName: 'get-super-admin',
+            functionArgs: [],
+            network: NETWORK,
+            senderAddress: REGISTRY_CONTRACT_ADDRESS,
+        });
+
+        const adminPrincipal = cvToValue(result);
+        return adminPrincipal || "";
+    } catch (error) {
+        console.error("Error getting super admin:", error);
+        throw new Error(`Error al obtener el super admin: ${error}`);
+    }
+}
+
+
+// ========================================
+// FUNCIONES PARA CERTIFICATE-MANAGER-V1
+// ========================================
+
+const MANAGER_CONTRACT_ADDRESS = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV";
+const MANAGER_CONTRACT_NAME = "certificate-manager-v1";
+
+// ---------- GESTIÓN DE ESCUELAS ----------
+
+export async function addSchoolManagerClient(
+    schoolPrincipal: string,
+    name: string,
+    metadataUrl: string
+) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'add-school',
+            functionArgs: [
+                principalCV(schoolPrincipal),
+                stringAsciiCV(name),
+                stringAsciiCV(metadataUrl)
+            ],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error adding school:', error);
+        throw new Error(`Error al agregar escuela: ${error}`);
+    }
+}
+
+export async function deactivateSchoolManagerClient(schoolPrincipal: string) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'deactivate-school',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error deactivating school:', error);
+        throw new Error(`Error al desactivar escuela: ${error}`);
+    }
+}
+
+export async function reactivateSchoolManagerClient(schoolPrincipal: string) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'reactivate-school',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error reactivating school:', error);
+        throw new Error(`Error al reactivar escuela: ${error}`);
+    }
+}
+
+export async function verifySchoolManagerClient(schoolPrincipal: string) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'verify-school',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error verifying school:', error);
+        throw new Error(`Error al verificar escuela: ${error}`);
+    }
+}
+
+export async function unverifySchoolManagerClient(schoolPrincipal: string) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'unverify-school',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error unverifying school:', error);
+        throw new Error(`Error al quitar verificación de escuela: ${error}`);
+    }
+}
+
+export async function updateSchoolMetadataUrlManagerClient(
+    schoolPrincipal: string,
+    metadataUrl: string
+) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'update-school-metadata-url',
+            functionArgs: [
+                principalCV(schoolPrincipal),
+                stringAsciiCV(metadataUrl)
+            ],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error updating school metadata URL:', error);
+        throw new Error(`Error al actualizar metadata URL: ${error}`);
+    }
+}
+
+export async function getSchoolInfoManagerClient(schoolPrincipal: string) {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'get-school-info',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const schoolData = cvToValue(result);
+        return schoolData;
+    } catch (error) {
+        console.error("Error getting school info:", error);
+        return null;
+    }
+}
+
+// ---------- SISTEMA DE CRÉDITOS ----------
+
+export async function adminFundSchoolManagerClient(
+    schoolPrincipal: string,
+    credits: number
+) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'admin-fund-school',
+            functionArgs: [
+                principalCV(schoolPrincipal),
+                uintCV(credits)
+            ],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error funding school:', error);
+        throw new Error(`Error al fondear escuela: ${error}`);
+    }
+}
+
+export async function setStxPerCreditManagerClient(newAmount: number) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'set-stx-per-credit',
+            functionArgs: [uintCV(newAmount)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error setting STX per credit:', error);
+        throw new Error(`Error al establecer precio por crédito: ${error}`);
+    }
+}
+
+export async function getSchoolCreditsManagerClient(schoolPrincipal: string): Promise<number> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'get-school-credits',
+            functionArgs: [principalCV(schoolPrincipal)],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const credits = cvToValue(result);
+        return Number(credits) || 0;
+    } catch (error) {
+        console.error("Error getting school credits:", error);
+        return 0;
+    }
+}
+
+export async function getStxPerCreditManagerClient(): Promise<number> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'get-stx-per-credit',
+            functionArgs: [],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const price = cvToValue(result);
+        return Number(price) || 0;
+    } catch (error) {
+        console.error("Error getting STX per credit:", error);
+        return 0;
+    }
+}
+
+// ---------- GESTIÓN DE CERTIFICADOS ----------
+
+export async function revokeCertificateManagerClient(certId: number) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'revoke-certificate',
+            functionArgs: [uintCV(certId)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error revoking certificate:', error);
+        throw new Error(`Error al revocar certificado: ${error}`);
+    }
+}
+
+export async function reactivateCertificateManagerClient(certId: number) {
+    try {
+        const txOptions = {
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'reactivate-certificate',
+            functionArgs: [uintCV(certId)],
+            network: NETWORK,
+            anchorMode: AnchorMode.Any,
+            postConditionMode: PostConditionMode.Allow,
+        };
+
+        return await openContractCall(txOptions);
+    } catch (error) {
+        console.error('Error reactivating certificate:', error);
+        throw new Error(`Error al reactivar certificado: ${error}`);
+    }
+}
+
+export async function getTotalCertificatesManagerClient(): Promise<number> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'get-total-certificates',
+            functionArgs: [],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const total = cvToValue(result);
+        return Number(total) || 0;
+    } catch (error) {
+        console.error("Error getting total certificates:", error);
+        return 0;
+    }
+}
+
+export async function getCertificateManagerClient(certId: number) {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'get-certificate',
+            functionArgs: [uintCV(certId)],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const certData = cvToValue(result);
+        return certData;
+    } catch (error) {
+        console.error("Error getting certificate:", error);
+        return null;
+    }
+}
+
+export async function isCertificateValidManagerClient(certId: number): Promise<boolean> {
+    try {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: MANAGER_CONTRACT_ADDRESS,
+            contractName: MANAGER_CONTRACT_NAME,
+            functionName: 'is-certificate-valid',
+            functionArgs: [uintCV(certId)],
+            network: NETWORK,
+            senderAddress: MANAGER_CONTRACT_ADDRESS,
+        });
+
+        const isValid = cvToValue(result);
+        return isValid?.value === true;
+    } catch (error) {
+        console.error("Error checking certificate validity:", error);
+        return false;
     }
 }
