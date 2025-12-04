@@ -37,14 +37,14 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
             label: "Academia",
             icon: School,
             description: "Emitir certificados",
-            roles: ["academy", "admin"]
+            roles: ["academy"]
         },
         {
             href: "/student",
             label: "Estudiante",
             icon: Users,
             description: "Ver mis certificados",
-            roles: ["student", "admin"]
+            roles: ["student"]
         },
         {
             href: "/admin",
