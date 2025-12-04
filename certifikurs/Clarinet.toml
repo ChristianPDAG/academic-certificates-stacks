@@ -5,8 +5,19 @@ authors = []
 telemetry = true
 cache_dir = '.\.cache'
 requirements = []
-[contracts.academic-certificates]
-path = 'contracts/academic-certificates.clar'
+
+[contracts.certificate-data]
+path = 'contracts/certificate-data.clar'
+clarity_version = 3
+epoch = 'latest'
+
+[contracts.certificate-manager-v1]
+path = 'contracts/certificate-manager-v1.clar'
+clarity_version = 3
+epoch = 'latest'
+
+[contracts.registry]
+path = 'contracts/registry.clar'
 clarity_version = 3
 epoch = 'latest'
 [repl.analysis]
