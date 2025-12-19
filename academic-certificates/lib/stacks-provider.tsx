@@ -86,28 +86,3 @@ export function useStacks() {
     }
     return context;
 }
-
-// Hook personalizado para transacciones
-export function useStacksTransaction() {
-    const { isSignedIn, userAddress } = useStacks();
-
-    const executeTransaction = async (txOptions: any) => {
-        if (!isSignedIn || !userAddress) {
-            throw new Error('Usuario no conectado');
-        }
-
-        try {
-            const result = await txOptions;
-            return result;
-        } catch (error) {
-            console.error('Error en la transacción:', error);
-            throw error;
-        }
-    };
-
-    return {
-        executeTransaction,
-        isSignedIn,
-        userAddress,
-    };
-}

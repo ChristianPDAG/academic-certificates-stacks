@@ -9,21 +9,13 @@ import {
     fetchCallReadOnlyFunction,
 } from '@stacks/transactions';
 import { STACKS_TESTNET, STACKS_MAINNET } from '@stacks/network';
+import { env } from '@/config/env/env.client'
 
-const DATA_CONTRACT_ADDRESS = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV";
-const DATA_CONTRACT_NAME = "certificate-data";
-const NETWORK = process.env.NEXT_PUBLIC_NETWORK === 'mainnet' ? STACKS_MAINNET : STACKS_TESTNET;
+const DATA_CONTRACT_ADDRESS = env.CONTRACT_ADDRESS;
+const DATA_CONTRACT_NAME = env.CONTRACT_DATA_NAME;
+const NETWORK = env.NETWORK === 'mainnet' ? STACKS_MAINNET : STACKS_TESTNET;
 
-// ========================================
-// FUNCIONES PARA CERTIFICATE-DATA
-// ========================================
 
-// ---------- AUTORIZACIÓN DE CONTRATOS ESCRITORES ----------
-
-/**
- * Autoriza un contrato para escribir en certificate-data (Cliente)
- * Solo el super-admin puede ejecutar esta función
- */
 export async function authorizeWriterDataClient(writerContract: string) {
     try {
         const txOptions = {
@@ -135,48 +127,4 @@ export async function getSuperAdminDataClient(): Promise<string> {
     }
 }
 
-// ---------- FUNCIONES READ-ONLY ADICIONALES ----------
 
-/**
- * Obtiene el precio actual en STX por crédito (Read-only)
- */
-export async function getStxPerCreditDataClient(): Promise<number> {
-    try {
-        const result = await fetchCallReadOnlyFunction({
-            contractAddress: DATA_CONTRACT_ADDRESS,
-            contractName: DATA_CONTRACT_NAME,
-            functionName: 'get-stx-per-credit',
-            functionArgs: [],
-            network: NETWORK,
-            senderAddress: DATA_CONTRACT_ADDRESS,
-        });
-
-        const price = cvToValue(result);
-        return Number(price) || 0;
-    } catch (error) {
-        console.error("Error getting STX per credit from data contract:", error);
-        return 0;
-    }
-}
-
-/**
- * Obtiene el contador total de certificados (Read-only)
- */
-export async function getCertificateCounterDataClient(): Promise<number> {
-    try {
-        const result = await fetchCallReadOnlyFunction({
-            contractAddress: DATA_CONTRACT_ADDRESS,
-            contractName: DATA_CONTRACT_NAME,
-            functionName: 'get-certificate-counter',
-            functionArgs: [],
-            network: NETWORK,
-            senderAddress: DATA_CONTRACT_ADDRESS,
-        });
-
-        const counter = cvToValue(result);
-        return Number(counter) || 0;
-    } catch (error) {
-        console.error("Error getting certificate counter:", error);
-        return 0;
-    }
-}
