@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   // Optimización de imágenes y videos
   experimental: {
     optimizePackageImports: ['framer-motion', '@supabase/supabase-js'],
+    webpackBuildWorker: true,
   },
-
   // Compresión
   compress: true,
 
@@ -42,6 +42,12 @@ const nextConfig: NextConfig = {
       net: false,
       tls: false,
     };
+
+    // Suprimir advertencias de dependencias opcionales de pino
+    config.ignoreWarnings = [
+      { module: /node_modules\/pino\/lib\/tools\.js/ },
+      /Can't resolve 'pino-pretty'/,
+    ];
 
     // Optimización de bundle size
     if (!isServer) {
