@@ -1,7 +1,7 @@
 // utils/cryptoUtils.ts
 
 import * as crypto from 'crypto';
-
+import { env } from '@/config/env/env.server';
 // --- CONFIGURACIÓN DE SEGURIDAD ---
 
 /**
@@ -26,7 +26,7 @@ const IV_SIZE = 16;
  * @throws Error si la variable de entorno no está definida o no tiene el tamaño correcto.
  */
 function getEncryptionKey(): Buffer {
-  const keyHex = process.env.ENCRYPTION_KEY;
+  const keyHex = env.ENCRYPTION_KEY;
 
   if (!keyHex) {
     throw new Error('FATAL: La variable de entorno ENCRYPTION_KEY no está definida.');
@@ -78,17 +78,17 @@ export function encryptPrivateKey(privateKey: string): string {
 export function decryptPrivateKey(encryptedKey: string): string {
   try {
     const key = getEncryptionKey();
-    
+
     // 1. Separar el IV y los datos encriptados
     const parts = encryptedKey.split(':');
     if (parts.length !== 2) {
-        throw new Error('Formato de clave encriptada inválido. Esperado: "IV:ENCRYPTED_DATA"');
+      throw new Error('Formato de clave encriptada inválido. Esperado: "IV:ENCRYPTED_DATA"');
     }
     const ivHex = parts[0];
     const encryptedHex = parts[1];
 
     if (ivHex.length !== IV_SIZE * 2) {
-         throw new Error('El IV extraído no tiene el tamaño correcto.');
+      throw new Error('El IV extraído no tiene el tamaño correcto.');
     }
 
     const iv = Buffer.from(ivHex, 'hex');
@@ -116,5 +116,5 @@ export function decryptPrivateKey(encryptedKey: string): string {
  * @returns Una clave aleatoria segura en formato hexadecimal.
  */
 export function generateRandomKey(): string {
-    return crypto.randomBytes(KEY_SIZE).toString('hex');
+  return crypto.randomBytes(KEY_SIZE).toString('hex');
 }
