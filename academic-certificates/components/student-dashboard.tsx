@@ -1,15 +1,11 @@
 "use client";
 
-import React from "react";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, GraduationCap, Loader2, AlertCircle } from "lucide-react";
-import { getStudentWallet } from "@/app/actions/academy";
-import {
-    getCertificateClient,
-    getStudentCertificatesClient,
-} from "@/lib/stacks-client";
+import { getStudentWallet } from "@/app/actions/student/credentials";
+import { getCertificatesByStudentWallet } from "@/app/actions/public/explorer";
 
 interface StudentDashboardProps {
     user: {
@@ -18,17 +14,30 @@ interface StudentDashboardProps {
     };
 }
 
-interface CertificateResultType {
-    id: number;
-    "school-id": { type: string; value: string };
-    "student-id": { type: string; value: string };
-    course: { type: string; value: string };
-    grade: { type: string; value: string };
-    "student-wallet": { type: string; value: string };
+export interface CertificateType {
+    id_certificate: string;
+    chain_cert_id: number;
+    student_name: string;
+    student_email: string;
+    student_wallet: string;
+    grade: string | null;
+    status: string;
+    created_at: string;
+    tx_id: string | null;
+    courses: {
+        id_course: string;
+        title: string;
+        hours: number;
+    };
+    academies: {
+        id_academy: string;
+        legal_name: string;
+        stacks_address: string;
+    };
 }
 
 export default function StudentDashboard({ user }: StudentDashboardProps) {
-    const [certificates, setCertificates] = useState<CertificateResultType[]>([]);
+    const [certificates, setCertificates] = useState<CertificateType[]>([]);
     const [loading, setLoading] = useState(true);
     const [stacksAddress, setStacksAddress] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
@@ -52,24 +61,9 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
 
             setStacksAddress(studentData.stacks_address);
 
-            const result = await getStudentCertificatesClient(studentData.stacks_address);
+            const certificatesData = await getCertificatesByStudentWallet(studentData.stacks_address);
 
-            if (result.value && result.value.value?.["certificate-ids"]) {
-                const rawIds = result.value.value["certificate-ids"].value;
-                const certIds = rawIds.map((i: any) => parseInt(i.value, 10));
-
-                const certificateDetails = await Promise.all(
-                    certIds.map(async (id: number) => {
-                        const certDetails = await getCertificateClient(id);
-                        const certData = certDetails.value.value as Record<string, any>;
-                        return { id, ...certData };
-                    })
-                );
-
-                setCertificates(certificateDetails.filter((c: any) => c.course));
-            } else {
-                setCertificates([]);
-            }
+            setCertificates(certificatesData);
         } catch (err) {
             console.error("Error loading student data:", err);
             setError(err instanceof Error ? err.message : "Error al cargar los datos del estudiante");
@@ -78,10 +72,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
         }
     };
 
-    const getVal = (v: any): string =>
-        v && typeof v === "object" && "value" in v ? v.value : v ?? "";
-
-    const CertificateCard = ({ certificate }: { certificate: CertificateResultType }) => (
+    const CertificateCard = ({ certificate }: { certificate: CertificateType }) => (
         <Card
             className="rounded-2xl border backdrop-blur-xl transition-all duration-300
                        bg-white/80 border-neutral-200 hover:border-sky-500/50 hover:shadow-xl
@@ -91,41 +82,44 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                 <div className="flex justify-between items-start gap-3">
                     <div className="flex-1">
                         <CardTitle className="text-lg mb-1">
-                            {getVal(certificate.course)}
+                            {certificate.courses.title}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-2">
                             <GraduationCap className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                            ID: {getVal(certificate["student-id"])}
+                            {certificate.student_name}
                         </CardDescription>
                     </div>
                     <Badge className="bg-sky-500 text-white hover:bg-sky-600">
-                        #{certificate.id}
+                        #{certificate.chain_cert_id}
                     </Badge>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div
-                    className="flex justify-between items-center p-3 rounded-xl border
-                              bg-gradient-to-br from-green-50 to-green-100 border-green-200
-                              dark:from-green-950/50 dark:to-green-900/30 dark:border-green-900/50"
-                >
-                    <span className="text-sm font-semibold text-green-800 dark:text-green-200">
-                        Calificación:
-                    </span>
-                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {getVal(certificate.grade)}
-                    </span>
-                </div>
+                {certificate.grade && (
+                    <div
+                        className="flex justify-between items-center p-3 rounded-xl border
+                                  bg-gradient-to-br from-green-50 to-green-100 border-green-200
+                                  dark:from-green-950/50 dark:to-green-900/30 dark:border-green-900/50"
+                    >
+                        <span className="text-sm font-semibold text-green-800 dark:text-green-200">
+                            Calificación:
+                        </span>
+                        <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            {certificate.grade}
+                        </span>
+                    </div>
+                )}
 
                 <div className="grid gap-3">
                     <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
                         <span className="text-sm font-semibold block mb-2">Academia</span>
+                        <p className="text-sm mb-1">{certificate.academies.legal_name}</p>
                         <p
                             className="text-xs font-mono rounded-lg p-2 break-all border
                                       bg-white border-neutral-200 text-neutral-900
                                       dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100"
                         >
-                            {getVal(certificate["school-id"])}
+                            {certificate.academies.stacks_address}
                         </p>
                     </div>
                 </div>
@@ -233,7 +227,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {certificates.map((certificate) => (
-                            <CertificateCard key={certificate.id} certificate={certificate} />
+                            <CertificateCard key={certificate.id_certificate} certificate={certificate} />
                         ))}
                     </div>
                 )}
