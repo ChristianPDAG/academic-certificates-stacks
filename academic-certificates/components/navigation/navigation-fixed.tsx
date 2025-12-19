@@ -37,20 +37,48 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
             label: "Academia",
             icon: School,
             description: "Emitir certificados",
-            roles: ["academy", "admin"]
+            roles: ["academy"]
+        },
+        {
+            href: "/academy/profile",
+            label: "Perfil Academia",
+            icon: School,
+            description: "Gestionar perfil de academia",
+            roles: ["academy"]
+        },
+        {
+            href: "/academy/certificates",
+            label: "Certificados Academia",
+            icon: School,
+            description: "Gestionar certificados de academia",
+            roles: ["academy"]
+        },
+        {
+            href: "/academy/courses",
+            label: "Cursos Academia",
+            icon: School,
+            description: "Gestionar cursos de academia",
+            roles: ["academy"]
         },
         {
             href: "/student",
             label: "Estudiante",
             icon: Users,
             description: "Ver mis certificados",
-            roles: ["student", "admin"]
+            roles: ["student"]
         },
         {
             href: "/admin",
             label: "Admin",
             icon: Settings,
             description: "Gestionar sistema",
+            roles: ["admin"]
+        },
+        {
+            href: "/admin/academies",
+            label: "Administrar Academias",
+            icon: Settings,
+            description: "Gestionar academias",
             roles: ["admin"]
         }
     ];
@@ -81,7 +109,8 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
         return (
             <div className={`flex flex-col gap-1 ${className || ''}`}>
                 {visibleItems.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                    // Solo marcar como activo si hay coincidencia exacta
+                    const isActive = pathname === item.href;
                     const Icon = item.icon;
 
                     return (
@@ -104,7 +133,8 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
     return (
         <nav className={`flex items-center gap-2 ${className || ''}`}>
             {visibleItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                // Solo marcar como activo si hay coincidencia exacta
+                const isActive = pathname === item.href;
                 const Icon = item.icon;
 
                 return (

@@ -1,0 +1,32 @@
+---
+id: 0
+name: Testnet deployment
+network: testnet
+stacks-node: "https://api.testnet.hiro.so"
+bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - contract-publish:
+            contract-name: registry
+            expected-sender: ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV
+            cost: 20000
+            path: contracts/registry.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: certificate-data
+            expected-sender: ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV
+            cost: 80000
+            path: contracts/certificate-data.clar
+            anchor-block-only: true
+            clarity-version: 3
+        - contract-publish:
+            contract-name: certificate-manager-v1
+            expected-sender: ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV
+            cost: 90000
+            path: contracts/certificate-manager-v1.clar
+            anchor-block-only: true
+            clarity-version: 3
+      epoch: "3.2"

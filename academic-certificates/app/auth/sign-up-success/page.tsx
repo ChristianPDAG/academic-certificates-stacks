@@ -5,6 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Registro Exitoso | Certifikurs",
+  description: "Confirma tu correo electrónico para activar tu cuenta",
+};
 
 export default function Page() {
   return (

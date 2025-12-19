@@ -58,14 +58,23 @@ genesis:
     - pox-4
     - signers
     - signers-voting
-    - costs-4
 plan:
   batches:
     - id: 0
       transactions:
         - emulated-contract-publish:
-            contract-name: academic-certificates
+            contract-name: certificate-data
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/academic-certificates.clar
+            path: contracts/certificate-data.clar
+            clarity-version: 3
+        - emulated-contract-publish:
+            contract-name: certificate-manager-v1
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/certificate-manager-v1.clar
+            clarity-version: 3
+        - emulated-contract-publish:
+            contract-name: registry
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/registry.clar
             clarity-version: 3
       epoch: "3.2"

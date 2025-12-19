@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -8,19 +8,45 @@ import { useScroll, useMotionValueEvent } from "framer-motion";
 import { IconMenu2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { Navigation } from "@/components/navigation/navigation-fixed";
+import { createClient } from "@/lib/supabase/client";
 
-import { LogoutButton } from "@/components/auth/logout-button"; // ← Debe ser client-safe
-import { Navigation } from "@/components/navigation/navigation-fixed"; // tu menú de usuario
-
-
-type Props = {
-  userEmail: string | null;
-  userRole: string | null;
-};
-
-export function FloatingNavClient({ userEmail, userRole }: Props) {
+export function FloatingNavClient() {
   const { scrollYProgress } = useScroll();
   const [visible, setVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUserEmail(data?.user?.email ?? null);
+      setUserRole(data?.user?.user_metadata?.role ?? null);
+      setIsLoading(false);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setUserEmail(session?.user?.email ?? null);
+          setUserRole(session?.user?.user_metadata?.role ?? null);
+        } else if (event === 'SIGNED_OUT') {
+          setUserEmail(null);
+          setUserRole(null);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useMotionValueEvent(scrollYProgress, "change", (current) => {
     if (typeof current !== "number") return;
@@ -47,29 +73,28 @@ export function FloatingNavClient({ userEmail, userRole }: Props) {
         </div>
 
         <div className="flex items-center gap-x-2">
-          {/* Theme switcher siempre visible */}
-
-
           {/* Bloque auth */}
           <div className="hidden lg:flex items-center gap-4">
-            <Navigation user={userEmail ? { email: userEmail, role: userRole } : null} />
+            {!isLoading && (
+              <>
+                <Navigation user={userEmail ? { email: userEmail, role: userRole } : null} />
 
-            {userEmail ? (
-              // Usuario logeado
-              <LogoutButton />
-            ) : (
-              // No logeado
-              <div className="flex items-center gap-2">
-                <Button asChild size="sm" variant="secondary">
-                  <Link href="/auth/sign-up-academy">Soy una Academia</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/auth/login">Iniciar sesión</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/auth/sign-up">Registrarse</Link>
-                </Button>
-              </div>
+                {userEmail ? (
+                  <LogoutButton />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button asChild size="sm" variant="secondary">
+                      <Link href="/auth/sign-up-academy">Soy una Academia</Link>
+                    </Button>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/auth/login">Iniciar sesión</Link>
+                    </Button>
+                    <Button asChild size="sm">
+                      <Link href="/auth/sign-up">Registrarse</Link>
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -90,39 +115,46 @@ export function FloatingNavClient({ userEmail, userRole }: Props) {
                   border: "1px solid rgba(255, 255, 255, 0.125)",
                 }}
               >
-                {/* Agregar elementos de navegación en móvil */}
-                <div className="py-1 space-y-1">
-                  {/* Mostrar los enlaces de navegación */}
-                  <Navigation
-                    user={userEmail ? { email: userEmail, role: userRole } : null}
-                    className="MenuItems"
-                  />
-                </div>
+                {!isLoading && (
+                  <div className="py-1 space-y-1">
+                    <Navigation
+                      user={userEmail ? { email: userEmail, role: userRole } : null}
+                      className="MenuItems"
+                    />
+                  </div>
+                )}
 
                 <div className="my-1 h-px bg-black/10" />
 
                 {/* Opciones de autenticación */}
                 <div className="py-1">
                   {userEmail ? (
-                    // Usuario logeado (móvil)
                     <MenuItem>
                       <LogoutButton className="w-full text-left px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10" />
                     </MenuItem>
                   ) : (
-                    // No logeado (móvil)
                     <>
-                    <MenuItem>
-                      <Link href="/auth/sign-up-academy" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
-                        Soy una Academia
-                      </Link>
-                    </MenuItem>
                       <MenuItem>
-                        <Link href="/auth/login" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
+                        <Link
+                          href="/auth/sign-up-academy"
+                          className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10"
+                        >
+                          Soy una Academia
+                        </Link>
+                      </MenuItem>
+                      <MenuItem>
+                        <Link
+                          href="/auth/login"
+                          className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10"
+                        >
                           Iniciar sesión
                         </Link>
                       </MenuItem>
                       <MenuItem>
-                        <Link href="/auth/sign-up" className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10">
+                        <Link
+                          href="/auth/sign-up"
+                          className="block px-2 py-1.5 text-sm/6 rounded hover:bg-black/5 dark:hover:bg-white/10"
+                        >
                           Registrarse
                         </Link>
                       </MenuItem>

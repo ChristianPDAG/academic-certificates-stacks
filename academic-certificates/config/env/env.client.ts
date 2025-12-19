@@ -1,0 +1,14 @@
+
+export const env = {
+    SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
+    CONTRACT_NAME: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
+    CONTRACT_REGISTRY_NAME: process.env.NEXT_PUBLIC_CONTRACT_REGISTRY_NAME || 'registry',
+    CONTRACT_DATA_NAME: process.env.NEXT_PUBLIC_CONTRACT_DATA_NAME || 'certificate-data',
+    NETWORK: process.env.NEXT_PUBLIC_NETWORK || 'testnet',
+    PRIVATE_KEY_HEX: process.env.NEXT_PUBLIC_PRIVATE_KEY_HEX || '',
+    CERTIFICATE_FUNCTION_NAME: process.env.NEXT_PUBLIC_CERTIFICATE_FUNCTION_NAME || 'issue-certificate',
+    GATEWAY_PINATA_URL: process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.pinata.cloud/ipfs/'
+
+}

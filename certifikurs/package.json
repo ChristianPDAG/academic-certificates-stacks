@@ -8,10 +8,15 @@
     "test": "vitest run",
     "test:report": "vitest run -- --coverage --costs",
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
-    "fuzz": "npx @stacks/rendezvous . academic-certificates test",
-    "fuzz:invariant": "npx @stacks/rendezvous . academic-certificates invariant",
-    "fuzz:all": "npm run fuzz && npm run fuzz:invariant"
-  
+    "fuzz:registry": "npx @stacks/rendezvous . registry test",
+    "fuzz:registry:invariant": "npx @stacks/rendezvous . registry invariant",
+    "fuzz:data": "npx @stacks/rendezvous . certificate-data test",
+    "fuzz:data:invariant": "npx @stacks/rendezvous . certificate-data invariant",
+    "fuzz:manager": "npx @stacks/rendezvous . certificate-manager-v1 test",
+    "fuzz:manager:invariant": "npx @stacks/rendezvous . certificate-manager-v1 invariant",
+    "fuzz:all": "npm run fuzz:registry && npm run fuzz:data && npm run fuzz:manager",
+    "fuzz:all:invariant": "npm run fuzz:registry:invariant && npm run fuzz:data:invariant && npm run fuzz:manager:invariant",
+    "fuzz:complete": "npm run fuzz:all && npm run fuzz:all:invariant"
   },
   "author": "",
   "license": "ISC",
