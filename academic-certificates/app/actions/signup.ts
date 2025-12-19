@@ -52,18 +52,45 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
 
         const supabase = await createClient();
         const encryptedPrivateKey = encryptPrivateKey(wallet.privateKey);
-        const { error } = await supabase.from('users').insert({
-            email,
-            role,
-            private_key: encryptedPrivateKey,
-            stacks_address: wallet.address,
-            nombre,
-            id_user: id
-        });
+        if (role === 'academy') {
+            const { data, error: errorAcademy } = await supabase.from('academies').insert({
+                legal_name: nombre,
+                contact_academy_email: email,
+                stacks_address: wallet.address,
+                stacks_key: encryptedPrivateKey,
+                validation_status: 'pending',
+                owner_user_id: id
+            }).select().single();
 
-        if (error) {
-            console.error('Error inserting user:', error);
-            return { success: false, error: error.message };
+            const { error } = await supabase.from('users').insert({
+                email,
+                role,
+                nombre,
+                id_user: id,
+                id_academy: data?.id_academy,
+                user_role_in_academy: 'owner'
+            });
+            if (error) {
+                console.error('Error inserting user:', error);
+                return { success: false, error: error.message };
+            }
+            if (errorAcademy) {
+                console.error('Error inserting academy:', errorAcademy);
+                return { success: false, error: errorAcademy.message };
+            }
+        } else {
+            const { error } = await supabase.from('users').insert({
+                email,
+                role,
+                nombre,
+                private_key: encryptedPrivateKey,
+                stacks_address: wallet.address,
+                id_user: id
+            });
+            if (error) {
+                console.error('Error inserting user:', error);
+                return { success: false, error: error.message };
+            }
         }
 
         return {

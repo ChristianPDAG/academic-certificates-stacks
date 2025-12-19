@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { decryptPrivateKey } from "@/utils/cryptoUtils";
 
+
 export async function getAcademyCredentials(id: string): Promise<{
     stacksAddress: string;
     privateKey: string;
@@ -9,24 +10,24 @@ export async function getAcademyCredentials(id: string): Promise<{
 }> {
     const supabase = await createClient();
     const { data, error }: { data: any; error: any; } = await supabase
-        .from("users")
-        .select("private_key, stacks_address, nombre ")
-        .eq("role", "academy")
-        .eq("id_user", id)
+        .from("academies")
+        .select("stacks_key, stacks_address, legal_name")
+        .eq("owner_user_id", id)
         .maybeSingle();
     if (error) {
+        console.log("Error fetching academy credentials:", error);
         throw new Error(error.message);
     }
 
-    const decryptedPrivateKey = decryptPrivateKey(data.private_key);
-    return { stacksAddress: data.stacks_address, privateKey: decryptedPrivateKey, name: data.nombre };
+    const decryptedPrivateKey = decryptPrivateKey(data.stacks_key);
+    return { stacksAddress: data.stacks_address, privateKey: decryptedPrivateKey, name: data.legal_name };
 }
 
 export async function getStudentWallet(email: string) {
     const supabase = await createClient();
     const { data, error } = await supabase
         .from("users")
-        .select("stacks_address, id, nombre")
+        .select("stacks_address, id_user, nombre")
         .eq("role", "student")
         .eq("email", email)
         .maybeSingle();
@@ -36,4 +37,20 @@ export async function getStudentWallet(email: string) {
     }
 
     return data || null;
+}
+
+
+export async function getAcademyIdByUserId(userId: string): Promise<string> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("academies")
+        .select("id_academy")
+        .eq("owner_user_id", userId)
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data.id_academy;
 }
