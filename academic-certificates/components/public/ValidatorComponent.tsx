@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { IconSearch, IconCertificate, IconShieldCheck } from "@tabler/icons-react";
+import { IconSearch, IconCertificate, IconShieldCheck, IconAlertCircle, IconCalendar, IconUser, IconSchool, IconAward, IconHash, IconBrandStackshare } from "@tabler/icons-react";
 import { Metadata } from "next";
+import { validateCertificateAction } from "@/app/actions/public/validate-certificate";
 
 export const metadata: Metadata = {
   title: "Validar Certificado | Certifikurs",
@@ -44,9 +45,62 @@ export const metadata: Metadata = {
 };
 
 interface ValidationResult {
-  isValid: boolean;
-  txData?: any;
+  success: boolean;
   error?: string;
+  data?: {
+    chainCertId: number;
+    isValidOnChain: boolean;
+    blockchainData: {
+      schoolId: string;
+      studentWallet: string;
+      grade: string | null;
+      issueHeight: number;
+      graduationDate: number;
+      expirationHeight: number | null;
+      metadataUrl: string;
+      dataHash: string;
+      revoked: boolean;
+    };
+    metadata: {
+      version: string;
+      certificate: {
+        title: string;
+        description: string;
+        modality: string;
+        hours: number;
+        issue_date_iso: string;
+        language: string;
+        category?: string;
+      };
+      recipient: {
+        name: string;
+        identifier_hash: string;
+        identifier_salt: string;
+      };
+      issuer: {
+        name: string;
+        department: string | null;
+        instructors: string[];
+        authorization_id: string;
+      };
+      achievement: {
+        skills_acquired: string[];
+        grade: string;
+        category: string;
+      };
+    };
+    hashVerified: boolean;
+    databaseData?: {
+      studentName: string;
+      studentEmail: string | null;
+      status: string;
+      createdAt: string;
+      courseId: string;
+      academyId: string;
+    };
+    txId: string;
+    explorerUrl: string;
+  };
 }
 
 export default function ValidatorComponent() {
@@ -56,71 +110,51 @@ export default function ValidatorComponent() {
 
   const searchParams = useSearchParams();
 
-  // ⚠️ Cambia a tu contrato real si lo mueves a mainnet o cambia el nombre
-  const EXPECTED_CONTRACT_ID = "ST15Z41T89K34CD6Q1N8DX2VZGCP50ATNAHPFXMBV.nft";
-
   /** 
-   * Toma el primer TXID válido si viene "pegado dos veces" u otros ruidos.
-   * Patrón: 0x + 64 hex (66 caracteres en total)
+   * Sanitizes input to handle transaction IDs or certificate IDs
    */
-  const sanitizeTxId = (raw: string) => {
+  const sanitizeInput = (raw: string): string => {
     if (!raw) return "";
-    const m = raw.match(/0x[a-fA-F0-9]{64}/);
-    return (m ? m[0] : raw.trim()).toLowerCase();
+    const trimmed = raw.trim();
+
+    // If it looks like a txid (0x + hex), extract the first valid one
+    if (trimmed.startsWith("0x")) {
+      const match = trimmed.match(/0x[a-fA-F0-9]{64}/);
+      return match ? match[0].toLowerCase() : trimmed.toLowerCase();
+    }
+
+    // Otherwise, treat as certificate ID (numeric)
+    return trimmed;
   };
 
-  /** Cuando el componente monta, si hay ?id= en la URL, autocompleta y valida */
+  /** When component mounts, if there's ?id= in URL, autocomplete and validate */
   useEffect(() => {
     const id = searchParams.get("id");
     if (!id) return;
 
-    const clean = sanitizeTxId(id);
+    const clean = sanitizeInput(id);
     if (!clean) return;
 
     setCertificateId(clean);
 
-    // Microtask: asegura que el setState anterior se aplique antes de validar
-    Promise.resolve().then(() => validateById(clean));
+    // Microtask: ensure setState applies before validation
+    Promise.resolve().then(() => validateCertificate(clean));
   }, [searchParams]);
 
-  /** Valida llamando a la API de Hiro por TXID */
-  const validateById = async (txid: string) => {
-    if (!txid) return;
+  /** Validates certificate using server action */
+  const validateCertificate = async (input: string) => {
+    if (!input) return;
 
     setIsSearching(true);
     setValidationResult(null);
 
     try {
-      const response = await fetch(
-        `https://api.testnet.hiro.so/extended/v1/tx/${txid}`
-      );
-
-      if (response.ok) {
-        const txData = await response.json();
-
-        const contractId = txData?.contract_call?.contract_id;
-        if (contractId !== EXPECTED_CONTRACT_ID) {
-          setValidationResult({
-            isValid: false,
-            error: `Esta transacción no pertenece al contrato de certificados esperado. Contrato encontrado: ${contractId || "N/A"}`,
-          });
-        } else {
-          setValidationResult({ isValid: true, txData });
-        }
-      } else {
-        // Intenta leer cuerpo para logs (opcional)
-        try {
-          await response.json();
-        } catch { }
-        setValidationResult({
-          isValid: false,
-          error: "Certificado no encontrado en la blockchain",
-        });
-      }
+      const result = await validateCertificateAction(input);
+      setValidationResult(result);
     } catch (error) {
       console.error("Error validating certificate:", error);
       setValidationResult({
-        isValid: false,
+        success: false,
         error: "Error al consultar la blockchain. Por favor, intenta nuevamente.",
       });
     } finally {
@@ -128,13 +162,26 @@ export default function ValidatorComponent() {
     }
   };
 
-  /** Submit del formulario (cuando el usuario escribe y pulsa validar) */
+  /** Submit form handler */
   const handleValidate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const txid = sanitizeTxId(certificateId);
-    if (!txid) return;
-    setCertificateId(txid); // normaliza lo que vea el usuario
-    await validateById(txid);
+    const input = sanitizeInput(certificateId);
+    if (!input) return;
+    setCertificateId(input);
+    await validateCertificate(input);
+  };
+
+  /** Format date from ISO string */
+  const formatDate = (isoString: string): string => {
+    try {
+      return new Date(isoString).toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return isoString;
+    }
   };
 
   return (
@@ -179,7 +226,7 @@ export default function ValidatorComponent() {
                   type="text"
                   value={certificateId}
                   onChange={(e) => setCertificateId(e.target.value)}
-                  placeholder="Ej: 0x3a78e7... (txid Stacks)"
+                  placeholder="Ej: 123 o 0x3a78e7..."
                   disabled={isSearching}
                   className="w-full rounded-xl px-5 md:px-6 py-3.5 md:py-4 pr-12 text-[15px] md:text-lg
                              bg-white text-neutral-900 placeholder:text-neutral-400
@@ -194,7 +241,7 @@ export default function ValidatorComponent() {
               </div>
 
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-                El ID del certificado es único y fue proporcionado al momento de su emisión.
+                Ingresa el ID del certificado (número) o el hash de transacción (0x...).
               </p>
             </div>
 
@@ -225,81 +272,257 @@ export default function ValidatorComponent() {
 
           {/* Resultado de la validación */}
           {validationResult && (
-            <div
-              className={`mt-6 rounded-xl border p-5 md:p-6 ${validationResult.isValid
-                ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
-                : "bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50"
-                }`}
-            >
-              {validationResult.isValid ? (
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <IconShieldCheck size={28} className="text-green-600 dark:text-green-400" />
-                    <h3 className="text-lg md:text-xl font-bold text-green-900 dark:text-green-200">
-                      ✓ Certificado Válido
-                    </h3>
+            <div className="mt-6 space-y-4">
+              {validationResult.success && validationResult.data ? (
+                <>
+                  {/* Status Badge */}
+                  <div
+                    className={`rounded-xl border p-5 md:p-6 ${validationResult.data.isValidOnChain && !validationResult.data.blockchainData.revoked
+                        ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
+                        : "bg-gradient-to-br from-yellow-50/70 to-yellow-100/60 border-yellow-200 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-800/50"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      {validationResult.data.isValidOnChain && !validationResult.data.blockchainData.revoked ? (
+                        <>
+                          <IconShieldCheck size={32} className="text-green-600 dark:text-green-400" />
+                          <div>
+                            <h3 className="text-xl font-bold text-green-900 dark:text-green-200">
+                              ✓ Certificado Válido
+                            </h3>
+                            <p className="text-sm text-green-700 dark:text-green-300">
+                              Verificado en blockchain de Stacks
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <IconAlertCircle size={32} className="text-yellow-600 dark:text-yellow-400" />
+                          <div>
+                            <h3 className="text-xl font-bold text-yellow-900 dark:text-yellow-200">
+                              ⚠ Certificado {validationResult.data.blockchainData.revoked ? "Revocado" : "Expirado"}
+                            </h3>
+                            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                              {validationResult.data.blockchainData.revoked
+                                ? "Este certificado ha sido revocado por la institución emisora"
+                                : "Este certificado ha alcanzado su fecha de expiración"}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Hash Verification */}
+                    <div className="flex items-center gap-2 text-sm">
+                      {validationResult.data.hashVerified ? (
+                        <>
+                          <IconShieldCheck size={18} className="text-green-600 dark:text-green-400" />
+                          <span className="text-green-800 dark:text-green-300 font-medium">
+                            Integridad de datos verificada
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <IconAlertCircle size={18} className="text-red-600 dark:text-red-400" />
+                          <span className="text-red-800 dark:text-red-300 font-medium">
+                            Advertencia: Los datos podrían haber sido modificados
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  <p className="text-sm md:text-base text-green-800 dark:text-green-300 mb-4">
-                    Este certificado existe en la blockchain de Stacks y es auténtico.
-                  </p>
+                  {/* Certificate Details */}
+                  <div className="rounded-xl border p-6 md:p-8 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800">
+                    <h3 className="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                      <IconCertificate size={28} className="text-sky-500" />
+                      Detalles del Certificado
+                    </h3>
 
-                  {validationResult.txData && (
-                    <div className="space-y-2 text-sm text-green-800 dark:text-green-300 mb-4">
-                      <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold">Estado:</span>
-                        <span className="font-mono">{validationResult.txData.tx_status}</span>
+                    <div className="grid gap-6 md:grid-cols-2">
+                      {/* Course Information */}
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <IconAward size={20} className="text-sky-500" />
+                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Curso</h4>
+                          </div>
+                          <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+                            {validationResult.data.metadata.certificate.title}
+                          </p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                            {validationResult.data.metadata.certificate.description}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Modalidad</p>
+                          <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                            {validationResult.data.metadata.certificate.modality}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Duración</p>
+                          <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                            {validationResult.data.metadata.certificate.hours} horas
+                          </p>
+                        </div>
+
+                        {validationResult.data.metadata.certificate.category && (
+                          <div>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">Categoría</p>
+                            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                              {validationResult.data.metadata.certificate.category}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold">Tipo:</span>
-                        <span className="font-mono">{validationResult.txData.tx_type}</span>
+
+                      {/* Recipient & Achievement */}
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <IconUser size={20} className="text-sky-500" />
+                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Estudiante</h4>
+                          </div>
+                          <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+                            {validationResult.data.metadata.recipient.name}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Calificación</p>
+                          <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                            {validationResult.data.metadata.achievement.grade}
+                          </p>
+                        </div>
+
+                        {validationResult.data.metadata.achievement.skills_acquired.length > 0 && (
+                          <div>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">Habilidades Adquiridas</p>
+                            <div className="flex flex-wrap gap-2">
+                              {validationResult.data.metadata.achievement.skills_acquired.map((skill, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-3 py-1 rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 border border-sky-200 dark:border-sky-800"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <IconCalendar size={20} className="text-sky-500" />
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">Fecha de Emisión</p>
+                          </div>
+                          <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                            {formatDate(validationResult.data.metadata.certificate.issue_date_iso)}
+                          </p>
+                        </div>
                       </div>
-                      {validationResult.txData.contract_call?.function_name && (
-                        <div className="flex flex-col md:flex-row md:gap-2">
-                          <span className="font-semibold">Función del Contrato:</span>
-                          <span className="font-mono">{validationResult.txData.contract_call.function_name}</span>
+                    </div>
+
+                    {/* Issuer Information */}
+                    <div className="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                      <div className="flex items-center gap-2 mb-3">
+                        <IconSchool size={20} className="text-sky-500" />
+                        <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Institución Emisora</h4>
+                      </div>
+                      <p className="font-medium text-neutral-900 dark:text-neutral-100 mb-2">
+                        {validationResult.data.metadata.issuer.name}
+                      </p>
+                      {validationResult.data.metadata.issuer.department && (
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+                          {validationResult.data.metadata.issuer.department}
+                        </p>
+                      )}
+                      {validationResult.data.metadata.issuer.instructors.length > 0 && (
+                        <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                          <span className="font-medium">Instructores: </span>
+                          {validationResult.data.metadata.issuer.instructors.join(", ")}
                         </div>
                       )}
-                      {validationResult.txData.contract_call?.contract_id && (
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-2 font-mono">
+                        ID: {validationResult.data.metadata.issuer.authorization_id}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Blockchain Information */}
+                  <div className="rounded-xl border p-5 md:p-6 bg-gradient-to-br from-purple-50/70 to-purple-100/60 border-purple-200 dark:from-purple-950/40 dark:to-purple-900/20 dark:border-purple-800/50">
+                    <h4 className="flex items-center gap-2 text-base md:text-lg font-bold text-purple-900 dark:text-purple-200 mb-4">
+                      <IconBrandStackshare size={24} />
+                      Información de Blockchain
+                    </h4>
+
+                    <div className="grid gap-3 text-sm">
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">ID del Certificado:</span>
+                        <span className="font-mono text-purple-900 dark:text-purple-100">
+                          {validationResult.data.chainCertId}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">Wallet del Estudiante:</span>
+                        <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
+                          {validationResult.data.blockchainData.studentWallet}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">Institución (Wallet):</span>
+                        <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
+                          {validationResult.data.blockchainData.schoolId}
+                        </span>
+                      </div>
+
+                      {validationResult.data.blockchainData.expirationHeight && (
                         <div className="flex flex-col md:flex-row md:gap-2">
-                          <span className="font-semibold">Contrato:</span>
-                          <span className="font-mono text-xs break-all">
-                            {validationResult.txData.contract_call.contract_id}
+                          <span className="font-semibold text-purple-800 dark:text-purple-300">Altura de Expiración:</span>
+                          <span className="font-mono text-purple-900 dark:text-purple-100">
+                            Bloque {validationResult.data.blockchainData.expirationHeight}
                           </span>
                         </div>
                       )}
-                      {validationResult.txData.block_height && (
-                        <div className="flex flex-col md:flex-row md:gap-2">
-                          <span className="font-semibold">Bloque:</span>
-                          <span className="font-mono">{validationResult.txData.block_height}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
 
-                  <a
-                    href={`https://explorer.hiro.so/txid/${certificateId.trim()}?chain=testnet`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-white font-semibold text-sm md:text-base
-                               bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg
-                               transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <IconShieldCheck size={20} />
-                    Ver en Blockchain Explorer
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </div>
+                      <div className="flex flex-col md:flex-row md:gap-2">
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">Hash de Datos:</span>
+                        <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
+                          {validationResult.data.blockchainData.dataHash}
+                        </span>
+                      </div>
+                    </div>
+
+                    <a
+                      href={validationResult.data.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-white font-semibold text-sm md:text-base
+                                 bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg
+                                 transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      <IconShieldCheck size={20} />
+                      Ver en Blockchain Explorer
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </>
               ) : (
-                <div>
+                // Error state
+                <div className="rounded-xl border p-5 md:p-6 bg-gradient-to-br from-red-50/70 to-red-100/60 border-red-200 dark:from-red-950/40 dark:to-red-900/20 dark:border-red-800/50">
                   <div className="flex items-center gap-2 mb-4">
                     <svg className="w-7 h-7 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <h3 className="text-lg md:text-xl font-bold text-red-900 dark:text-red-200">
-                      ✗ Certificado No Válido
+                      ✗ No se pudo validar el certificado
                     </h3>
                   </div>
 
