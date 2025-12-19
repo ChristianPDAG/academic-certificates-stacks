@@ -2,7 +2,14 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { Settings } from "lucide-react";
-import { AdminContent } from "@/components/academy/admin-content";
+import { AdminContent } from "@/app/admin/components/admin-content";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Administrador | Certifikurs",
+  description: "Panel de administración para gestionar academias y certificados",
+};
 
 export default async function AdminPage() {
   const supabase = await createClient();
