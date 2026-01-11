@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Course } from "@/types/course";
 import {
@@ -45,6 +46,7 @@ interface CoursesContentProps {
 }
 
 export function CoursesContent({ academyId }: CoursesContentProps) {
+    const { t } = useTranslation();
     const [courses, setCourses] = React.useState<Course[]>([]);
     const [filteredCourses, setFilteredCourses] = React.useState<Course[]>([]);
     const [searchTerm, setSearchTerm] = React.useState("");
@@ -68,7 +70,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
             setCourses(data);
             setFilteredCourses(data);
         } catch (err: any) {
-            setError(err.message || "Error al cargar los cursos");
+            setError(err.message || t("academy.courses.errorLoading"));
         } finally {
             setIsLoading(false);
         }
@@ -199,15 +201,15 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                                Gestión de Cursos
+                                {t("academy.courses.title")} <span className="text-sky-500">{t("academy.courses.titleHighlight")}</span>
                             </h1>
                             <p className="text-muted-foreground">
-                                Administra los cursos de tu academia
+                                {t("academy.courses.description")}
                             </p>
                         </div>
                         <Button onClick={handleAddCourse} size="lg">
                             <Plus className="mr-2 h-5 w-5" />
-                            Nuevo Curso
+                            {t("academy.courses.addCourse")}
                         </Button>
                     </div>
                 </motion.div>
@@ -222,7 +224,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                 >
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Cursos</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t("academy.courses.stats.total")}</CardTitle>
                             <BookOpen className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
@@ -232,7 +234,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Activos</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t("academy.courses.stats.active")}</CardTitle>
                             <Award className="h-4 w-4 text-green-600" />
                         </CardHeader>
                         <CardContent>
@@ -244,7 +246,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Inactivos</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t("academy.courses.stats.inactive")}</CardTitle>
                             <AlertCircle className="h-4 w-4 text-amber-600" />
                         </CardHeader>
                         <CardContent>
@@ -256,7 +258,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Horas</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t("academy.courses.stats.totalHours")}</CardTitle>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
@@ -276,7 +278,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Buscar cursos por título, descripción, categoría o instructor..."
+                            placeholder={t("academy.courses.filters.search")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10"
@@ -289,21 +291,21 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                             onClick={() => setFilterStatus("all")}
                             size="sm"
                         >
-                            Todos
+                            {t("academy.courses.filters.all")}
                         </Button>
                         <Button
                             variant={filterStatus === "active" ? "default" : "outline"}
                             onClick={() => setFilterStatus("active")}
                             size="sm"
                         >
-                            Activos
+                            {t("academy.courses.filters.active")}
                         </Button>
                         <Button
                             variant={filterStatus === "inactive" ? "default" : "outline"}
                             onClick={() => setFilterStatus("inactive")}
                             size="sm"
                         >
-                            Inactivos
+                            {t("academy.courses.filters.inactive")}
                         </Button>
                     </div>
                 </motion.div>
@@ -333,18 +335,18 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                         <BookOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                         <h3 className="text-lg font-semibold mb-2">
                             {searchTerm || filterStatus !== "all"
-                                ? "No se encontraron cursos"
-                                : "No hay cursos registrados"}
+                                ? t("academy.courses.table.noCourses")
+                                : t("academy.courses.table.noCourses")}
                         </h3>
                         <p className="text-muted-foreground mb-6">
                             {searchTerm || filterStatus !== "all"
-                                ? "Intenta con otros términos de búsqueda o filtros"
-                                : "Comienza creando tu primer curso"}
+                                ? t("academy.courses.filters.search")
+                                : t("academy.courses.table.noCoursesDescription")}
                         </p>
                         {!searchTerm && filterStatus === "all" && (
                             <Button onClick={handleAddCourse}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Crear Primer Curso
+                                {t("academy.courses.addCourse")}
                             </Button>
                         )}
                     </motion.div>
@@ -376,7 +378,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                                     <div className="flex items-center justify-between mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="items-per-page" className="text-sm">
-                                                Por página:
+                                                {t("academy.courses.pagination.itemsPerPage")}
                                             </Label>
                                             <Select
                                                 value={itemsPerPage.toString()}
@@ -394,8 +396,8 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                                                 </SelectContent>
                                             </Select>
                                             <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                                                Mostrando {(currentPage - 1) * itemsPerPage + 1} -{" "}
-                                                {Math.min(currentPage * itemsPerPage, filteredCourses.length)} de{" "}
+                                                {t("academy.courses.pagination.showing")} {(currentPage - 1) * itemsPerPage + 1} {t("academy.courses.pagination.to")}{" "}
+                                                {Math.min(currentPage * itemsPerPage, filteredCourses.length)} {t("academy.courses.pagination.of")}{" "}
                                                 {filteredCourses.length}
                                             </span>
                                         </div>
@@ -410,7 +412,7 @@ export function CoursesContent({ academyId }: CoursesContentProps) {
                                                 <ChevronLeft className="h-4 w-4" />
                                             </Button>
                                             <span className="text-sm font-medium">
-                                                Página {currentPage} de {totalPages}
+                                                Página {currentPage} {t("academy.courses.pagination.of")} {totalPages}
                                             </span>
                                             <Button
                                                 variant="outline"

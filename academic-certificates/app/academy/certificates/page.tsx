@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,6 +63,7 @@ interface MetadataCache {
 }
 
 export default function CertificatesPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [userId, setUserId] = useState<string>("");
     const [certificates, setCertificates] = useState<CertificateRow[]>([]);
@@ -372,11 +374,11 @@ export default function CertificatesPage() {
                 <div className="flex items-center gap-3 mb-2">
                     <Award className="h-8 w-8 text-sky-500" />
                     <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
-                        Gestión de Certificados
+                        {t("academy.certificates.title")} <span className="text-sky-500">{t("academy.certificates.titleHighlight")}</span>
                     </h1>
                 </div>
                 <p className="text-neutral-600 dark:text-neutral-400">
-                    Administra, filtra y sincroniza todos los certificados emitidos por tu academia
+                    {t("academy.certificates.description")}
                 </p>
             </div>
 
@@ -387,7 +389,7 @@ export default function CertificatesPage() {
                         <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
                             {certificates.length}
                         </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Total Certificados</p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.total")}</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -395,7 +397,7 @@ export default function CertificatesPage() {
                         <div className="text-2xl font-bold text-green-600">
                             {certificates.filter((c) => c.status === "issued").length}
                         </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Activos</p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.issued")}</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -403,7 +405,7 @@ export default function CertificatesPage() {
                         <div className="text-2xl font-bold text-red-600">
                             {certificates.filter((c) => c.status === "revoked").length}
                         </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Revocados</p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.revoked")}</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -411,7 +413,7 @@ export default function CertificatesPage() {
                         <div className="text-2xl font-bold text-amber-600">
                             {certificates.filter((c) => c.status === "draft").length}
                         </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Borradores</p>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.drafts")}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -423,20 +425,20 @@ export default function CertificatesPage() {
                         <div>
                             <CardTitle className="flex items-center gap-2">
                                 <Filter className="h-5 w-5" />
-                                Filtros y Acciones
+                                {t("academy.certificates.filters.search")}
                             </CardTitle>
                             <CardDescription>
-                                Busca y filtra certificados, realiza acciones en masa
+                                {t("academy.certificates.description")}
                             </CardDescription>
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => loadCertificates(true)} disabled={loading}>
                                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                                Actualizar
+                                {t("academy.certificates.table.sync")}
                             </Button>
                             <Button variant="outline" onClick={handleExport} disabled={filteredAndSortedCertificates.length === 0}>
                                 <Download className="h-4 w-4 mr-2" />
-                                Exportar CSV
+                                {t("academy.certificates.export")}
                             </Button>
                         </div>
                     </div>
@@ -445,12 +447,12 @@ export default function CertificatesPage() {
                     {/* Search and filters row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="md:col-span-2">
-                            <Label htmlFor="search">Buscar</Label>
+                            <Label htmlFor="search">{t("academy.certificates.filters.search")}</Label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
                                 <Input
                                     id="search"
-                                    placeholder="Nombre, email, wallet o curso..."
+                                    placeholder={t("academy.certificates.filters.search")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="pl-10"
@@ -458,16 +460,16 @@ export default function CertificatesPage() {
                             </div>
                         </div>
                         <div>
-                            <Label htmlFor="status-filter">Estado</Label>
+                            <Label htmlFor="status-filter">{t("academy.certificates.filters.status")}</Label>
                             <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
                                 <SelectTrigger id="status-filter">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Todos</SelectItem>
-                                    <SelectItem value="issued">Activos</SelectItem>
-                                    <SelectItem value="revoked">Revocados</SelectItem>
-                                    <SelectItem value="draft">Borradores</SelectItem>
+                                    <SelectItem value="all">{t("academy.certificates.filters.all")}</SelectItem>
+                                    <SelectItem value="issued">{t("academy.certificates.filters.issued")}</SelectItem>
+                                    <SelectItem value="revoked">{t("academy.certificates.filters.revoked")}</SelectItem>
+                                    <SelectItem value="draft">{t("academy.certificates.filters.draft")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -477,7 +479,7 @@ export default function CertificatesPage() {
                     {selectedIds.size > 0 && (
                         <div className="flex items-center gap-3 p-4 bg-sky-50 dark:bg-sky-950/20 rounded-lg border border-sky-200 dark:border-sky-900">
                             <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                                {selectedIds.size} certificado{selectedIds.size > 1 ? "s" : ""} seleccionado{selectedIds.size > 1 ? "s" : ""}
+                                {selectedIds.size} {t("academy.certificates.bulkActions.selected")}
                             </span>
                             <div className="flex gap-2 ml-auto">
                                 <Button
@@ -487,7 +489,7 @@ export default function CertificatesPage() {
                                     disabled={processing}
                                 >
                                     <XCircle className="h-4 w-4 mr-2" />
-                                    Revocar Seleccionados
+                                    {t("academy.certificates.dialogs.revoke")}
                                 </Button>
                                 <Button
                                     variant="default"
@@ -497,14 +499,14 @@ export default function CertificatesPage() {
                                     className="bg-green-600 hover:bg-green-700"
                                 >
                                     <CheckCircle2 className="h-4 w-4 mr-2" />
-                                    Reactivar Seleccionados
+                                    {t("academy.certificates.dialogs.reactivate")}
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setSelectedIds(new Set())}
                                 >
-                                    Limpiar
+                                    {t("academy.certificates.dialogs.cancel")}
                                 </Button>
                             </div>
                         </div>
@@ -534,7 +536,7 @@ export default function CertificatesPage() {
                         <div className="flex items-center justify-between mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
                             <div className="flex items-center gap-2">
                                 <Label htmlFor="items-per-page" className="text-sm">
-                                    Por página:
+                                    {t("academy.certificates.pagination.itemsPerPage")}
                                 </Label>
                                 <Select
                                     value={itemsPerPage.toString()}
@@ -552,8 +554,8 @@ export default function CertificatesPage() {
                                     </SelectContent>
                                 </Select>
                                 <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                                    Mostrando {(currentPage - 1) * itemsPerPage + 1} -{" "}
-                                    {Math.min(currentPage * itemsPerPage, filteredAndSortedCertificates.length)} de{" "}
+                                    {t("academy.certificates.pagination.showing")} {(currentPage - 1) * itemsPerPage + 1} {t("academy.certificates.pagination.to")}{" "}
+                                    {Math.min(currentPage * itemsPerPage, filteredAndSortedCertificates.length)} {t("academy.certificates.pagination.of")}{" "}
                                     {filteredAndSortedCertificates.length}
                                 </span>
                             </div>
@@ -568,7 +570,7 @@ export default function CertificatesPage() {
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
                                 <span className="text-sm font-medium">
-                                    Página {currentPage} de {totalPages}
+                                    Página {currentPage} {t("academy.certificates.pagination.of")} {totalPages}
                                 </span>
                                 <Button
                                     variant="outline"
@@ -589,16 +591,16 @@ export default function CertificatesPage() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {bulkAction === "revoke" ? "Revocar Certificados" : "Reactivar Certificados"}
+                            {bulkAction === "revoke" ? t("academy.certificates.dialogs.revokeTitle") : t("academy.certificates.dialogs.reactivateTitle")}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            ¿Estás seguro de que deseas {bulkAction === "revoke" ? "revocar" : "reactivar"}{" "}
-                            {selectedIds.size} certificado{selectedIds.size > 1 ? "s" : ""}? Esta acción se
-                            registrará en la blockchain.
+                            {bulkAction === "revoke" 
+                                ? t("academy.certificates.dialogs.revokeDescription")
+                                : t("academy.certificates.dialogs.reactivateDescription")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={processing}>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel disabled={processing}>{t("academy.certificates.dialogs.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleBulkAction}
                             disabled={processing}
@@ -611,12 +613,12 @@ export default function CertificatesPage() {
                             {processing ? (
                                 <>
                                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                    Procesando...
+                                    {t("academy.certificates.dialogs.processing")}
                                 </>
                             ) : bulkAction === "revoke" ? (
-                                "Revocar Todos"
+                                t("academy.certificates.dialogs.revoke")
                             ) : (
-                                "Reactivar Todos"
+                                t("academy.certificates.dialogs.reactivate")
                             )}
                         </AlertDialogAction>
                     </AlertDialogFooter>

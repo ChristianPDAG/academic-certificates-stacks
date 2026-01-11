@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, GraduationCap, Loader2, AlertCircle } from "lucide-react";
@@ -37,6 +38,7 @@ export interface CertificateType {
 }
 
 export default function StudentDashboard({ user }: StudentDashboardProps) {
+    const { t } = useTranslation();
     const [certificates, setCertificates] = useState<CertificateType[]>([]);
     const [loading, setLoading] = useState(true);
     const [stacksAddress, setStacksAddress] = useState<string>("");
@@ -54,7 +56,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
             const studentData = await getStudentWallet(user.email);
 
             if (!studentData?.stacks_address) {
-                setError("No se encontró una dirección de Stacks asociada a tu cuenta");
+                setError(t("studentDashboard.noStacksAddress"));
                 setLoading(false);
                 return;
             }
@@ -66,7 +68,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
             setCertificates(certificatesData);
         } catch (err) {
             console.error("Error loading student data:", err);
-            setError(err instanceof Error ? err.message : "Error al cargar los datos del estudiante");
+            setError(err instanceof Error ? err.message : t("studentDashboard.errorLoadingStudent"));
         } finally {
             setLoading(false);
         }
@@ -102,7 +104,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                                   dark:from-green-950/50 dark:to-green-900/30 dark:border-green-900/50"
                     >
                         <span className="text-sm font-semibold text-green-800 dark:text-green-200">
-                            Calificación:
+                            {t("studentDashboard.gradeLabel")}
                         </span>
                         <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                             {certificate.grade}
@@ -112,7 +114,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
 
                 <div className="grid gap-3">
                     <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                        <span className="text-sm font-semibold block mb-2">Academia</span>
+                        <span className="text-sm font-semibold block mb-2">{t("studentDashboard.academyLabel")}</span>
                         <p className="text-sm mb-1">{certificate.academies.legal_name}</p>
                         <p
                             className="text-xs font-mono rounded-lg p-2 break-all border
@@ -136,10 +138,10 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                     <GraduationCap className="h-8 w-8 text-sky-500 dark:text-sky-400" />
                     <div>
                         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            ¡Bienvenido, {user.email.split("@")[0]}!
+                            {t("studentDashboard.welcome", { name: user.email.split("@")[0] })}
                         </h1>
                         <p className="text-neutral-600 dark:text-neutral-400">
-                            Aquí puedes consultar tus certificados académicos
+                            {t("studentDashboard.description")}
                         </p>
                     </div>
                 </div>
@@ -150,7 +152,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                                bg-white/80 border-neutral-200
                                dark:bg-neutral-900/70 dark:border-neutral-800">
                     <CardHeader>
-                        <CardTitle className="text-base">Tu dirección de Stacks</CardTitle>
+                        <CardTitle className="text-base">{t("studentDashboard.stacksAddress")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
@@ -168,7 +170,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                 <div className="flex items-center gap-2 mb-6">
                     <Award className="h-6 w-6 text-sky-500 dark:text-sky-400" />
                     <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                        Mis Certificados
+                        {t("studentDashboard.myCertificates")}
                     </h2>
                     {certificates.length > 0 && (
                         <Badge className="bg-sky-500 text-white">
@@ -185,7 +187,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                             <div className="flex flex-col items-center justify-center py-12">
                                 <Loader2 className="h-12 w-12 animate-spin text-sky-500 dark:text-sky-400 mb-4" />
                                 <p className="text-neutral-600 dark:text-neutral-400">
-                                    Cargando tus certificados...
+                                    {t("studentDashboard.loadingCertificates")}
                                 </p>
                             </div>
                         </CardContent>
@@ -199,7 +201,7 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                                 <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                                 <div>
                                     <p className="font-semibold text-red-900 dark:text-red-200">
-                                        Error al cargar certificados
+                                        {t("studentDashboard.errorLoadingCertificates")}
                                     </p>
                                     <p className="text-sm text-red-700 dark:text-red-300">
                                         {error}
@@ -216,10 +218,10 @@ export default function StudentDashboard({ user }: StudentDashboardProps) {
                             <div className="flex flex-col items-center justify-center py-12 text-neutral-500 dark:text-neutral-400">
                                 <Award className="h-16 w-16 mb-4 opacity-50" />
                                 <p className="text-lg font-semibold mb-2">
-                                    No tienes certificados aún
+                                    {t("studentDashboard.noCertificates")}
                                 </p>
                                 <p className="text-sm text-center max-w-md">
-                                    Los certificados emitidos a tu dirección aparecerán aquí
+                                    {t("studentDashboard.noCertificatesDescription")}
                                 </p>
                             </div>
                         </CardContent>

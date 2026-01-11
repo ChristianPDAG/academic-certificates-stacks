@@ -5,20 +5,22 @@ import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
 import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function FAQTeaser() {
+  const { t } = useTranslation();
   const items = [
     {
-      q: "¿Qué es la Web 2 y la Web 3?",
-      a: "Web 2 es la web tradicional con plataformas centralizadas. Web 3 añade propiedad y verificación en blockchain, permitiendo que los datos y activos sean tuyos.",
+      q: t("home.faq.question1"),
+      a: t("home.faq.answer1"),
     },
     {
-      q: "¿Qué es una wallet y qué es una dirección?",
-      a: "La wallet es tu billetera cripto. Su dirección es como tu número de cuenta: sirve para recibir o identificar activos/acciones en la cadena.",
+      q: t("home.faq.question2"),
+      a: t("home.faq.answer2"),
     },
     {
-      q: "¿Necesito crear mi propia wallet para usar el sistema?",
-      a: "No. Nuestro flujo te registra y asocia internamente la wallet; puedes usar el sistema sin instalar nada. Si luego quieres, conectas tu wallet personal.",
+      q: t("home.faq.question3"),
+      a: t("home.faq.answer3"),
     },
   ];
 
@@ -41,7 +43,7 @@ export default function FAQTeaser() {
               viewport={{ once: true, amount: 0.4 }}
               variants={slideInFromBottom({ delay: 0.1 })}
             >
-              Preguntas <span className="text-sky-500 dark:text-sky-400">Frecuentes</span>
+              {t("home.faq.title")} <span className="text-sky-500 dark:text-sky-400">{t("home.faq.titleHighlight")}</span>
             </motion.h2>
 
             <motion.p
@@ -51,7 +53,7 @@ export default function FAQTeaser() {
               viewport={{ once: true, amount: 0.4 }}
               variants={slideInFromBottom({ delay: 0.25 })}
             >
-              Resuelve los conceptos clave de forma simple y conoce cómo funcionamos.
+              {t("home.faq.description")}
             </motion.p>
 
             <motion.div
@@ -65,7 +67,7 @@ export default function FAQTeaser() {
                 href="/faq"
                 className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-white bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-2 border-sky-500 hover:border-sky-600 relative overflow-hidden group"
               >
-                <span className="relative z-10">Ver Preguntas Frecuentes</span>
+                <span className="relative z-10">{t("home.faq.viewAllButton")}</span>
                 <span className="absolute inset-0 bg-sky-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
               </Link>
 
@@ -119,7 +121,7 @@ export default function FAQTeaser() {
                           href="/faq"
                           className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-900/20 dark:hover:bg-sky-900/30 border border-sky-200 dark:border-sky-800/60 transition-all duration-200"
                         >
-                          Ver todas las preguntas
+                          {t("home.faq.viewAllLink")}
                           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                             <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
@@ -132,7 +134,7 @@ export default function FAQTeaser() {
 
               <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                 <IconInfoCircle size={16} />
-                Más conceptos y guías paso a paso en la página de Preguntas Frecuentes.
+                {t("home.faq.moreInfo")}
               </div>
             </motion.div>
           </div>

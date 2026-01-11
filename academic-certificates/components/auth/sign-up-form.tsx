@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ export function SignUpForm({
   type,
   ...props
 }: React.ComponentPropsWithoutRef<"div"> & signUpFormProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,17 +38,6 @@ export function SignUpForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const content = {
-    student: {
-      title: "Regístrate como Estudiante",
-      description: "Comienza a validar y gestionar tus certificados académicos en la blockchain de Stacks"
-    },
-    academy: {
-      title: "Comienza a Certificar en la Blockchain",
-      description: "Emite y gestiona certificados académicos de forma segura e inmutable"
-    }
-  };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
@@ -54,7 +45,7 @@ export function SignUpForm({
     setError(null);
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match");
+      setError(t("auth.signup.passwordMismatch"));
       setIsLoading(false);
       return;
     }
@@ -89,10 +80,10 @@ export function SignUpForm({
       <Card>
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            {content[type].title}
+            {t(`auth.signup.${type}.title`)}
           </CardTitle>
           <CardDescription className="text-base">
-            {content[type].description}
+            {t(`auth.signup.${type}.description`)}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -100,12 +91,12 @@ export function SignUpForm({
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="nombre" className="text-sm font-medium">
-                  {type === "academy" ? "Nombre de la Academia" : "Nombre Completo"}
+                  {type === "academy" ? t("auth.signup.academyName") : t("auth.signup.name")}
                 </Label>
                 <Input
                   id="nombre"
                   type="text"
-                  placeholder={type === "academy" ? "Ej: Academia de Desarrollo Web" : "Ej: Juan Pérez"}
+                  placeholder={type === "academy" ? t("auth.signup.academyNamePlaceholder") : t("auth.signup.namePlaceholder")}
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -114,12 +105,12 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Correo Electrónico
+                  {t("auth.signup.email")}
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="correo@ejemplo.com"
+                  placeholder={t("auth.signup.emailPlaceholder")}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -128,12 +119,12 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  Contraseña
+                  {t("auth.signup.password")}
                 </Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={t("auth.signup.passwordPlaceholder")}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -142,12 +133,12 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="repeat-password" className="text-sm font-medium">
-                  Confirmar Contraseña
+                  {t("auth.signup.confirmPassword")}
                 </Label>
                 <Input
                   id="repeat-password"
                   type="password"
-                  placeholder="Repite tu contraseña"
+                  placeholder={t("auth.signup.confirmPasswordPlaceholder")}
                   required
                   value={repeatPassword}
                   onChange={(e) => setRepeatPassword(e.target.value)}
@@ -165,19 +156,19 @@ export function SignUpForm({
                 disabled={isLoading}
               >
                 {isLoading 
-                  ? "Creando cuenta..." 
+                  ? t("auth.signup.signingUp") 
                   : type === "academy" 
-                    ? "Comenzar a Certificar" 
-                    : "Crear Cuenta de Estudiante"}
+                    ? t("auth.signup.academySignUpButton") 
+                    : t("auth.signup.signUpButton")}
               </Button>
             </div>
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              ¿Ya tienes una cuenta?{" "}
+              {t("auth.signup.alreadyHaveAccount")}{" "}
               <Link 
                 href="/auth/login" 
                 className="font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 underline underline-offset-4 transition-colors"
               >
-                Inicia Sesión
+                {t("auth.signup.login")}
               </Link>
             </div>
           </form>

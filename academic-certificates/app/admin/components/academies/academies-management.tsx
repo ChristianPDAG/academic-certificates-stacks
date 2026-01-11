@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
 import { getAllAcademies } from "@/app/actions/admin/academies";
@@ -28,6 +29,7 @@ interface AcademiesManagementProps {
 }
 
 export function AcademiesManagement({ initialAcademies }: AcademiesManagementProps) {
+    const { t } = useTranslation();
     const [academies, setAcademies] = useState<Academy[]>(initialAcademies);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive" | "pending">("all");
@@ -90,10 +92,10 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                         </div>
                     </div>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
-                        Gestión de <span className="text-sky-500 dark:text-sky-400">Academias</span>
+                        {t("admin.academies.title")} <span className="text-sky-500 dark:text-sky-400">{t("admin.academies.titleHighlight")}</span>
                     </h1>
                     <p className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 max-w-3xl mx-auto">
-                        Administra el estado, validación y créditos de las instituciones académicas.
+                        {t("admin.academies.description")}
                     </p>
                 </motion.div>
 
@@ -110,7 +112,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="flex items-center gap-3 mb-2">
                                 <Users className="h-8 w-8 text-sky-500 dark:text-sky-400" />
                                 <div>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">Total Academias</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("admin.academies.stats.totalAcademies")}</p>
                                     <p className="text-3xl font-bold text-sky-600 dark:text-sky-400">{stats.total}</p>
                                 </div>
                             </div>
@@ -120,7 +122,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="flex items-center gap-3 mb-2">
                                 <TrendingUp className="h-8 w-8 text-green-500 dark:text-green-400" />
                                 <div>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">Activas</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("admin.academies.stats.active")}</p>
                                     <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.active}</p>
                                 </div>
                             </div>
@@ -130,7 +132,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="flex items-center gap-3 mb-2">
                                 <Award className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
                                 <div>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">Pendientes</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("admin.academies.stats.pending")}</p>
                                     <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending}</p>
                                 </div>
                             </div>
@@ -140,7 +142,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="flex items-center gap-3 mb-2">
                                 <School className="h-8 w-8 text-amber-500 dark:text-amber-400" />
                                 <div>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">Créditos Totales</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("admin.academies.stats.totalCredits")}</p>
                                     <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{stats.totalCredits}</p>
                                 </div>
                             </div>
@@ -161,11 +163,11 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="md:col-span-6 space-y-2">
                                 <Label htmlFor="search" className="flex items-center gap-2 font-semibold">
                                     <Search className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                    Buscar Academia
+                                    {t("admin.academies.search.label")}
                                 </Label>
                                 <Input
                                     id="search"
-                                    placeholder="Nombre, email o dirección..."
+                                    placeholder={t("admin.academies.search.placeholder")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="bg-white dark:bg-neutral-800 border-2"
@@ -175,7 +177,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="md:col-span-4 space-y-2">
                                 <Label className="flex items-center gap-2 font-semibold">
                                     <Filter className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                    Filtrar por Estado
+                                    {t("admin.academies.filter.label")}
                                 </Label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <Button
@@ -183,28 +185,28 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                                         onClick={() => setFilterStatus("all")}
                                         className="text-sm"
                                     >
-                                        Todas
+                                        {t("admin.academies.filter.all")}
                                     </Button>
                                     <Button
                                         variant={filterStatus === "active" ? "default" : "outline"}
                                         onClick={() => setFilterStatus("active")}
                                         className="text-sm"
                                     >
-                                        Activas
+                                        {t("admin.academies.filter.active")}
                                     </Button>
                                     <Button
                                         variant={filterStatus === "inactive" ? "default" : "outline"}
                                         onClick={() => setFilterStatus("inactive")}
                                         className="text-sm"
                                     >
-                                        Inactivas
+                                        {t("admin.academies.filter.inactive")}
                                     </Button>
                                     <Button
                                         variant={filterStatus === "pending" ? "default" : "outline"}
                                         onClick={() => setFilterStatus("pending")}
                                         className="text-sm"
                                     >
-                                        Pendientes
+                                        {t("admin.academies.filter.pending")}
                                     </Button>
                                 </div>
                             </div>
@@ -212,7 +214,7 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                             <div className="md:col-span-2 flex items-end">
                                 <Button onClick={handleRefresh} disabled={isRefreshing} className="w-full bg-sky-500 hover:bg-sky-600">
                                     <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                                    Actualizar
+                                    {t("admin.academies.refresh")}
                                 </Button>
                             </div>
                         </div>
@@ -230,11 +232,11 @@ export function AcademiesManagement({ initialAcademies }: AcademiesManagementPro
                     {filteredAcademies.length === 0 ? (
                         <div className="text-center py-12">
                             <School className="h-16 w-16 mx-auto text-neutral-400 dark:text-neutral-600 mb-4" />
-                            <h3 className="text-xl font-semibold mb-2">No se encontraron academias</h3>
+                            <h3 className="text-xl font-semibold mb-2">{t("admin.academies.noResults")}</h3>
                             <p className="text-neutral-600 dark:text-neutral-400">
                                 {searchTerm || filterStatus !== "all"
-                                    ? "Intenta cambiar los filtros de búsqueda"
-                                    : "No hay academias registradas en el sistema"}
+                                    ? t("admin.academies.changeFilters")
+                                    : t("admin.academies.noAcademies")}
                             </p>
                         </div>
                     ) : (

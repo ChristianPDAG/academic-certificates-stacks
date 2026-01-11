@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import Hero from "@/components/home/Hero";
 import { Metadata, Viewport } from "next";
-
+import Blog from "@/components/Blog";
 // Lazy load de componentes que están fuera del viewport inicial
 const Validator = dynamic(() => import("@/components/home/Validator"), {
   loading: () => <div className="min-h-screen" />,
@@ -75,6 +75,7 @@ export default function Home() {
       <Hero />
       <Validator />
       <FAQSection />
+      <Blog />
       <Advantages />
       <About />
     </main>

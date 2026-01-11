@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface MessageType {
 }
 
 export function SchoolManagement() {
+    const { t } = useTranslation();
     const [message, setMessage] = useState<MessageType | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -60,7 +62,7 @@ export function SchoolManagement() {
 
     const handleAddSchool = async () => {
         if (!newSchool.principal || !newSchool.name) {
-            showMessage("error", "Complete los campos requeridos");
+            showMessage("error", t("admin.schools.requiredFields"));
             return;
         }
 
@@ -71,11 +73,11 @@ export function SchoolManagement() {
                 newSchool.name,
                 newSchool.metadataUrl || ""
             );
-            showMessage("success", "Escuela agregada exitosamente");
+            showMessage("success", t("admin.schools.schoolAdded"));
             setShowAddDialog(false);
             setNewSchool({ principal: "", name: "", metadataUrl: "" });
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -86,9 +88,9 @@ export function SchoolManagement() {
         setLoading(true);
         try {
             await deactivateSchoolManagerClient(principal);
-            showMessage("success", "Escuela desactivada");
+            showMessage("success", t("admin.schools.schoolDeactivated"));
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -99,9 +101,9 @@ export function SchoolManagement() {
         setLoading(true);
         try {
             await reactivateSchoolManagerClient(principal);
-            showMessage("success", "Escuela reactivada");
+            showMessage("success", t("admin.schools.schoolReactivated"));
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -112,9 +114,9 @@ export function SchoolManagement() {
         setLoading(true);
         try {
             await verifySchoolManagerClient(principal);
-            showMessage("success", "Escuela verificada");
+            showMessage("success", t("admin.schools.schoolVerified"));
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -125,9 +127,9 @@ export function SchoolManagement() {
         setLoading(true);
         try {
             await unverifySchoolManagerClient(principal);
-            showMessage("success", "Verificación removida");
+            showMessage("success", t("admin.schools.verificationRemoved"));
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -135,7 +137,7 @@ export function SchoolManagement() {
 
     const handleUpdateMetadata = async () => {
         if (!metadataUpdate.principal || !metadataUpdate.url) {
-            showMessage("error", "Complete todos los campos");
+            showMessage("error", t("admin.schools.allFields"));
             return;
         }
 
@@ -145,11 +147,11 @@ export function SchoolManagement() {
                 metadataUpdate.principal,
                 metadataUpdate.url
             );
-            showMessage("success", "Metadata actualizada");
+            showMessage("success", t("admin.schools.metadataUpdated"));
             setShowMetadataDialog(false);
             setMetadataUpdate({ principal: "", url: "" });
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -162,10 +164,10 @@ export function SchoolManagement() {
             const info = await getSchoolInfoManagerClient(queryPrincipal);
             setSchoolInfo(info);
             if (!info) {
-                showMessage("error", "Escuela no encontrada");
+                showMessage("error", t("admin.schools.schoolNotFound"));
             }
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.schools.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -193,30 +195,30 @@ export function SchoolManagement() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <School className="h-5 w-5" />
-                        Gestión de Escuelas
+                        {t("admin.schools.title")}
                     </CardTitle>
-                    <CardDescription>Administra las academias del sistema</CardDescription>
+                    <CardDescription>{t("admin.schools.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* Consultar Escuela */}
                     <div className="space-y-4 p-4 border rounded-lg">
-                        <h3 className="font-semibold">Consultar Escuela</h3>
+                        <h3 className="font-semibold">{t("admin.schools.querySchool")}</h3>
                         <div className="flex gap-2">
                             <Input
-                                placeholder="Principal de la escuela"
+                                placeholder={t("admin.schools.schoolPrincipalPlaceholder")}
                                 value={queryPrincipal}
                                 onChange={(e) => setQueryPrincipal(e.target.value)}
                             />
                             <Button onClick={handleQuerySchool} disabled={loading}>
-                                Consultar
+                                {t("admin.schools.query")}
                             </Button>
                         </div>
                         {schoolInfo && (
                             <div className="mt-4 p-4 bg-muted rounded-lg space-y-2">
-                                <p><strong>Nombre:</strong> {schoolInfo.name}</p>
-                                <p><strong>Activa:</strong> {schoolInfo.active ? "Sí" : "No"}</p>
-                                <p><strong>Verificada:</strong> {schoolInfo.verified ? "Sí" : "No"}</p>
-                                <p><strong>Metadata URL:</strong> {schoolInfo["metadata-url"] || "N/A"}</p>
+                                <p><strong>{t("admin.schools.name")}:</strong> {schoolInfo.name}</p>
+                                <p><strong>{t("admin.schools.active")}:</strong> {schoolInfo.active ? t("admin.schools.yes") : t("admin.schools.no")}</p>
+                                <p><strong>{t("admin.schools.verified")}:</strong> {schoolInfo.verified ? t("admin.schools.yes") : t("admin.schools.no")}</p>
+                                <p><strong>{t("admin.schools.metadataUrl")}:</strong> {schoolInfo["metadata-url"] || t("admin.schools.notApplicable")}</p>
 
                                 <div className="flex flex-wrap gap-2 pt-2">
                                     {schoolInfo.active ? (
@@ -226,7 +228,7 @@ export function SchoolManagement() {
                                             onClick={() => handleDeactivateSchool(queryPrincipal)}
                                             disabled={loading}
                                         >
-                                            Desactivar
+                                            {t("admin.schools.deactivate")}
                                         </Button>
                                     ) : (
                                         <Button
@@ -235,7 +237,7 @@ export function SchoolManagement() {
                                             onClick={() => handleReactivateSchool(queryPrincipal)}
                                             disabled={loading}
                                         >
-                                            Reactivar
+                                            {t("admin.schools.reactivate")}
                                         </Button>
                                     )}
 
@@ -247,7 +249,7 @@ export function SchoolManagement() {
                                             disabled={loading}
                                         >
                                             <ShieldOff className="h-4 w-4 mr-2" />
-                                            Quitar Verificación
+                                            {t("admin.schools.removeVerification")}
                                         </Button>
                                     ) : (
                                         <Button
@@ -257,7 +259,7 @@ export function SchoolManagement() {
                                             disabled={loading}
                                         >
                                             <ShieldCheck className="h-4 w-4 mr-2" />
-                                            Verificar
+                                            {t("admin.schools.verify")}
                                         </Button>
                                     )}
                                 </div>
@@ -269,11 +271,11 @@ export function SchoolManagement() {
                     <div className="flex flex-wrap gap-3 pt-4 border-t">
                         <Button onClick={() => setShowAddDialog(true)}>
                             <School className="h-4 w-4 mr-2" />
-                            Agregar Escuela
+                            {t("admin.schools.addSchool")}
                         </Button>
                         <Button variant="outline" onClick={() => setShowMetadataDialog(true)}>
                             <Edit className="h-4 w-4 mr-2" />
-                            Actualizar Metadata
+                            {t("admin.schools.updateMetadata")}
                         </Button>
                     </div>
                 </CardContent>
@@ -283,14 +285,14 @@ export function SchoolManagement() {
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Agregar Nueva Escuela</DialogTitle>
+                        <DialogTitle>{t("admin.schools.addNewSchool")}</DialogTitle>
                         <DialogDescription>
-                            Complete la información de la nueva academia
+                            {t("admin.schools.addSchoolDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Principal de la Escuela *</Label>
+                            <Label>{t("admin.schools.schoolPrincipalRequired")}</Label>
                             <Input
                                 placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
                                 value={newSchool.principal}
@@ -300,9 +302,9 @@ export function SchoolManagement() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Nombre *</Label>
+                            <Label>{t("admin.schools.nameRequired")}</Label>
                             <Input
-                                placeholder="Universidad XYZ"
+                                placeholder={t("admin.schools.namePlaceholder")}
                                 value={newSchool.name}
                                 onChange={(e) =>
                                     setNewSchool({ ...newSchool, name: e.target.value })
@@ -310,7 +312,7 @@ export function SchoolManagement() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Metadata URL</Label>
+                            <Label>{t("admin.schools.metadataUrl")}</Label>
                             <Textarea
                                 placeholder="https://..."
                                 value={newSchool.metadataUrl}
@@ -322,10 +324,10 @@ export function SchoolManagement() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                            Cancelar
+                            {t("admin.schools.cancel")}
                         </Button>
                         <Button onClick={handleAddSchool} disabled={loading}>
-                            {loading ? "Procesando..." : "Agregar Escuela"}
+                            {loading ? t("admin.schools.processing") : t("admin.schools.addSchoolButton")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -335,14 +337,14 @@ export function SchoolManagement() {
             <Dialog open={showMetadataDialog} onOpenChange={setShowMetadataDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Actualizar Metadata URL</DialogTitle>
+                        <DialogTitle>{t("admin.schools.updateMetadataUrl")}</DialogTitle>
                         <DialogDescription>
-                            Actualiza la URL de metadata de una escuela
+                            {t("admin.schools.updateMetadataDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Principal de la Escuela</Label>
+                            <Label>{t("admin.schools.schoolPrincipal")}</Label>
                             <Input
                                 placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
                                 value={metadataUpdate.principal}
@@ -352,7 +354,7 @@ export function SchoolManagement() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Nueva Metadata URL</Label>
+                            <Label>{t("admin.schools.newMetadataUrl")}</Label>
                             <Textarea
                                 placeholder="https://..."
                                 value={metadataUpdate.url}
@@ -364,10 +366,10 @@ export function SchoolManagement() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowMetadataDialog(false)}>
-                            Cancelar
+                            {t("admin.schools.cancel")}
                         </Button>
                         <Button onClick={handleUpdateMetadata} disabled={loading}>
-                            {loading ? "Procesando..." : "Actualizar"}
+                            {loading ? t("admin.schools.processing") : t("admin.schools.update")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

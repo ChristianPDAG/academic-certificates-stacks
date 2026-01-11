@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
     updateAcademyStatusInDB,
     updateAcademyCreditsInDB,
@@ -55,6 +56,7 @@ interface AcademyCardProps {
 }
 
 export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
+    const { t } = useTranslation();
     const [isProcessing, setIsProcessing] = useState(false);
     const [creditsToAdd, setCreditsToAdd] = useState("");
     const [stxToTransfer, setStxToTransfer] = useState("");
@@ -83,14 +85,14 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
             // Si la blockchain tiene éxito, actualizar BD
             await updateAcademyStatusInDB(academy.id_academy, isActive);
 
-            setSuccess(`Academia ${isActive ? "desactivada" : "activada"} exitosamente en blockchain y BD`);
+            setSuccess(isActive ? t("admin.academies.messages.deactivatedSuccess") : t("admin.academies.messages.activatedSuccess"));
             setTimeout(() => {
                 onUpdate();
                 setSuccess("");
             }, 2000);
         } catch (err: any) {
             console.error("Error en toggle status:", err);
-            setError(err.message || "Error al cambiar el estado. La transacción blockchain puede estar pendiente.");
+            setError(err.message || t("admin.academies.messages.toggleError"));
         } finally {
             setIsProcessing(false);
         }
@@ -100,7 +102,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
         try {
             const amount = parseInt(creditsToAdd);
             if (isNaN(amount) || amount <= 0) {
-                setError("Ingrese una cantidad válida de créditos");
+                setError(t("admin.academies.messages.validCredits"));
                 return;
             }
 
@@ -114,7 +116,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
             // Si la blockchain tiene éxito, actualizar BD
             await updateAcademyCreditsInDB(academy.id_academy, amount);
 
-            setSuccess(`Se agregaron ${amount} créditos exitosamente en blockchain y BD`);
+            setSuccess(t("admin.academies.messages.creditsSuccess", { amount }));
             setCreditsToAdd("");
             setShowFundingInput(false);
             setTimeout(() => {
@@ -123,7 +125,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
             }, 2000);
         } catch (err: any) {
             console.error("Error al agregar créditos:", err);
-            setError(err.message || "Error al agregar créditos. La transacción blockchain puede estar pendiente.");
+            setError(err.message || t("admin.academies.messages.creditsError"));
         } finally {
             setIsProcessing(false);
         }
@@ -133,7 +135,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
         try {
             const amount = parseFloat(stxToTransfer);
             if (isNaN(amount) || amount <= 0) {
-                setError("Ingrese una cantidad válida de STX");
+                setError(t("admin.academies.messages.validSTX"));
                 return;
             }
 
@@ -155,7 +157,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
             );
         } catch (err: any) {
             console.error("Error al transferir STX:", err);
-            setError(err.message || "Error al transferir STX.");
+            setError(err.message || t("admin.academies.messages.stxError"));
         } finally {
             setIsProcessing(false);
         }
@@ -187,14 +189,14 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
             // Si la blockchain tiene éxito (o es rechazo), actualizar BD
             await updateAcademyValidationStatus(academy.id_academy, status);
 
-            setSuccess(`Academia ${status === "approved" ? "aprobada y registrada en blockchain" : "rechazada"} exitosamente`);
+            setSuccess(status === "approved" ? t("admin.academies.messages.approvedSuccess") : t("admin.academies.messages.rejectedSuccess"));
             setTimeout(() => {
                 onUpdate();
                 setSuccess("");
             }, 2000);
         } catch (err: any) {
             console.error("Error al actualizar validación:", err);
-            setError(err.message || "Error al actualizar validación. La transacción blockchain puede estar pendiente.");
+            setError(err.message || t("admin.academies.messages.validationError"));
         } finally {
             setIsProcessing(false);
         }
@@ -234,29 +236,29 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                         {isActive ? (
                             <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
                                 <Power className="h-3 w-3 mr-1" />
-                                Activa
+                                {t("admin.academies.card.active")}
                             </Badge>
                         ) : (
                             <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20">
                                 <PowerOff className="h-3 w-3 mr-1" />
-                                Inactiva
+                                {t("admin.academies.card.inactive")}
                             </Badge>
                         )}
 
                         {academy.validation_status === "approved" ? (
                             <Badge className="bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20">
                                 <CheckCircle2 className="h-3 w-3 mr-1" />
-                                Aprobada
+                                {t("admin.academies.card.approved")}
                             </Badge>
                         ) : academy.validation_status === "rejected" ? (
                             <Badge className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">
                                 <XCircle className="h-3 w-3 mr-1" />
-                                Rechazada
+                                {t("admin.academies.card.rejected")}
                             </Badge>
                         ) : (
                             <Badge className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20">
                                 <Clock className="h-3 w-3 mr-1" />
-                                Pendiente
+                                {t("admin.academies.card.pending")}
                             </Badge>
                         )}
                     </div>
@@ -269,7 +271,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <Coins className="h-5 w-5 text-amber-500" />
-                            <span className="font-semibold">Créditos Disponibles</span>
+                            <span className="font-semibold">{t("admin.academies.card.creditsAvailable")}</span>
                         </div>
                         <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">{academy.credits}</span>
                     </div>
@@ -280,23 +282,23 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                 <TabsList className="grid w-full grid-cols-2">
                                     <TabsTrigger value="credits" className="text-xs">
                                         <Coins className="h-3 w-3 mr-1" />
-                                        Créditos
+                                        {t("admin.academies.card.creditsTab")}
                                     </TabsTrigger>
                                     <TabsTrigger value="stx" className="text-xs">
                                         <ArrowUpRight className="h-3 w-3 mr-1" />
-                                        STX (Gas)
+                                        {t("admin.academies.card.stxTab")}
                                     </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="credits" className="space-y-2 mt-3">
                                     <Label htmlFor={`credits-${academy.id_academy}`} className="text-xs">
-                                        Cantidad de créditos a agregar
+                                        {t("admin.academies.card.creditsLabel")}
                                     </Label>
                                     <Input
                                         id={`credits-${academy.id_academy}`}
                                         type="number"
                                         min="1"
-                                        placeholder="100"
+                                        placeholder={t("admin.academies.card.creditsPlaceholder")}
                                         value={creditsToAdd}
                                         onChange={(e) => setCreditsToAdd(e.target.value)}
                                         className="bg-white dark:bg-neutral-800 border-2"
@@ -304,37 +306,33 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                     />
                                     <p className="text-xs text-muted-foreground">
                                         {creditsToAdd && parseInt(creditsToAdd) > 0
-                                            ? `La academia podrá emitir ${creditsToAdd} certificado(s) adicional(es)`
-                                            : "1 crédito = 1 certificado"
+                                            ? t("admin.academies.card.creditsWillIssue", { count: parseInt(creditsToAdd) })
+                                            : t("admin.academies.card.creditsInfo")
                                         }
                                     </p>
                                 </TabsContent>
 
                                 <TabsContent value="stx" className="space-y-2 mt-3">
                                     <Label htmlFor={`stx-${academy.id_academy}`} className="text-xs">
-                                        Cantidad de STX a transferir
+                                        {t("admin.academies.card.stxLabel")}
                                     </Label>
                                     <Input
                                         id={`stx-${academy.id_academy}`}
                                         type="number"
                                         min="0.001"
                                         step="0.1"
-                                        placeholder="1.0"
+                                        placeholder={t("admin.academies.card.stxPlaceholder")}
                                         value={stxToTransfer}
                                         onChange={(e) => setStxToTransfer(e.target.value)}
                                         className="bg-white dark:bg-neutral-800 border-2"
                                         disabled={isProcessing}
                                     />
                                     <div className="bg-blue-50 dark:bg-blue-950/50 p-2 rounded text-xs space-y-1">
-                                        <p className="font-medium">💡 Para qué sirven los STX:</p>
+                                        <p className="font-medium">{t("admin.academies.card.stxInfo")}</p>
                                         <ul className="ml-4 space-y-0.5 text-muted-foreground">
-                                            <li>• Pagar fees de gas en cada transacción</li>
-                                            <li>• ~0.0005 STX por certificado emitido</li>
-                                            {stxToTransfer && parseFloat(stxToTransfer) > 0 && (
-                                                <li className="font-medium text-foreground">
-                                                    • Con {stxToTransfer} STX: ~{Math.floor(parseFloat(stxToTransfer) * 2000)} transacciones
-                                                </li>
-                                            )}
+                                            <li>• {t("admin.academies.card.stxUse1")}</li>
+                                            <li>• {t("admin.academies.card.stxUse2")}</li>
+                                            <li>• {t("admin.academies.card.stxUse3")}</li>
                                         </ul>
                                     </div>
                                 </TabsContent>
@@ -355,9 +353,9 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                     ) : (
                                         <>
                                             {fundingType === "credits" ? (
-                                                <><Coins className="mr-2 h-4 w-4" /> Agregar Créditos</>
+                                                <><Coins className="mr-2 h-4 w-4" /> {t("admin.academies.card.addCredits")}</>
                                             ) : (
-                                                <><ArrowUpRight className="mr-2 h-4 w-4" /> Transferir STX</>
+                                                <><ArrowUpRight className="mr-2 h-4 w-4" /> {t("admin.academies.card.transferSTX")}</>
                                             )}
                                         </>
                                     )}
@@ -371,7 +369,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                     }}
                                     disabled={isProcessing}
                                 >
-                                    Cancelar
+                                    {t("admin.academies.card.cancel")}
                                 </Button>
                             </div>
                         </div>
@@ -382,7 +380,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                             disabled={isProcessing || !isActive}
                         >
                             <Coins className="mr-2 h-4 w-4" />
-                            Fondear Academia
+                            {t("admin.academies.card.fundAcademy")}
                         </Button>
                     )}
                 </div>
@@ -406,7 +404,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                         ) : (
                             <Power className="mr-2 h-4 w-4" />
                         )}
-                        {isActive ? "Desactivar Academia" : "Activar Academia"}
+                        {isActive ? t("admin.academies.card.deactivate") : t("admin.academies.card.activate")}
                     </Button>
 
                     {/* Validación */}
@@ -422,7 +420,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                 ) : (
                                     <CheckCircle2 className="mr-2 h-4 w-4" />
                                 )}
-                                Aprobar
+                                {t("admin.academies.card.approve")}
                             </Button>
                             <Button
                                 onClick={() => handleValidationStatus("rejected")}
@@ -434,7 +432,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                 ) : (
                                     <XCircle className="mr-2 h-4 w-4" />
                                 )}
-                                Rechazar
+                                {t("admin.academies.card.reject")}
                             </Button>
                         </div>
                     )}

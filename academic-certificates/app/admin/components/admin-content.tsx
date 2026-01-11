@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { StacksProvider } from "@/lib/stacks-provider";
 import { WalletConnection } from "@/components/wallet-connection";
 import { AdminNewDashboard } from "@/app/admin/components/admin-new-dashboard";
@@ -10,6 +11,8 @@ import { DataContractManagement, DataAdminSettings } from "@/app/admin/component
 
 
 export function AdminContent() {
+    const { t } = useTranslation();
+    
     return (
         <StacksProvider>
             <WalletConnection>
@@ -18,7 +21,7 @@ export function AdminContent() {
                 {/* Gestión de Certificate Manager (Lógica de Negocio) */}
                 <div className="space-y-6 mt-6">
                     <h2 className="text-2xl font-bold text-foreground">
-                        Certificate Manager - Lógica de Negocio
+                        {t("admin.dashboard.managerTitle")}
                     </h2>
                     <SchoolManagement />
                     <CreditManagement />
@@ -28,7 +31,7 @@ export function AdminContent() {
                 {/* Gestión de Certificate Data (Capa de Almacenamiento) */}
                 <div className="space-y-6 mt-8 pt-8 border-t">
                     <h2 className="text-2xl font-bold text-foreground">
-                        Certificate Data - Capa de Almacenamiento
+                        {t("admin.dashboard.dataTitle")}
                     </h2>
                     <DataContractManagement />
                     <DataAdminSettings />

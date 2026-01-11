@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, useState } from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const slideInFromBottom = ({ delay = 0 }) => ({
   offScreen: {
@@ -38,6 +39,7 @@ const slideInFromLeft = ({ delay = 0 }) => ({
 });
 
 const Hero = memo(() => {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -97,22 +99,21 @@ const Hero = memo(() => {
                   className="uppercase tracking-widest text-base text-blue-100 text-center lg:text-left"
                   variants={slideInFromBottom({ delay: 0 })}
                 >
-                  Certifikurs
+                  {t("home.hero.badge")}
                 </m.p>
                 <m.h1
                   className="text-white text-4xl lg:text-6xl text-center lg:text-left font-bold leading-tight tracking-wide my-2"
                   variants={slideInFromBottom({ delay: 0.1 })}
                 >
-                  El Fin de los Certificados Falsos <br />
-                  <span className="text-[#00A1FF]">Confianza Instantánea</span>
+                  {t("home.hero.title")} <br />
+                  <span className="text-[#00A1FF]">{t("home.hero.titleHighlight")}</span>
                 </m.h1>
 
                 <m.p
                   className="md:tracking-wider text-base md:text-lg lg:text-2xl text-gray-100 text-center lg:text-left mb-4 lg:mb-0"
                   variants={slideInFromBottom({ delay: 0.2 })}
-                >
-                  Conectamos instituciones, estudiantes y empresas con una fuente única de la verdad. <b>Protege tu prestigio, demuestra tu valor, contrata con certeza.</b>
-                </m.p>
+                  dangerouslySetInnerHTML={{ __html: t("home.hero.description") }}
+                />
 
                 <m.a
                   href="#about"

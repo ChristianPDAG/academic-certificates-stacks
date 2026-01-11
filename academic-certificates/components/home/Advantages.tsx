@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/utils/utils";
 import {
   IconSearch,
@@ -5,6 +7,7 @@ import {
   IconUser,
   IconSettings,
 } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 
 const Feature = ({
   title,
@@ -49,28 +52,27 @@ const Feature = ({
 };
 
 const Advantages = () => {
+  const { t } = useTranslation();
+  
   const features = [
     {
-      title: "Explorador Público",
-      description:
-        "Consulta certificados públicamente sin necesidad de registro.",
+      title: t("home.advantages.explorer.title"),
+      description: t("home.advantages.explorer.description"),
         icon: <IconSearch size={40} color="#00A1FF" />,
     },
     {
-      title: "Academia",
-      description:
-        "Emite certificados para tus estudiantes utilizando la blockchain de Stacks.",
+      title: t("home.advantages.academy.title"),
+      description: t("home.advantages.academy.description"),
         icon: <IconSchool size={40} color="#00A1FF" />,
     },
     {
-      title: "Estudiante",
-      description:
-        "Consulta y verifica tus certificados académicos almacenados en blockchain.",
+      title: t("home.advantages.student.title"),
+      description: t("home.advantages.student.description"),
         icon: <IconUser size={40} color="#00A1FF" />,
     },
     {
-      title: "Administrador",
-      description: "Gestiona academias autorizadas y administra el sistema.",
+      title: t("home.advantages.admin.title"),
+      description: t("home.advantages.admin.description"),
         icon: <IconSettings size={40} color="#00A1FF" />,
     }
   ];
