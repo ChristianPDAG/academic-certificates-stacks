@@ -11,7 +11,7 @@ export async function getStudentWalletByEmail(email: string) {
 
         const { data, error } = await supabase
             .from("users")
-            .select("stacks_address, id_user, nombre")
+            .select("stacks_address, id_user, full_name")
             .eq("role", "student")
             .eq("email", email)
             .maybeSingle();

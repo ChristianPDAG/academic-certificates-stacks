@@ -2,6 +2,10 @@ import dynamic from 'next/dynamic';
 import Hero from "@/components/home/Hero";
 import { Metadata, Viewport } from "next";
 import Blog from "@/components/Blog";
+import { getPostsPage } from "@/app/actions/blog/blog";
+
+// Revalidate homepage every 3 minutes for fresh content
+export const revalidate = 180;
 // Lazy load de componentes que están fuera del viewport inicial
 const Validator = dynamic(() => import("@/components/home/Validator"), {
   loading: () => <div className="min-h-screen" />,
@@ -69,13 +73,17 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
-export default function Home() {
+export default async function Home() {
+  // Fetch latest 3 blog posts for homepage
+  const { posts } = await getPostsPage(1);
+  const latestPosts = posts.slice(0, 3);
+
   return (
     <main className="relative flex dark:bg-black-100 justify-center items-center flex-col overflow-hidden mx-auto z-0">
       <Hero />
       <Validator />
       <FAQSection />
-      <Blog />
+      <Blog posts={latestPosts} />
       <Advantages />
       <About />
     </main>

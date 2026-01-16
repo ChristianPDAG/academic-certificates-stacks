@@ -1,20 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import dompurify from "isomorphic-dompurify";
-import { useParams } from "next/navigation";
-import { fetchPost, fetchCategories } from "@/utils/fetch";
-import { Categories } from "@/types/blog";
 import { useTranslation } from "react-i18next";
+import { Post } from "@/types/blog";
 
-interface Post {
-  title: string;
-  description: string;
-  content: string;
-  thumbnail: string;
-  published: string;
+interface BlogPostProps {
+  post: Post;
 }
 
 const formatDate = (date: string) => {
@@ -25,25 +17,9 @@ const formatDate = (date: string) => {
   });
 };
 
-const BlogPost = () => {
-  const params = useParams();
-  const param = params.slug?.toString() ?? "";
-
-  const [post, setPost] = useState<Post | null>(null);
-  const [, setCategories] = useState<Categories[]>([]);
+const BlogPost = ({ post }: BlogPostProps) => {
   const sanitizer = dompurify.sanitize;
   const { t } = useTranslation();
-
-  useEffect(() => {
-    (async () => {
-      setPost(await fetchPost(param));
-      setCategories(await fetchCategories());
-    })();
-  }, [param]);
-
-  if (!post) {
-    return <p data-oid="n6.o330">Cargando...</p>; // O un spinner de carga
-  }
 
   return (
     <div className="py-20" data-oid="1sgpwog">
@@ -53,8 +29,8 @@ const BlogPost = () => {
           data-oid="hrpr3:w"
         >
           <Image
-            src={post && `${process.env.NEXT_PUBLIC_BACKEND_URL}${post.thumbnail}`}
-            alt="image"
+            src={post.thumbnail || "/img/blog/default.jpg"}
+            alt={post.title || "Blog post image"}
             fill
             className="object-cover object-center"
             unoptimized
@@ -103,8 +79,13 @@ const BlogPost = () => {
                     </div>
                   </div>
                   <p className="font-bold text-foreground" data-oid="2p:wnr9">
-                    Certifikurs
+                    {post.author?.full_name || "Certifikurs"}
                   </p>
+                  {post.author?.designation && (
+                    <p className="text-sm text-muted-foreground">
+                      {post.author.designation}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -120,6 +101,16 @@ const BlogPost = () => {
                 </p>
               </div>
             </div>
+            {post.view_count !== undefined && (
+              <div className="mb-3">
+                <div className="mb-2">
+                  <div className="text-muted-foreground font-bold">
+                    {t("blog.views") || "Vistas"}
+                  </div>
+                </div>
+                <p className="font-bold text-foreground">{post.view_count}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

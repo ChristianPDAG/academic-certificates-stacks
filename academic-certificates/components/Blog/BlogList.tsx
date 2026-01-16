@@ -1,57 +1,39 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { fetchPostsPage } from "@/utils/fetch";
+import React, { useState } from "react";
 import BlogCard from "./BlogCard";
 import Pagination from "./Pagination";
-import Image from "next/image";
 import { useTranslation } from "react-i18next";
+import { PaginatedPosts, Post } from "@/types/blog";
+import { useRouter, useSearchParams } from "next/navigation";
 
-interface Blog {
-  slug: string;
-  title: string;
-  thumbnail: string;
-  published: string;
+interface BlogListProps {
+  initialData: PaginatedPosts;
 }
 
-const BlogList = () => {
-  const [posts, setPosts] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+const BlogList = ({ initialData }: BlogListProps) => {
+  const [data, setData] = useState<PaginatedPosts>(initialData);
   const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const fetchPostsByPage = async (page: number) => {
-      try {
-        setLoading(true);
-        const data = await fetchPostsPage(page);
-        setPosts(data.results.posts);
-        setTotalPages(Math.ceil(data.count / 6));
-        setLoading(false);
-      } catch (error) {
-        console.error("An error occurred:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchPostsByPage(currentPage);
-  }, [currentPage]);
-
-  if (loading) {
-    return <p data-oid="pf-y5t1">{t("blog.loading")}</p>;
-  }
+  const handlePageChange = (page: number) => {
+    // Update URL with new page parameter
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`/blog?${params.toString()}`);
+  };
 
   return (
     <>
       {/* Hero Section */}
-<section
-  className="relative w-full min-h-[40vh]
+      <section
+        className="relative w-full min-h-[40vh]
              bg-gradient-to-r from-primary via-primary/90 to-primary/80
              dark:from-primary dark:via-primary/80 dark:to-primary/70
              px-4 lg:px-0 pt-32 pb-24 flex items-center"
->
-  <div className="container mx-auto max-w-7xl text-center" data-oid="hero-container">
+      >
+        <div className="container mx-auto max-w-7xl text-center" data-oid="hero-container">
           <h1
             className="text-4xl md:text-6xl font-bold text-primary-foreground mb-6"
             data-oid="hero-title"
@@ -74,13 +56,13 @@ const BlogList = () => {
             className="flex flex-wrap justify-center gap-6"
             data-oid=".a87651"
           >
-            {posts && posts.length > 0 ? (
-              posts.map((post, index) => (
+            {data.posts && data.posts.length > 0 ? (
+              data.posts.map((post: Post) => (
                 <BlogCard
-                  key={index}
-                  url={post.slug}
-                  title={post.title}
-                  imageURL={post.thumbnail}
+                  key={post.id}
+                  url={post.slug || "#"}
+                  title={post.title || "Untitled"}
+                  imageURL={post.thumbnail || "/img/blog/default.jpg"}
                   date={new Date(post.published).toLocaleDateString("es-ES", {
                     year: "numeric",
                     month: "numeric",
@@ -101,14 +83,16 @@ const BlogList = () => {
             )}
           </div>
 
-          <div className="mt-8" data-oid="a36v_ko">
-            <Pagination
-              list_page={setCurrentPage}
-              count={totalPages}
-              type={"small"}
-              data-oid="t4e4zut"
-            />
-          </div>
+          {data.totalPages > 1 && (
+            <div className="mt-8" data-oid="a36v_ko">
+              <Pagination
+                list_page={handlePageChange}
+                count={data.totalPages}
+                type={"small"}
+                data-oid="t4e4zut"
+              />
+            </div>
+          )}
         </div>
       </section>
     </>

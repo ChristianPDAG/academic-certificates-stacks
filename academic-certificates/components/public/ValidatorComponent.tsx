@@ -152,6 +152,7 @@ export default function ValidatorComponent() {
 
     try {
       const result = await validateCertificateAction(input);
+      console.log("Validation result:", result);
       setValidationResult(result);
     } catch (error) {
       console.error("Error validating certificate:", error);
@@ -280,8 +281,8 @@ export default function ValidatorComponent() {
                   {/* Status Badge */}
                   <div
                     className={`rounded-xl border p-5 md:p-6 ${validationResult.data.isValidOnChain && !validationResult.data.blockchainData.revoked
-                        ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
-                        : "bg-gradient-to-br from-yellow-50/70 to-yellow-100/60 border-yellow-200 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-800/50"
+                      ? "bg-gradient-to-br from-green-50/70 to-green-100/60 border-green-200 dark:from-green-950/40 dark:to-green-900/20 dark:border-green-800/50"
+                      : "bg-gradient-to-br from-yellow-50/70 to-yellow-100/60 border-yellow-200 dark:from-yellow-950/40 dark:to-yellow-900/20 dark:border-yellow-800/50"
                       }`}
                   >
                     <div className="flex items-center gap-3 mb-3">
@@ -487,7 +488,7 @@ export default function ValidatorComponent() {
                         <div className="flex flex-col md:flex-row md:gap-2">
                           <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.expirationHeight")}:</span>
                           <span className="font-mono text-purple-900 dark:text-purple-100">
-                            {t("validator.block")} {validationResult.data.blockchainData.expirationHeight}
+                            {t("validator.block")} {isNaN(validationResult.data.blockchainData.expirationHeight) ? t("validator.notAvailable") : validationResult.data.blockchainData.expirationHeight === 0 ? t("validator.never") : validationResult.data.blockchainData.expirationHeight}
                           </span>
                         </div>
                       )}

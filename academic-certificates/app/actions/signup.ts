@@ -65,7 +65,7 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
             const { error } = await supabase.from('users').insert({
                 email,
                 role,
-                nombre,
+                full_name: nombre,
                 id_user: id,
                 id_academy: data?.id_academy,
                 user_role_in_academy: 'owner'
@@ -82,7 +82,7 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
             const { error } = await supabase.from('users').insert({
                 email,
                 role,
-                nombre,
+                full_name: nombre,
                 private_key: encryptedPrivateKey,
                 stacks_address: wallet.address,
                 id_user: id
