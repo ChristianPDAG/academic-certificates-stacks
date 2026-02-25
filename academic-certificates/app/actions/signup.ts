@@ -1,63 +1,30 @@
 "use server";
 import { createHash } from "crypto";
 import { createClient } from '@/lib/supabase/server';
+import { createWalletForUser, WalletServiceError } from '@/utils/walletApi';
 
 export async function hashPasswordDeterministic(password: string) {
     return createHash("sha256").update(password).digest("hex");
 }
 
-import { generateWallet, generateSecretKey } from '@stacks/wallet-sdk';
-import { privateKeyToAddress } from '@stacks/transactions';
-import { encryptPrivateKey } from "@/utils/cryptoUtils";
-
-function logAddressesFromPrivateKey(privateKey: string) {
-    // Compressed private key (64 or 66 characters)
-
-    // For mainnet
-    const mainnetAddress = privateKeyToAddress(
-        privateKey,
-        "mainnet"
-    );
-
-    // For testnet
-    const testnetAddress = privateKeyToAddress(
-        privateKey,
-        "testnet"
-    );
-
-    return { mainnetAddress, testnetAddress };
-}
-async function createWalletFromSeed() {
-    const secretKey = generateSecretKey();
-
-    const wallet = await generateWallet({
-        secretKey,
-        password: 'optional-encryption-password',
-    });
-
-    // Get the first account's address
-    const account = wallet.accounts[0];
-    const result = logAddressesFromPrivateKey(account.stxPrivateKey);
-    return {
-        privateKey: account.stxPrivateKey,
-        address: result.testnetAddress
-    };
-}
-
 
 export async function signup({ id, email, role, nombre }: { id: string, email: string, role: string, nombre: string }) {
     try {
-        // Generar wallet de Stacks para el nuevo usuario
-        const wallet = await createWalletFromSeed();
-
+        // 1. Obtain the current session JWT for authenticating with the wallet service
         const supabase = await createClient();
-        const encryptedPrivateKey = encryptPrivateKey(wallet.privateKey);
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+            console.error('No active session found during signup wallet creation');
+            return { success: false, error: 'Authentication required to create wallet' };
+        }
+
+
+        // 3. Persist user/academy data in Supabase
         if (role === 'academy') {
             const { data, error: errorAcademy } = await supabase.from('academies').insert({
                 legal_name: nombre,
                 contact_academy_email: email,
-                stacks_address: wallet.address,
-                stacks_key: encryptedPrivateKey,
                 validation_status: 'pending',
                 owner_user_id: id
             }).select().single();
@@ -83,8 +50,6 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
                 email,
                 role,
                 full_name: nombre,
-                private_key: encryptedPrivateKey,
-                stacks_address: wallet.address,
                 id_user: id
             });
             if (error) {
@@ -92,15 +57,21 @@ export async function signup({ id, email, role, nombre }: { id: string, email: s
                 return { success: false, error: error.message };
             }
         }
+        // 2. Create wallet via Wallet Generator Lambda (secure, KMS-backed)
+        const walletResult = await createWalletForUser(session.access_token);
+        const stacksAddress = walletResult.wallet.stacksAddress;
 
         return {
             success: true,
             wallet: {
-                address: wallet.address,
-                // Note: No enviamos la private key al cliente por seguridad
+                address: stacksAddress,
             }
         };
     } catch (error) {
+        if (error instanceof WalletServiceError) {
+            console.error(`Wallet service error (${error.statusCode}):`, error.message, error.details);
+            return { success: false, error: 'Failed to create wallet. Please try again.' };
+        }
         console.error('Error during signup:', error);
         return { success: false, error: 'Failed to create user account' };
     }

@@ -1,8 +1,41 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { getAcademyCredits, deductAcademyCredit } from "./credits";
-import { getAcademyCredentials, getAcademyIdByUserId } from "./credentials";
+import { getAcademyInfo, getAcademyIdByUserId } from "./credentials";
 import { uploadCourseMetadata } from "./courses";
+import { getWalletForUser } from "@/utils/walletApi";
+import { signTransaction, SignerServiceError } from "@/utils/signerApi";
+
+/**
+ * Helper: obtains the JWT from the current Supabase session.
+ * Throws if no session is available.
+ */
+async function requireSessionJwt(): Promise<string> {
+    const supabase = await createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+        throw new Error("Sesión no encontrada. Inicia sesión para continuar.");
+    }
+    return session.access_token;
+}
+
+/**
+ * Flujo completo: build unsigned tx → sign via Lambda → broadcast.
+ * Returns the txid and explorer URL.
+ */
+async function signAndBroadcast(
+    jwt: string,
+    txHex: string
+): Promise<{ txid: string; urlTransaction: string }> {
+    // 1. Sign via Signer Lambda (handles origin + sponsor in one call)
+    const signResult = await signTransaction(jwt, txHex);
+
+    // 2. Broadcast the signed transaction
+    const { broadcastCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
+    const { txid, urlTransaction } = await broadcastCertificateTx(signResult.signedTxHex);
+
+    return { txid, urlTransaction };
+}
 
 export async function issueCertificateAction(
     userId: string,
@@ -25,22 +58,24 @@ export async function issueCertificateAction(
     }
 ): Promise<{ success: boolean; txid: string; urlTransaction: string; verificationCode: string; certificateId: string }> {
     try {
-        // Get academy credentials
-        const { privateKey, stacksAddress, name: academyName } = await getAcademyCredentials(userId);
+        // 1. Authenticate and get wallet info
+        const jwt = await requireSessionJwt();
+        const wallet = await getWalletForUser(jwt);
+        const { name: academyName } = await getAcademyInfo(userId);
         const academyId = await getAcademyIdByUserId(userId);
 
-        // Check credits
+        // 2. Check credits
         const credits = await getAcademyCredits(userId);
         if (credits < 1) {
             throw new Error("Créditos insuficientes");
         }
 
-        // Parse skills from comma-separated string to array
+        // 3. Parse skills from comma-separated string to array
         const skillsArray = editableCourseData.skills
             ? editableCourseData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0)
             : [];
 
-        // Upload metadata to Storage and get URL + hash + verification code
+        // 4. Upload metadata to Storage and get URL + hash + verification code
         const { metadataUrl, hash, verificationCode } = await uploadCourseMetadata(
             academyId,
             {
@@ -66,24 +101,26 @@ export async function issueCertificateAction(
             }
         );
 
-        // Import function from stacks-academy
-        const { issueCertificateWithPrivateKey } = await import("@/lib/stacks/academy/certificates-manager");
-
-        // Issue certificate on blockchain with metadata URL and hash
-        const result = await issueCertificateWithPrivateKey(
+        // 5. Build unsigned transaction
+        const { buildIssueCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
+        const { txHex, certificateId } = await buildIssueCertificateTx(
             studentWallet,
             grade,
             graduationDate,
-            expirationHeight, // Pasar el block height de vencimiento
+            expirationHeight,
             metadataUrl,
-            hash, // Use the SHA-256 hash of the JSON
-            privateKey
+            hash,
+            wallet.publicKey
         );
-        console.log("Certificate issued on blockchain:", result);
-        // Deduct credit from DB
+
+        // 6. Sign via Signer Lambda + broadcast
+        const { txid, urlTransaction } = await signAndBroadcast(jwt, txHex);
+        console.log("Certificate issued on blockchain:", { txid, certificateId });
+
+        // 7. Deduct credit from DB
         await deductAcademyCredit(academyId);
 
-        // Get student user_id from email (if exists)
+        // 8. Get student user_id from email (if exists)
         const supabase = await createClient();
         let studentUserId = null;
         if (studentEmail) {
@@ -97,7 +134,7 @@ export async function issueCertificateAction(
             studentUserId = studentData?.id_user || null;
         }
 
-        // Save certificate record in database
+        // 9. Save certificate record in database
         const { data: certificateRecord, error: certError } = await supabase
             .from("certificates")
             .insert({
@@ -111,8 +148,8 @@ export async function issueCertificateAction(
                 verification_code: verificationCode,
                 metadata_uri: metadataUrl,
                 metadata_hash: hash,
-                chain_cert_id: result.certificateId, // Se puede actualizar después si la blockchain devuelve un ID
-                tx_id: result.txid,
+                chain_cert_id: certificateId,
+                tx_id: txid,
                 status: 'issued',
             })
             .select('id_certificate')
@@ -120,15 +157,20 @@ export async function issueCertificateAction(
 
         if (certError) {
             console.error("Error saving certificate to database:", certError);
-            // No lanzar error aquí para no fallar la emisión si blockchain fue exitoso
         }
 
         return {
-            ...result,
+            success: true,
+            txid,
+            urlTransaction,
             verificationCode,
             certificateId: certificateRecord?.id_certificate || '',
         };
     } catch (error: any) {
+        if (error instanceof SignerServiceError) {
+            console.error(`Signer service error (${error.statusCode}):`, error.message, error.details);
+            throw new Error("Error al firmar la transacción. Intenta nuevamente.");
+        }
         console.error("Error issuing certificate:", error);
         throw new Error(error.message || "Error al emitir certificado");
     }
@@ -139,12 +181,19 @@ export async function revokeCertificateAction(
     certId: number
 ): Promise<{ success: boolean; txid: string; urlTransaction: string }> {
     try {
-        const { privateKey } = await getAcademyCredentials(userId);
-        const { revokeCertificateWithPrivateKey } = await import("@/lib/stacks/academy/certificates-manager");
+        const jwt = await requireSessionJwt();
+        const wallet = await getWalletForUser(jwt);
 
-        const result = await revokeCertificateWithPrivateKey(certId, privateKey);
-        return result;
+        const { buildRevokeCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
+        const txHex = await buildRevokeCertificateTx(certId, wallet.publicKey);
+        const { txid, urlTransaction } = await signAndBroadcast(jwt, txHex);
+
+        return { success: true, txid, urlTransaction };
     } catch (error: any) {
+        if (error instanceof SignerServiceError) {
+            console.error(`Signer service error (${error.statusCode}):`, error.message);
+            throw new Error("Error al firmar la transacción de revocación.");
+        }
         console.error("Error revoking certificate:", error);
         throw new Error(error.message || "Error al revocar certificado");
     }
@@ -155,12 +204,19 @@ export async function reactivateCertificateAction(
     certId: number
 ): Promise<{ success: boolean; txid: string; urlTransaction: string }> {
     try {
-        const { privateKey } = await getAcademyCredentials(userId);
-        const { reactivateCertificateWithPrivateKey } = await import("@/lib/stacks/academy/certificates-manager");
+        const jwt = await requireSessionJwt();
+        const wallet = await getWalletForUser(jwt);
 
-        const result = await reactivateCertificateWithPrivateKey(certId, privateKey);
-        return result;
+        const { buildReactivateCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
+        const txHex = await buildReactivateCertificateTx(certId, wallet.publicKey);
+        const { txid, urlTransaction } = await signAndBroadcast(jwt, txHex);
+
+        return { success: true, txid, urlTransaction };
     } catch (error: any) {
+        if (error instanceof SignerServiceError) {
+            console.error(`Signer service error (${error.statusCode}):`, error.message);
+            throw new Error("Error al firmar la transacción de reactivación.");
+        }
         console.error("Error reactivating certificate:", error);
         throw new Error(error.message || "Error al reactivar certificado");
     }
@@ -239,8 +295,9 @@ export async function bulkRevokeCertificates(
     userId: string,
     certIds: number[]
 ): Promise<{ success: number; failed: number; errors: string[] }> {
-    const { privateKey } = await getAcademyCredentials(userId);
-    const { revokeCertificateWithPrivateKey } = await import("@/lib/stacks/academy/certificates-manager");
+    const jwt = await requireSessionJwt();
+    const wallet = await getWalletForUser(jwt);
+    const { buildRevokeCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
 
     let success = 0;
     let failed = 0;
@@ -248,7 +305,8 @@ export async function bulkRevokeCertificates(
 
     for (const certId of certIds) {
         try {
-            await revokeCertificateWithPrivateKey(certId, privateKey);
+            const txHex = await buildRevokeCertificateTx(certId, wallet.publicKey);
+            await signAndBroadcast(jwt, txHex);
             success++;
         } catch (error: any) {
             failed++;
@@ -266,8 +324,9 @@ export async function bulkReactivateCertificates(
     userId: string,
     certIds: number[]
 ): Promise<{ success: number; failed: number; errors: string[] }> {
-    const { privateKey } = await getAcademyCredentials(userId);
-    const { reactivateCertificateWithPrivateKey } = await import("@/lib/stacks/academy/certificates-manager");
+    const jwt = await requireSessionJwt();
+    const wallet = await getWalletForUser(jwt);
+    const { buildReactivateCertificateTx } = await import("@/lib/stacks/academy/certificates-manager");
 
     let success = 0;
     let failed = 0;
@@ -275,7 +334,8 @@ export async function bulkReactivateCertificates(
 
     for (const certId of certIds) {
         try {
-            await reactivateCertificateWithPrivateKey(certId, privateKey);
+            const txHex = await buildReactivateCertificateTx(certId, wallet.publicKey);
+            await signAndBroadcast(jwt, txHex);
             success++;
         } catch (error: any) {
             failed++;

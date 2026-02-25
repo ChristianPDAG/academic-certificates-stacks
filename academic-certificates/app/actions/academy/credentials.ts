@@ -2,7 +2,33 @@
 import { createClient } from "@/lib/supabase/server";
 import { decryptPrivateKey } from "@/utils/cryptoUtils";
 
+/**
+ * Returns academy info (name, stacks address) without exposing private keys.
+ * The private key is no longer needed since signing is handled by the Signer Lambda.
+ */
+export async function getAcademyInfo(id: string): Promise<{
+    stacksAddress: string;
+    name: string;
+}> {
+    const supabase = await createClient();
+    const { data, error }: { data: any; error: any; } = await supabase
+        .from("academies")
+        .select("stacks_address, legal_name")
+        .eq("owner_user_id", id)
+        .maybeSingle();
+    if (error) {
+        console.log("Error fetching academy info:", error);
+        throw new Error(error.message);
+    }
 
+    return { stacksAddress: data.stacks_address, name: data.legal_name };
+}
+
+/**
+ * @deprecated Use {@link getAcademyInfo} instead. Private keys are now managed
+ * by the Signer Lambda — they never leave the Lambda environment.
+ * Kept temporarily for any remaining callers during migration.
+ */
 export async function getAcademyCredentials(id: string): Promise<{
     stacksAddress: string;
     privateKey: string;
