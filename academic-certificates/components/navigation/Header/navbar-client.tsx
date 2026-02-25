@@ -71,15 +71,13 @@ export function FloatingNavClient() {
   return (
     <header
       className={`fixed inset-x-0 top-3 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl border shadow-sm transition-all duration-300 ease-in-out
-        ${
-          visible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-3 pointer-events-none"
+        ${visible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-3 pointer-events-none"
         }
-        ${
-          scrolled
-            ? "bg-background/95 border-border backdrop-blur-md"
-            : "bg-background/80 border-border/50 backdrop-blur-sm"
+        ${scrolled
+          ? "bg-background/95 border-border backdrop-blur-md"
+          : "bg-background/80 border-border/50 backdrop-blur-sm"
         }
       `}
       style={{
@@ -91,7 +89,7 @@ export function FloatingNavClient() {
         {/* Left: logo */}
         <div className="flex items-center gap-x-5">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logos/logo.png" alt="logo" width={50} height={30} />
+            <Image src="/logos/certifikurs.png" alt="logo" width={50} height={30} />
           </Link>
         </div>
 

@@ -32,33 +32,33 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const supabase = createClient();
+    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
       // Comentado Supabase temporalmente
-      // const { error: signInError } = await supabase.auth.signInWithPassword({
-      //   email,
-      //   password,
-      // });
-      // if (signInError) throw signInError;
-      // const data = await login();
-      // if (data.role === 'admin') {
-      //   router.push("/admin");
-      // }
-      // if (data.role === 'student') {
-      //   router.push("/student");
-      // }
-      // if (data.role === 'academy') {
-      //   router.push("/academy");
-      //   return;
-      // }
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) throw signInError;
+      const data = await login();
+      if (data.role === 'admin') {
+        router.push("/admin");
+      }
+      if (data.role === 'student') {
+        router.push("/student");
+      }
+      if (data.role === 'academy') {
+        router.push("/academy");
+        return;
+      }
 
       // Simular login exitoso y redirigir a student
-      setTimeout(() => {
-        router.push("/student");
-      }, 1000);
+      //setTimeout(() => {
+      //  router.push("/student");
+      //}, 1000);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
