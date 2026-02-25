@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ interface MessageType {
 }
 
 export function CertificateManagement() {
+    const { t } = useTranslation();
     const [message, setMessage] = useState<MessageType | null>(null);
     const [loading, setLoading] = useState(false);
     const [totalCertificates, setTotalCertificates] = useState<number>(0);
@@ -64,7 +66,7 @@ export function CertificateManagement() {
     const handleQueryCertificate = async () => {
         const certId = parseInt(queryCertId);
         if (isNaN(certId)) {
-            showMessage("error", "ID de certificado inválido");
+            showMessage("error", t("admin.certificates.invalidId"));
             return;
         }
 
@@ -79,10 +81,10 @@ export function CertificateManagement() {
             setIsValid(valid);
 
             if (!cert) {
-                showMessage("error", "Certificado no encontrado");
+                showMessage("error", t("admin.certificates.notFound"));
             }
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.certificates.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -95,7 +97,7 @@ export function CertificateManagement() {
         setLoading(true);
         try {
             await revokeCertificateManagerClient(certId);
-            showMessage("success", `Certificado #${certId} revocado`);
+            showMessage("success", t("admin.certificates.revoked", { id: certId }));
             setShowRevokeDialog(false);
             setActionCertId("");
             // Recargar si es el certificado actual
@@ -103,7 +105,7 @@ export function CertificateManagement() {
                 handleQueryCertificate();
             }
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.certificates.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -116,7 +118,7 @@ export function CertificateManagement() {
         setLoading(true);
         try {
             await reactivateCertificateManagerClient(certId);
-            showMessage("success", `Certificado #${certId} reactivado`);
+            showMessage("success", t("admin.certificates.reactivated", { id: certId }));
             setShowReactivateDialog(false);
             setActionCertId("");
             // Recargar si es el certificado actual
@@ -124,7 +126,7 @@ export function CertificateManagement() {
                 handleQueryCertificate();
             }
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.certificates.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -154,13 +156,13 @@ export function CertificateManagement() {
                         <div>
                             <CardTitle className="flex items-center gap-2">
                                 <Award className="h-5 w-5" />
-                                Gestión de Certificados
+                                {t("admin.certificates.title")}
                             </CardTitle>
-                            <CardDescription>Administra certificados del sistema</CardDescription>
+                            <CardDescription>{t("admin.certificates.description")}</CardDescription>
                         </div>
                         <Button variant="outline" size="sm" onClick={loadTotalCertificates}>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Actualizar
+                            {t("admin.certificates.refresh")}
                         </Button>
                     </div>
                 </CardHeader>
@@ -170,7 +172,7 @@ export function CertificateManagement() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-purple-600 font-medium">
-                                    Total de Certificados
+                                    {t("admin.certificates.totalCertificates")}
                                 </p>
                                 <p className="text-3xl font-bold text-purple-900">
                                     {totalCertificates}
@@ -182,51 +184,51 @@ export function CertificateManagement() {
 
                     {/* Consultar Certificado */}
                     <div className="space-y-4 p-4 border rounded-lg">
-                        <h3 className="font-semibold">Consultar Certificado</h3>
+                        <h3 className="font-semibold">{t("admin.certificates.queryCertificate")}</h3>
                         <div className="flex gap-2">
                             <Input
                                 type="number"
-                                placeholder="ID del certificado"
+                                placeholder={t("admin.certificates.certificateId")}
                                 value={queryCertId}
                                 onChange={(e) => setQueryCertId(e.target.value)}
                             />
                             <Button onClick={handleQueryCertificate} disabled={loading}>
-                                Consultar
+                                {t("admin.certificates.query")}
                             </Button>
                         </div>
 
                         {certInfo && (
                             <div className="mt-4 p-4 bg-muted rounded-lg space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="font-semibold">Certificado #{queryCertId}</h4>
+                                    <h4 className="font-semibold">{t("admin.certificates.certificateNumber", { id: queryCertId })}</h4>
                                     {isValid !== null && (
                                         <Badge variant={isValid ? "default" : "destructive"}>
-                                            {isValid ? "Válido" : "Inválido"}
+                                            {isValid ? t("admin.certificates.valid") : t("admin.certificates.invalid")}
                                         </Badge>
                                     )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                     <div>
-                                        <p className="text-muted-foreground">Escuela</p>
+                                        <p className="text-muted-foreground">{t("admin.certificates.school")}</p>
                                         <p className="font-mono text-xs break-all">
                                             {certInfo["school-id"]?.value}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground">Estudiante</p>
+                                        <p className="text-muted-foreground">{t("admin.certificates.student")}</p>
                                         <p className="font-mono text-xs break-all">
                                             {certInfo["student-wallet"]?.value}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground">Calificación</p>
-                                        <p>{certInfo.grade?.value || "N/A"}</p>
+                                        <p className="text-muted-foreground">{t("admin.certificates.grade")}</p>
+                                        <p>{certInfo.grade?.value || t("admin.certificates.notApplicable")}</p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground">Estado</p>
+                                        <p className="text-muted-foreground">{t("admin.certificates.status")}</p>
                                         <Badge variant={certInfo.revoked ? "destructive" : "default"}>
-                                            {certInfo.revoked ? "Revocado" : "Activo"}
+                                            {certInfo.revoked ? t("admin.certificates.revoked") : t("admin.certificates.active")}
                                         </Badge>
                                     </div>
                                 </div>
@@ -241,7 +243,7 @@ export function CertificateManagement() {
                                             }}
                                         >
                                             <RotateCcw className="h-4 w-4 mr-2" />
-                                            Reactivar
+                                            {t("admin.certificates.reactivate")}
                                         </Button>
                                     ) : (
                                         <Button
@@ -253,7 +255,7 @@ export function CertificateManagement() {
                                             }}
                                         >
                                             <Ban className="h-4 w-4 mr-2" />
-                                            Revocar
+                                            {t("admin.certificates.revoke")}
                                         </Button>
                                     )}
                                 </div>
@@ -268,14 +270,14 @@ export function CertificateManagement() {
                             onClick={() => setShowRevokeDialog(true)}
                         >
                             <Ban className="h-4 w-4 mr-2" />
-                            Revocar Certificado
+                            {t("admin.certificates.revokeCertificate")}
                         </Button>
                         <Button
                             variant="outline"
                             onClick={() => setShowReactivateDialog(true)}
                         >
                             <RotateCcw className="h-4 w-4 mr-2" />
-                            Reactivar Certificado
+                            {t("admin.certificates.reactivateCertificate")}
                         </Button>
                     </div>
                 </CardContent>
@@ -285,14 +287,14 @@ export function CertificateManagement() {
             <Dialog open={showRevokeDialog} onOpenChange={setShowRevokeDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Revocar Certificado</DialogTitle>
+                        <DialogTitle>{t("admin.certificates.revokeCertificate")}</DialogTitle>
                         <DialogDescription>
-                            Ingresa el ID del certificado que deseas revocar
+                            {t("admin.certificates.revokeDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>ID del Certificado</Label>
+                            <Label>{t("admin.certificates.certificateId")}</Label>
                             <Input
                                 type="number"
                                 placeholder="123"
@@ -302,20 +304,20 @@ export function CertificateManagement() {
                         </div>
                         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                             <p className="text-sm text-red-800">
-                                ⚠️ Esta acción marcará el certificado como revocado
+                                {t("admin.certificates.revokeWarning")}
                             </p>
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowRevokeDialog(false)}>
-                            Cancelar
+                            {t("admin.certificates.cancel")}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={handleRevokeCertificate}
                             disabled={loading}
                         >
-                            {loading ? "Procesando..." : "Revocar"}
+                            {loading ? t("admin.certificates.processing") : t("admin.certificates.revoke")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -325,14 +327,14 @@ export function CertificateManagement() {
             <Dialog open={showReactivateDialog} onOpenChange={setShowReactivateDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Reactivar Certificado</DialogTitle>
+                        <DialogTitle>{t("admin.certificates.reactivateCertificate")}</DialogTitle>
                         <DialogDescription>
-                            Ingresa el ID del certificado revocado que deseas reactivar
+                            {t("admin.certificates.reactivateDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>ID del Certificado</Label>
+                            <Label>{t("admin.certificates.certificateId")}</Label>
                             <Input
                                 type="number"
                                 placeholder="123"
@@ -342,16 +344,16 @@ export function CertificateManagement() {
                         </div>
                         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p className="text-sm text-blue-800">
-                                💡 Solo certificados revocados pueden ser reactivados
+                                {t("admin.certificates.reactivateInfo")}
                             </p>
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowReactivateDialog(false)}>
-                            Cancelar
+                            {t("admin.certificates.cancel")}
                         </Button>
                         <Button onClick={handleReactivateCertificate} disabled={loading}>
-                            {loading ? "Procesando..." : "Reactivar"}
+                            {loading ? t("admin.certificates.processing") : t("admin.certificates.reactivate")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

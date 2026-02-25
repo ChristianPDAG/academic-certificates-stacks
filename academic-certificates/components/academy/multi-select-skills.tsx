@@ -4,6 +4,7 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "react-i18next";
 
 interface MultiSelectSkillsProps {
     value: string[];
@@ -16,6 +17,7 @@ export function MultiSelectSkills({
     onChange,
     placeholder = "Escribe una habilidad y presiona Enter",
 }: MultiSelectSkillsProps) {
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = React.useState("");
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -54,7 +56,7 @@ export function MultiSelectSkills({
                             className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                         >
                             <X className="h-3 w-3" />
-                            <span className="sr-only">Eliminar {skill}</span>
+                            <span className="sr-only">{t("academy.courses.dialog.removeSkill")} {skill}</span>
                         </button>
                     </Badge>
                 ))}
@@ -68,7 +70,7 @@ export function MultiSelectSkills({
                 />
             </div>
             <p className="text-xs text-muted-foreground">
-                Presiona Enter para agregar. Ejemplos: React, Solidity, Smart Contracts
+                {t("academy.courses.dialog.skillsHint")}
             </p>
         </div>
     );

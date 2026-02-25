@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface LogoutButtonProps {
   className?: string;
@@ -12,6 +13,7 @@ interface LogoutButtonProps {
 
 export function LogoutButton({ className, variant = "default", size = "default" }: LogoutButtonProps = {}) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const logout = async () => {
     const supabase = createClient();
@@ -20,5 +22,5 @@ export function LogoutButton({ className, variant = "default", size = "default" 
     router.refresh(); // Fuerza refresco para que el navbar se actualice
   };
 
-  return <Button className={className} variant={variant} size={size} onClick={logout}>Logout</Button>;
+  return <Button className={className} variant={variant} size={size} onClick={logout}>{t("auth.logout.button")}</Button>;
 }

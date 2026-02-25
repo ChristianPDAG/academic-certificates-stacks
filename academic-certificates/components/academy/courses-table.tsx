@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { Course } from "@/types/course";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export function CoursesTable({
     sortDirection,
     onSort,
 }: CoursesTableProps) {
+    const { t } = useTranslation();
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
@@ -95,9 +97,9 @@ export function CoursesTable({
 
     const getStatusBadge = (isActive: boolean) => {
         return isActive ? (
-            <Badge className="bg-green-500 hover:bg-green-600 text-white">Activo</Badge>
+            <Badge className="bg-green-500 hover:bg-green-600 text-white">{t("academy.courses.table.active")}</Badge>
         ) : (
-            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">Inactivo</Badge>
+            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">{t("academy.courses.table.inactive")}</Badge>
         );
     };
 
@@ -107,18 +109,18 @@ export function CoursesTable({
                 <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
                     <thead className="bg-neutral-50 dark:bg-neutral-900/50">
                         <tr>
-                            <SortableHeader field="title">Curso</SortableHeader>
+                            <SortableHeader field="title">{t("academy.courses.table.course")}</SortableHeader>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-                                Categoría
+                                {t("academy.courses.table.category")}
                             </th>
-                            <SortableHeader field="instructor_name">Instructor</SortableHeader>
+                            <SortableHeader field="instructor_name">{t("academy.courses.table.instructor")}</SortableHeader>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-                                Detalles
+                                {t("academy.courses.table.details")}
                             </th>
-                            <SortableHeader field="is_active">Estado</SortableHeader>
-                            <SortableHeader field="created_at">Fecha Creación</SortableHeader>
+                            <SortableHeader field="is_active">{t("academy.courses.table.status")}</SortableHeader>
+                            <SortableHeader field="created_at">{t("academy.courses.table.createdAt")}</SortableHeader>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
-                                Acciones
+                                {t("academy.courses.table.actions")}
                             </th>
                         </tr>
                     </thead>
@@ -129,7 +131,7 @@ export function CoursesTable({
                                     <div className="flex items-center justify-center gap-2">
                                         <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-sky-500" />
                                         <span className="text-neutral-600 dark:text-neutral-400">
-                                            Cargando cursos...
+                                            {t("academy.courses.table.loading")}
                                         </span>
                                     </div>
                                 </td>
@@ -137,7 +139,7 @@ export function CoursesTable({
                         ) : courses.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-8 text-center text-neutral-500 dark:text-neutral-400">
-                                    No se encontraron cursos
+                                    {t("academy.courses.table.noCourses")}
                                 </td>
                             </tr>
                         ) : (
@@ -174,7 +176,7 @@ export function CoursesTable({
                                     {/* Instructor */}
                                     <td className="px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100">
                                         {course.instructor_name || (
-                                            <span className="text-neutral-400">Sin asignar</span>
+                                            <span className="text-neutral-400">N/A</span>
                                         )}
                                     </td>
 
@@ -239,18 +241,18 @@ export function CoursesTable({
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem onClick={() => onEdit(course)}>
                                                     <Edit className="mr-2 h-4 w-4" />
-                                                    Editar
+                                                    {t("academy.courses.table.edit")}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => onToggleStatus(course)}>
                                                     {course.is_active ? (
                                                         <>
                                                             <PowerOff className="mr-2 h-4 w-4" />
-                                                            Desactivar
+                                                            {t("academy.courses.table.deactivate")}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Power className="mr-2 h-4 w-4" />
-                                                            Activar
+                                                            {t("academy.courses.table.activate")}
                                                         </>
                                                     )}
                                                 </DropdownMenuItem>
@@ -260,7 +262,7 @@ export function CoursesTable({
                                                     className="text-red-600 focus:text-red-600"
                                                 >
                                                     <Trash2 className="mr-2 h-4 w-4" />
-                                                    Eliminar
+                                                    {t("academy.courses.table.delete")}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -276,19 +278,18 @@ export function CoursesTable({
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("academy.courses.deleteDialog.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta acción no se puede deshacer. El curso "{courseToDelete?.title}" será
-                            eliminado permanentemente de la base de datos.
+                            {t("academy.courses.deleteDialog.description")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>{t("academy.courses.deleteDialog.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             className="bg-red-600 hover:bg-red-700"
                         >
-                            Eliminar
+                            {t("academy.courses.deleteDialog.delete")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

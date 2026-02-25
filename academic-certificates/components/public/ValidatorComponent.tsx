@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { IconSearch, IconCertificate, IconShieldCheck, IconAlertCircle, IconCalendar, IconUser, IconSchool, IconAward, IconHash, IconBrandStackshare } from "@tabler/icons-react";
 import { Metadata } from "next";
 import { validateCertificateAction } from "@/app/actions/public/validate-certificate";
+import { useTranslation } from "react-i18next";
 
 export const metadata: Metadata = {
   title: "Validar Certificado | Certifikurs",
@@ -104,6 +105,7 @@ interface ValidationResult {
 }
 
 export default function ValidatorComponent() {
+  const { t } = useTranslation();
   const [certificateId, setCertificateId] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -155,7 +157,7 @@ export default function ValidatorComponent() {
       console.error("Error validating certificate:", error);
       setValidationResult({
         success: false,
-        error: "Error al consultar la blockchain. Por favor, intenta nuevamente.",
+        error: t("validator.error"),
       });
     } finally {
       setIsSearching(false);
@@ -202,10 +204,10 @@ export default function ValidatorComponent() {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-            Valida tu <span className="text-sky-500 dark:text-sky-400">Certificado</span>
+            {t("validator.title")} <span className="text-sky-500 dark:text-sky-400">{t("validator.titleHighlight")}</span>
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
-            Verifica la autenticidad de cualquier certificado emitido en nuestra plataforma. Solo necesitas el ID del certificado.
+            {t("validator.description")}
           </p>
         </div>
 
@@ -217,7 +219,7 @@ export default function ValidatorComponent() {
                 htmlFor="certificateId"
                 className="block text-sm md:text-base font-semibold mb-2 text-neutral-800 dark:text-neutral-100"
               >
-                ID del Certificado
+                {t("validator.certificateIdLabel")}
               </label>
 
               <div className="relative">
@@ -226,7 +228,7 @@ export default function ValidatorComponent() {
                   type="text"
                   value={certificateId}
                   onChange={(e) => setCertificateId(e.target.value)}
-                  placeholder="Ej: 123 o 0x3a78e7..."
+                  placeholder={t("validator.certificateIdPlaceholder")}
                   disabled={isSearching}
                   className="w-full rounded-xl px-5 md:px-6 py-3.5 md:py-4 pr-12 text-[15px] md:text-lg
                              bg-white text-neutral-900 placeholder:text-neutral-400
@@ -241,7 +243,7 @@ export default function ValidatorComponent() {
               </div>
 
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-                Ingresa el ID del certificado (número) o el hash de transacción (0x...).
+                {t("validator.certificateIdHelp")}
               </p>
             </div>
 
@@ -259,12 +261,12 @@ export default function ValidatorComponent() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Verificando en blockchain...
+                  {t("validator.validating")}
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <IconShieldCheck size={22} />
-                  Validar Certificado
+                  {t("validator.validateButton")}
                 </span>
               )}
             </button>
@@ -288,10 +290,10 @@ export default function ValidatorComponent() {
                           <IconShieldCheck size={32} className="text-green-600 dark:text-green-400" />
                           <div>
                             <h3 className="text-xl font-bold text-green-900 dark:text-green-200">
-                              ✓ Certificado Válido
+                              {t("validator.validCertificate")}
                             </h3>
                             <p className="text-sm text-green-700 dark:text-green-300">
-                              Verificado en blockchain de Stacks
+                              {t("validator.validDescription")}
                             </p>
                           </div>
                         </>
@@ -300,12 +302,12 @@ export default function ValidatorComponent() {
                           <IconAlertCircle size={32} className="text-yellow-600 dark:text-yellow-400" />
                           <div>
                             <h3 className="text-xl font-bold text-yellow-900 dark:text-yellow-200">
-                              ⚠ Certificado {validationResult.data.blockchainData.revoked ? "Revocado" : "Expirado"}
+                              {validationResult.data.blockchainData.revoked ? t("validator.revokedCertificate") : t("validator.expiredCertificate")}
                             </h3>
                             <p className="text-sm text-yellow-700 dark:text-yellow-300">
                               {validationResult.data.blockchainData.revoked
-                                ? "Este certificado ha sido revocado por la institución emisora"
-                                : "Este certificado ha alcanzado su fecha de expiración"}
+                                ? t("validator.revokedDescription")
+                                : t("validator.expiredDescription")}
                             </p>
                           </div>
                         </>
@@ -318,14 +320,14 @@ export default function ValidatorComponent() {
                         <>
                           <IconShieldCheck size={18} className="text-green-600 dark:text-green-400" />
                           <span className="text-green-800 dark:text-green-300 font-medium">
-                            Integridad de datos verificada
+                            {t("validator.hashVerified")}
                           </span>
                         </>
                       ) : (
                         <>
                           <IconAlertCircle size={18} className="text-red-600 dark:text-red-400" />
                           <span className="text-red-800 dark:text-red-300 font-medium">
-                            Advertencia: Los datos podrían haber sido modificados
+                            {t("validator.hashWarning")}
                           </span>
                         </>
                       )}
@@ -336,7 +338,7 @@ export default function ValidatorComponent() {
                   <div className="rounded-xl border p-6 md:p-8 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800">
                     <h3 className="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
                       <IconCertificate size={28} className="text-sky-500" />
-                      Detalles del Certificado
+                      {t("validator.certificateDetails")}
                     </h3>
 
                     <div className="grid gap-6 md:grid-cols-2">
@@ -345,7 +347,7 @@ export default function ValidatorComponent() {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <IconAward size={20} className="text-sky-500" />
-                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Curso</h4>
+                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">{t("validator.course")}</h4>
                           </div>
                           <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
                             {validationResult.data.metadata.certificate.title}
@@ -356,22 +358,22 @@ export default function ValidatorComponent() {
                         </div>
 
                         <div>
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Modalidad</p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("validator.modality")}</p>
                           <p className="font-medium text-neutral-900 dark:text-neutral-100">
                             {validationResult.data.metadata.certificate.modality}
                           </p>
                         </div>
 
                         <div>
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Duración</p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("validator.duration")}</p>
                           <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                            {validationResult.data.metadata.certificate.hours} horas
+                            {validationResult.data.metadata.certificate.hours} {t("validator.hours")}
                           </p>
                         </div>
 
                         {validationResult.data.metadata.certificate.category && (
                           <div>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">Categoría</p>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("validator.category")}</p>
                             <p className="font-medium text-neutral-900 dark:text-neutral-100">
                               {validationResult.data.metadata.certificate.category}
                             </p>
@@ -384,7 +386,7 @@ export default function ValidatorComponent() {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <IconUser size={20} className="text-sky-500" />
-                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Estudiante</h4>
+                            <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">{t("validator.student")}</h4>
                           </div>
                           <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
                             {validationResult.data.metadata.recipient.name}
@@ -392,7 +394,7 @@ export default function ValidatorComponent() {
                         </div>
 
                         <div>
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Calificación</p>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("validator.grade")}</p>
                           <p className="font-medium text-neutral-900 dark:text-neutral-100">
                             {validationResult.data.metadata.achievement.grade}
                           </p>
@@ -400,7 +402,7 @@ export default function ValidatorComponent() {
 
                         {validationResult.data.metadata.achievement.skills_acquired.length > 0 && (
                           <div>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">Habilidades Adquiridas</p>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">{t("validator.skillsAcquired")}</p>
                             <div className="flex flex-wrap gap-2">
                               {validationResult.data.metadata.achievement.skills_acquired.map((skill, idx) => (
                                 <span
@@ -417,7 +419,7 @@ export default function ValidatorComponent() {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <IconCalendar size={20} className="text-sky-500" />
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">Fecha de Emisión</p>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("validator.issueDate")}</p>
                           </div>
                           <p className="font-medium text-neutral-900 dark:text-neutral-100">
                             {formatDate(validationResult.data.metadata.certificate.issue_date_iso)}
@@ -430,7 +432,7 @@ export default function ValidatorComponent() {
                     <div className="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
                       <div className="flex items-center gap-2 mb-3">
                         <IconSchool size={20} className="text-sky-500" />
-                        <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">Institución Emisora</h4>
+                        <h4 className="font-semibold text-neutral-800 dark:text-neutral-200">{t("validator.issuer")}</h4>
                       </div>
                       <p className="font-medium text-neutral-900 dark:text-neutral-100 mb-2">
                         {validationResult.data.metadata.issuer.name}
@@ -442,7 +444,7 @@ export default function ValidatorComponent() {
                       )}
                       {validationResult.data.metadata.issuer.instructors.length > 0 && (
                         <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                          <span className="font-medium">Instructores: </span>
+                          <span className="font-medium">{t("validator.instructors")}: </span>
                           {validationResult.data.metadata.issuer.instructors.join(", ")}
                         </div>
                       )}
@@ -456,26 +458,26 @@ export default function ValidatorComponent() {
                   <div className="rounded-xl border p-5 md:p-6 bg-gradient-to-br from-purple-50/70 to-purple-100/60 border-purple-200 dark:from-purple-950/40 dark:to-purple-900/20 dark:border-purple-800/50">
                     <h4 className="flex items-center gap-2 text-base md:text-lg font-bold text-purple-900 dark:text-purple-200 mb-4">
                       <IconBrandStackshare size={24} />
-                      Información de Blockchain
+                      {t("validator.blockchainInfo")}
                     </h4>
 
                     <div className="grid gap-3 text-sm">
                       <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold text-purple-800 dark:text-purple-300">ID del Certificado:</span>
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.certificateId")}:</span>
                         <span className="font-mono text-purple-900 dark:text-purple-100">
                           {validationResult.data.chainCertId}
                         </span>
                       </div>
 
                       <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold text-purple-800 dark:text-purple-300">Wallet del Estudiante:</span>
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.studentWallet")}:</span>
                         <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
                           {validationResult.data.blockchainData.studentWallet}
                         </span>
                       </div>
 
                       <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold text-purple-800 dark:text-purple-300">Institución (Wallet):</span>
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.institutionWallet")}:</span>
                         <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
                           {validationResult.data.blockchainData.schoolId}
                         </span>
@@ -483,15 +485,15 @@ export default function ValidatorComponent() {
 
                       {validationResult.data.blockchainData.expirationHeight && (
                         <div className="flex flex-col md:flex-row md:gap-2">
-                          <span className="font-semibold text-purple-800 dark:text-purple-300">Altura de Expiración:</span>
+                          <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.expirationHeight")}:</span>
                           <span className="font-mono text-purple-900 dark:text-purple-100">
-                            Bloque {validationResult.data.blockchainData.expirationHeight}
+                            {t("validator.block")} {validationResult.data.blockchainData.expirationHeight}
                           </span>
                         </div>
                       )}
 
                       <div className="flex flex-col md:flex-row md:gap-2">
-                        <span className="font-semibold text-purple-800 dark:text-purple-300">Hash de Datos:</span>
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">{t("validator.dataHash")}:</span>
                         <span className="font-mono text-xs break-all text-purple-900 dark:text-purple-100">
                           {validationResult.data.blockchainData.dataHash}
                         </span>
@@ -507,7 +509,7 @@ export default function ValidatorComponent() {
                                  transition-all duration-300 hover:-translate-y-0.5"
                     >
                       <IconShieldCheck size={20} />
-                      Ver en Blockchain Explorer
+                      {t("validator.viewInExplorer")}
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
@@ -522,12 +524,12 @@ export default function ValidatorComponent() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <h3 className="text-lg md:text-xl font-bold text-red-900 dark:text-red-200">
-                      ✗ No se pudo validar el certificado
+                      {t("validator.notFound")}
                     </h3>
                   </div>
 
                   <p className="text-sm md:text-base text-red-800 dark:text-red-300">
-                    {validationResult.error || "No se encontró ningún certificado con este ID en la blockchain."}
+                    {validationResult.error || t("validator.notFoundDescription")}
                   </p>
                 </div>
               )}
@@ -538,24 +540,24 @@ export default function ValidatorComponent() {
           <div className="mt-8 rounded-xl border p-5 md:p-6 bg-gradient-to-br from-blue-50/70 to-blue-100/60 border-blue-200 dark:from-blue-950/40 dark:to-blue-900/20 dark:border-blue-800/50">
             <h3 className="mb-3 flex items-center gap-2 text-base md:text-lg font-bold text-blue-900 dark:text-blue-200">
               <IconCertificate size={22} />
-              ¿Cómo funciona la validación?
+              {t("validator.howItWorks")}
             </h3>
             <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
               <li className="flex gap-2">
                 <span className="text-sky-500 dark:text-sky-400 mt-0.5">✓</span>
-                Ingresa el ID único del certificado que deseas validar.
+                {t("validator.howItWorksStep1")}
               </li>
               <li className="flex gap-2">
                 <span className="text-sky-500 dark:text-sky-400 mt-0.5">✓</span>
-                El sistema consultará la blockchain de Stacks en tiempo real.
+                {t("validator.howItWorksStep2")}
               </li>
               <li className="flex gap-2">
                 <span className="text-sky-500 dark:text-sky-400 mt-0.5">✓</span>
-                Verás toda la información del certificado y su estado de validez.
+                {t("validator.howItWorksStep3")}
               </li>
               <li className="flex gap-2">
                 <span className="text-sky-500 dark:text-sky-400 mt-0.5">✓</span>
-                La validación es instantánea, segura y transparente.
+                {t("validator.howItWorksStep4")}
               </li>
             </ul>
           </div>
@@ -564,12 +566,12 @@ export default function ValidatorComponent() {
         {/* CTA inferior */}
         <div className="mt-10 text-center">
           <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-400">
-            ¿No tienes un certificado?{" "}
+            {t("validator.noCertificate")}{" "}
             <a
               href="/explorer"
               className="font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 underline-offset-4 hover:underline"
             >
-              Explora certificados públicos →
+              {t("validator.exploreCertificates")}
             </a>
           </p>
         </div>

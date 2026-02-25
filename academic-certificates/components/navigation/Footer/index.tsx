@@ -2,8 +2,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { IconMail } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="bg-background border-t border-white/10">
       <div className="container mx-auto max-w-7xl px-4 py-16 md:py-20 lg:py-24">
@@ -21,21 +23,36 @@ const Footer = () => {
               />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Certifikurs &copy; 2025.
-              <br />Todos los derechos reservados.
+              {t("footer.copyright")}
             </p>
           </div>
 
           {/* Col 2: enlaces */}
           <div>
-            <h2 className="mb-4 text-xl font-bold text-foreground">Enlaces</h2>
+            <h2 className="mb-4 text-xl font-bold text-foreground">{t("footer.links")}</h2>
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/Empresa"
+                  href="/"
                   className="text-base text-muted-foreground hover:text-primary transition"
                 >
-                  Empresa
+                  {t("navbar.home")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/explorer"
+                  className="text-base text-muted-foreground hover:text-primary transition"
+                >
+                  {t("navbar.explorer")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/validator"
+                  className="text-base text-muted-foreground hover:text-primary transition"
+                >
+                  {t("navbar.validator")}
                 </Link>
               </li>
               <li>
@@ -43,7 +60,7 @@ const Footer = () => {
                   href="/blog"
                   className="text-base text-muted-foreground hover:text-primary transition"
                 >
-                  Blog
+                  {t("navbar.blog")}
                 </Link>
               </li>
             </ul>
@@ -51,14 +68,14 @@ const Footer = () => {
 
           {/* Col 3: legal */}
           <div>
-            <h2 className="mb-4 text-xl font-bold text-foreground">Legal</h2>
+            <h2 className="mb-4 text-xl font-bold text-foreground">{t("footer.legal")}</h2>
             <ul className="space-y-3">
               <li>
                 <Link
                   href="/terminos"
                   className="text-base text-muted-foreground hover:text-primary transition"
                 >
-                  Términos y Condiciones
+                  {t("footer.terms")}
                 </Link>
               </li>
               <li>
@@ -66,7 +83,7 @@ const Footer = () => {
                   href="/privacidad"
                   className="text-base text-muted-foreground hover:text-primary transition"
                 >
-                  Privacidad
+                  {t("footer.privacy")}
                 </Link>
               </li>
               <li>
@@ -74,7 +91,7 @@ const Footer = () => {
                   href="/cookies"
                   className="text-base text-muted-foreground hover:text-primary transition"
                 >
-                  Cookies
+                  {t("footer.cookies")}
                 </Link>
               </li>
             </ul>
@@ -82,7 +99,7 @@ const Footer = () => {
 
           {/* Col 4: contacto */}
           <div className="mx-auto lg:mx-0">
-            <h2 className="mb-4 text-xl font-bold text-foreground">Contacto</h2>
+            <h2 className="mb-4 text-xl font-bold text-foreground">{t("footer.contact")}</h2>
             <ul className="space-y-3">
               <li className="inline-flex lg:flex items-center gap-2 text-base">
                 <IconMail size={22} className="text-foreground" />

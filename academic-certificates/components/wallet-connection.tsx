@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Wallet, AlertCircle } from "lucide-react";
 import { useStacks } from "@/lib/stacks-provider";
+import { useTranslation } from "react-i18next";
 
 interface WalletConnectionProps {
     children: React.ReactNode;
@@ -12,6 +13,7 @@ interface WalletConnectionProps {
 
 export function WalletConnection({ children }: WalletConnectionProps) {
     const { isSignedIn, connectWallet, userData, userAddress } = useStacks();
+    const { t } = useTranslation();
 
     if (!isSignedIn) {
         return (
@@ -20,19 +22,19 @@ export function WalletConnection({ children }: WalletConnectionProps) {
                     <CardHeader className="text-center">
                         <CardTitle className="flex items-center justify-center gap-2">
                             <Wallet className="h-5 w-5" />
-                            Conectar Wallet
+                            {t("wallet.connectWallet")}
                         </CardTitle>
                         <CardDescription>
-                            Necesitas conectar tu wallet de Stacks para acceder al panel de administración
+                            {t("wallet.connectDescription")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-center gap-2 text-amber-600 text-sm">
                             <AlertCircle className="h-4 w-4" />
-                            <span>Se requiere Stacks Wallet para firmar transacciones</span>
+                            <span>{t("wallet.requiredForTransactions")}</span>
                         </div>
                         <Button onClick={connectWallet} className="w-full">
-                            Conectar Stacks Wallet
+                            {t("wallet.connectButton")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -48,15 +50,15 @@ export function WalletConnection({ children }: WalletConnectionProps) {
                     <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
                             <Wallet className="h-5 w-5" />
-                            Wallet Conectada
+                            {t("wallet.connectedWallet")}
                         </span>
-                        <Badge variant="secondary">Conectada</Badge>
+                        <Badge variant="secondary">{t("wallet.connected")}</Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-2">
                         <div>
-                            <span className="text-sm font-medium">Dirección: </span>
+                            <span className="text-sm font-medium">{t("wallet.address")}: </span>
                             <span className="text-sm font-mono bg-muted px-2 py-1 rounded">
                                 {userAddress}
                             </span>

@@ -2,24 +2,27 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { slideInFromBottom, slideInFromLeft } from "@/utils/motion";
 
 type FAQ = { q: string; a: string };
 
 export default function FAQPage() {
-  const [faqs] = useState<FAQ[]>([
-    { q: "¿Qué es la Web 2?", a: "Es la web actual dominada por plataformas centralizadas (apps, redes sociales, servidores de empresas) donde confías en un intermediario." },
-    { q: "¿Qué es la Web 3?", a: "Una evolución que agrega blockchain para verificar y registrar acciones/activos sin depender de un tercero. Aporta propiedad, trazabilidad y pruebas públicas." },
-    { q: "¿Por qué a veces seguimos usando Web 2 si existe Web 3?", a: "Porque hay casos donde lo centralizado es más simple o rápido de usar, y en otros la verificación pública de Web 3 es clave. Combinamos ambos según convenga." },
-    { q: "¿Qué es una wallet?", a: "Tu billetera cripto. Gestiona claves y firmas para demostrar que una acción te pertenece. Piensa en ella como tu identidad/llavero en blockchain." },
-    { q: "¿Qué es una dirección de wallet?", a: "Es como tu número de cuenta. Sirve para recibir o ubicar tus operaciones en la red. No revela tus claves privadas." },
-    { q: "¿Necesito crear mi wallet para usar el sistema?", a: "No. Te registras normalmente y nosotros asociamos internamente una wallet. Puedes usar funciones básicas sin instalar nada. Luego, si quieres, conectas tu wallet personal." },
-    { q: "¿Por qué usamos la blockchain de Stacks?", a: "Porque es económica, estable y se integra con Bitcoin. Nos permite anclar datos de forma confiable para certificados y verificación pública." },
-    { q: "¿Qué es un ID de transacción (TXID)?", a: "Es el identificador único de una operación en la blockchain. Con él se consulta estado, bloque y detalles para confirmar autenticidad." },
-    { q: "¿La verificación es pública?", a: "Sí. Cualquiera puede revisar el TXID en un explorador de bloques y confirmar que el certificado existe y fue emitido correctamente." },
-    { q: "¿Qué ocurre si el contrato no coincide con el esperado?", a: "Se indica que la transacción no pertenece al contrato de certificados, evitando falsos positivos." },
-    { q: "¿Por qué somos descentralizados?", a: "Para que la verificación no dependa solo de nosotros: la evidencia vive en la cadena. Aun así, ofrecemos una UX simple estilo Web 2." },
-  ]);
+  const { t } = useTranslation();
+
+  const faqs: FAQ[] = [
+    { q: t("faqPage.q1"), a: t("faqPage.a1") },
+    { q: t("faqPage.q2"), a: t("faqPage.a2") },
+    { q: t("faqPage.q3"), a: t("faqPage.a3") },
+    { q: t("faqPage.q4"), a: t("faqPage.a4") },
+    { q: t("faqPage.q5"), a: t("faqPage.a5") },
+    { q: t("faqPage.q6"), a: t("faqPage.a6") },
+    { q: t("faqPage.q7"), a: t("faqPage.a7") },
+    { q: t("faqPage.q8"), a: t("faqPage.a8") },
+    { q: t("faqPage.q9"), a: t("faqPage.a9") },
+    { q: t("faqPage.q10"), a: t("faqPage.a10") },
+    { q: t("faqPage.q11"), a: t("faqPage.a11") },
+  ];
 
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
@@ -38,9 +41,9 @@ export default function FAQPage() {
           variants={slideInFromBottom({ delay: 0.1 })}
         >
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">Preguntas <span className="text-sky-500 dark:text-sky-400">Frecuentes</span></h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">{t("faqPage.title")} <span className="text-sky-500 dark:text-sky-400">{t("faqPage.titleHighlight")}</span></h1>
           <p className="mt-3 max-w-2xl mx-auto text-neutral-600 dark:text-neutral-300">
-            Conceptos clave explicados de forma simple: Web 2 / Web 3, wallets, direcciones y TXID.
+            {t("faqPage.description")}
           </p>
         </motion.div>
       </section>

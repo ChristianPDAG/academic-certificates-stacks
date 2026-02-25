@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslation } from 'react-i18next';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,30 +28,37 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
+    // const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (signInError) throw signInError;
-      const data = await login();
-      if (data.role === 'admin') {
-        router.push("/admin");
-      }
-      if (data.role === 'student') {
+      // Comentado Supabase temporalmente
+      // const { error: signInError } = await supabase.auth.signInWithPassword({
+      //   email,
+      //   password,
+      // });
+      // if (signInError) throw signInError;
+      // const data = await login();
+      // if (data.role === 'admin') {
+      //   router.push("/admin");
+      // }
+      // if (data.role === 'student') {
+      //   router.push("/student");
+      // }
+      // if (data.role === 'academy') {
+      //   router.push("/academy");
+      //   return;
+      // }
+
+      // Simular login exitoso y redirigir a student
+      setTimeout(() => {
         router.push("/student");
-      }
-      if (data.role === 'academy') {
-        router.push("/academy");
-        return;
-      }
+      }, 1000);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -63,10 +71,10 @@ export function LoginForm({
       <Card>
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Inicia Sesión
+            {t('auth.login.title')}
           </CardTitle>
           <CardDescription className="text-base">
-            Accede a tu cuenta para gestionar tus certificados académicos
+            {t('auth.login.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -74,7 +82,7 @@ export function LoginForm({
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Correo Electrónico
+                  {t('auth.login.email')}
                 </Label>
                 <Input
                   id="email"
@@ -89,13 +97,13 @@ export function LoginForm({
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password" className="text-sm font-medium">
-                    Contraseña
+                    {t('auth.login.password')}
                   </Label>
                   <Link
                     href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 underline-offset-4 hover:underline transition-colors"
                   >
-                    ¿Olvidaste tu contraseña?
+                    {t('auth.login.forgotPassword')}
                   </Link>
                 </div>
                 <Input
@@ -118,16 +126,16 @@ export function LoginForm({
                 className="w-full h-11 text-base font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
                 disabled={isLoading}
               >
-                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+                {isLoading ? t('auth.login.loggingIn') : t('auth.login.loginButton')}
               </Button>
             </div>
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              ¿No tienes una cuenta?{" "}
+              {t('auth.login.noAccount')}{" "}
               <Link
                 href="/auth/sign-up"
                 className="font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 underline underline-offset-4 transition-colors"
               >
-                Regístrate
+                {t('auth.login.signUp')}
               </Link>
             </div>
           </form>

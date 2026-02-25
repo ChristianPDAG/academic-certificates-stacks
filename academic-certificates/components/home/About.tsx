@@ -9,8 +9,11 @@ import {
   slideInFromLeft,
   slideInFromRight,
 } from "@/utils/motion";
+import { useTranslation } from "react-i18next";
 
 const About = () => {
+  const { t } = useTranslation();
+  
   return (
     <section id="about" className="w-full relative">
       <div className="bg-[url('/img/bg-nodes-1.svg')] w-full h-full bg-cover bg-center absolute bottom-0 left-0 opacity-50 dark:opacity-20 -z-10" />
@@ -25,7 +28,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.2 })}
             >
-              <span className="text-[#00A1FF]">Características del Sistema</span>
+              <span className="text-[#00A1FF]">{t("home.about.features.title")}</span>
             </motion.h2>
             <motion.p
               initial={"offScreen"}
@@ -33,7 +36,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.4 })}
             >
-              <strong>Seguridad Blockchain</strong> los certificados se almacenan de forma inmutable en la blockchain de Stacks
+              <strong>{t("home.about.features.description")}</strong>
             </motion.p>
           </div>
           <div className="w-full lg:w-1/2 flex justify-center">
@@ -43,7 +46,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromLeft({ delay: 0.8 })}
             >
-              <PinContainer title="Tecnología Blockchain e Inteligencia Artificial">
+              <PinContainer title={t("home.about.features.pinTitle")}>
                 <div className="flex basis-full flex-col p-1 tracking-tight text-slate-100/50 sm:basis-1/2 w-[20rem] h-[12rem] lg:w-[24rem] lg:h-[15rem]">
                   <div className="flex flex-1 w-full rounded-lg mt-4 overflow-hidden">
                     <Image
@@ -81,8 +84,8 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.2 })}
             >
-              Verificación{" "}
-              <span className="text-[#00A1FF]">Instantánea </span>
+              {t("home.about.verification.title")}{" "}
+              <span className="text-[#00A1FF]">{t("home.about.verification.titleHighlight")} </span>
             </motion.h3>
             <motion.p
               initial={"offScreen"}
@@ -90,7 +93,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.4 })}
             >
-              Cualquier persona puede verificar la autenticidad de un certificado.
+              {t("home.about.verification.description")}
             </motion.p>
           </div>
         </div>
@@ -103,7 +106,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.2 })}
             >
-              Multi-<span className="text-[#00A1FF]">Academia</span>
+              {t("home.about.multiAcademy.title")}<span className="text-[#00A1FF]">{t("home.about.multiAcademy.titleHighlight")}</span>
             </motion.h3>
             <motion.p
               initial={"offScreen"}
@@ -111,7 +114,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromBottom({ delay: 0.4 })}
             >
-              Múltiples instituciones pueden emitir certificados en el mismo sistema.
+              {t("home.about.multiAcademy.description")}
             </motion.p>
           </div>
           <div className="w-full lg:w-1/2 flex justify-center items-center z-10">
@@ -154,7 +157,7 @@ const About = () => {
               viewport={{ once: true }}
               variants={slideInFromRight({ delay: 0.4 })}
             >
-              Propiedad del <span className="text-[#00A1FF]">Estudiante</span>
+              {t("home.about.ownership.title")} <span className="text-[#00A1FF]">{t("home.about.ownership.titleHighlight")}</span>
             </motion.h3>
             <motion.p
               initial={"offScreen"}
@@ -163,7 +166,7 @@ const About = () => {
               variants={slideInFromRight({ delay: 0.6 })}
               className="text-right lg:text-left lg:pl-8"
             >
-              Los certificados se almacenan directamente en el wallet del estudiante.
+              {t("home.about.ownership.description")}
             </motion.p>
           </div>
         </div>

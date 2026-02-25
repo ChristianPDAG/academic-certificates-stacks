@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ interface MessageType {
 }
 
 export function DataContractManagement() {
+    const { t } = useTranslation();
     const [message, setMessage] = useState<MessageType | null>(null);
     const [loading, setLoading] = useState(false);
     const [superAdmin, setSuperAdmin] = useState<string>("");
@@ -64,18 +66,18 @@ export function DataContractManagement() {
 
     const handleAuthorizeWriter = async () => {
         if (!writerToAuthorize.trim()) {
-            showMessage("error", "Ingresa una dirección de contrato válida");
+            showMessage("error", t("admin.dataContract.validAddress"));
             return;
         }
 
         setLoading(true);
         try {
             await authorizeWriterDataClient(writerToAuthorize);
-            showMessage("success", "Contrato autorizado como escritor");
+            showMessage("success", t("admin.dataContract.contractAuthorized"));
             setShowAuthorizeDialog(false);
             setWriterToAuthorize("");
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.dataContract.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -83,18 +85,18 @@ export function DataContractManagement() {
 
     const handleRevokeWriter = async () => {
         if (!writerToRevoke.trim()) {
-            showMessage("error", "Ingresa una dirección de contrato válida");
+            showMessage("error", t("admin.dataContract.validAddress"));
             return;
         }
 
         setLoading(true);
         try {
             await revokeWriterDataClient(writerToRevoke);
-            showMessage("success", "Autorización de escritor revocada");
+            showMessage("success", t("admin.dataContract.authorizationRevoked"));
             setShowRevokeDialog(false);
             setWriterToRevoke("");
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.dataContract.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -102,7 +104,7 @@ export function DataContractManagement() {
 
     const handleCheckAuthorization = async () => {
         if (!queryContract.trim()) {
-            showMessage("error", "Ingresa una dirección de contrato");
+            showMessage("error", t("admin.dataContract.enterAddress"));
             return;
         }
 
@@ -111,7 +113,7 @@ export function DataContractManagement() {
             const authorized = await isWriterAuthorizedDataClient(queryContract);
             setIsAuthorized(authorized);
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.dataContract.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -141,15 +143,15 @@ export function DataContractManagement() {
                         <div>
                             <CardTitle className="flex items-center gap-2">
                                 <Database className="h-5 w-5" />
-                                Gestión del Contrato de Datos
+                                {t("admin.dataContract.title")}
                             </CardTitle>
                             <CardDescription>
-                                Administra contratos autorizados para escribir en certificate-data
+                                {t("admin.dataContract.description")}
                             </CardDescription>
                         </div>
                         <Button variant="outline" size="sm" onClick={loadSuperAdmin}>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Actualizar
+                            {t("admin.dataContract.refresh")}
                         </Button>
                     </div>
                 </CardHeader>
@@ -159,11 +161,11 @@ export function DataContractManagement() {
                         <div className="flex items-center gap-2 mb-2">
                             <Shield className="h-4 w-4 text-purple-600" />
                             <p className="text-sm text-purple-600 font-medium">
-                                Super Admin del Contrato de Datos
+                                {t("admin.dataContract.superAdmin")}
                             </p>
                         </div>
                         <p className="font-mono text-xs break-all text-purple-900">
-                            {superAdmin || "Cargando..."}
+                            {superAdmin || t("admin.dataContract.loading")}
                         </p>
                     </div>
 
@@ -171,7 +173,7 @@ export function DataContractManagement() {
                     <div className="space-y-4 p-4 border rounded-lg">
                         <h3 className="font-semibold flex items-center gap-2">
                             <Key className="h-4 w-4" />
-                            Verificar Autorización de Contrato
+                            {t("admin.dataContract.verifyAuthorization")}
                         </h3>
                         <div className="flex gap-2">
                             <Input
@@ -180,14 +182,14 @@ export function DataContractManagement() {
                                 onChange={(e) => setQueryContract(e.target.value)}
                             />
                             <Button onClick={handleCheckAuthorization} disabled={loading}>
-                                Verificar
+                                {t("admin.dataContract.verify")}
                             </Button>
                         </div>
                         {isAuthorized !== null && (
                             <div className="p-4 bg-muted rounded-lg flex items-center justify-between">
-                                <span className="text-sm font-medium">Estado de Autorización:</span>
+                                <span className="text-sm font-medium">{t("admin.dataContract.authorizationStatus")}:</span>
                                 <Badge variant={isAuthorized ? "default" : "destructive"}>
-                                    {isAuthorized ? "Autorizado" : "No Autorizado"}
+                                    {isAuthorized ? t("admin.dataContract.authorized") : t("admin.dataContract.notAuthorized")}
                                 </Badge>
                             </div>
                         )}
@@ -197,23 +199,21 @@ export function DataContractManagement() {
                     <div className="flex flex-wrap gap-3 pt-4 border-t">
                         <Button onClick={() => setShowAuthorizeDialog(true)}>
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            Autorizar Contrato
+                            {t("admin.dataContract.authorizeContract")}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={() => setShowRevokeDialog(true)}
                         >
                             <AlertCircle className="h-4 w-4 mr-2" />
-                            Revocar Autorización
+                            {t("admin.dataContract.revokeAuthorization")}
                         </Button>
                     </div>
 
                     {/* Info Box */}
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                            <strong>ℹ️ Importante:</strong> Solo contratos autorizados pueden
-                            escribir datos en certificate-data. El contrato certificate-manager-v1
-                            debe estar autorizado para funcionar correctamente.
+                            {t("admin.dataContract.importantInfo")}
                         </p>
                     </div>
                 </CardContent>
@@ -223,14 +223,14 @@ export function DataContractManagement() {
             <Dialog open={showAuthorizeDialog} onOpenChange={setShowAuthorizeDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Autorizar Contrato Escritor</DialogTitle>
+                        <DialogTitle>{t("admin.dataContract.authorizeWriterContract")}</DialogTitle>
                         <DialogDescription>
-                            Autoriza un contrato para que pueda escribir en certificate-data
+                            {t("admin.dataContract.authorizeDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Dirección del Contrato (Principal)</Label>
+                            <Label>{t("admin.dataContract.contractAddress")}</Label>
                             <Input
                                 placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.certificate-manager-v1"
                                 value={writerToAuthorize}
@@ -239,7 +239,7 @@ export function DataContractManagement() {
                         </div>
                         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                             <p className="text-sm text-yellow-800">
-                                ⚠️ Solo el super admin puede autorizar contratos escritores.
+                                {t("admin.dataContract.superAdminOnlyWarning")}
                             </p>
                         </div>
                     </div>
@@ -252,13 +252,13 @@ export function DataContractManagement() {
                             }}
                             disabled={loading}
                         >
-                            Cancelar
+                            {t("admin.dataContract.cancel")}
                         </Button>
                         <Button
                             onClick={handleAuthorizeWriter}
                             disabled={loading || !writerToAuthorize.trim()}
                         >
-                            {loading ? "Procesando..." : "Autorizar"}
+                            {loading ? t("admin.dataContract.processing") : t("admin.dataContract.authorize")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -268,14 +268,14 @@ export function DataContractManagement() {
             <Dialog open={showRevokeDialog} onOpenChange={setShowRevokeDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Revocar Autorización de Escritor</DialogTitle>
+                        <DialogTitle>{t("admin.dataContract.revokeWriterAuthorization")}</DialogTitle>
                         <DialogDescription>
-                            Revoca la autorización de un contrato para escribir en certificate-data
+                            {t("admin.dataContract.revokeDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Dirección del Contrato (Principal)</Label>
+                            <Label>{t("admin.dataContract.contractAddress")}</Label>
                             <Input
                                 placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.certificate-manager-v1"
                                 value={writerToRevoke}
@@ -284,8 +284,7 @@ export function DataContractManagement() {
                         </div>
                         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                             <p className="text-sm text-red-800 font-semibold">
-                                ⚠️ ADVERTENCIA: El contrato perderá permisos de escritura
-                                inmediatamente. Solo el super admin puede ejecutar esta acción.
+                                {t("admin.dataContract.revokeWarning")}
                             </p>
                         </div>
                     </div>
@@ -298,14 +297,14 @@ export function DataContractManagement() {
                             }}
                             disabled={loading}
                         >
-                            Cancelar
+                            {t("admin.dataContract.cancel")}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={handleRevokeWriter}
                             disabled={loading || !writerToRevoke.trim()}
                         >
-                            {loading ? "Procesando..." : "Revocar"}
+                            {loading ? t("admin.dataContract.processing") : t("admin.dataContract.revoke")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

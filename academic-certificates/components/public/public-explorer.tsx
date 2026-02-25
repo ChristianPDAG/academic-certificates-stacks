@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -69,6 +70,7 @@ interface CombinedCertificate {
 }
 
 export default function PublicExplorer() {
+  const { t } = useTranslation();
   const [totalCertificates, setTotalCertificates] = useState<number>(0);
   const [superAdmin, setSuperAdmin] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -141,7 +143,7 @@ export default function PublicExplorer() {
 
       const dbCertificates = await getCertificatesByStudentWallet(studentWallet);
       if (dbCertificates.length === 0) {
-        alert("No se encontraron certificados para este estudiante");
+        alert(t("explorer.noStudentCertificates"));
         return;
       }
 
@@ -165,7 +167,7 @@ export default function PublicExplorer() {
       setStudentCertificates(combinedCertificates);
     } catch (error) {
       console.error("Error searching student certificates:", error);
-      alert("Error al buscar certificados del estudiante");
+      alert(t("explorer.errorSearchingStudent"));
     } finally {
       setSearchingStudent(false);
     }
@@ -217,7 +219,7 @@ export default function PublicExplorer() {
       }
     } catch (error) {
       console.error("Error searching school data:", error);
-      alert("Error al buscar datos de la academia");
+      alert(t("explorer.errorSearchingAcademy"));
     } finally {
       setSearchingSchool(false);
     }
@@ -249,22 +251,22 @@ export default function PublicExplorer() {
             <div className="flex items-center gap-3">
               <GraduationCap className="h-5 w-5 text-sky-500 dark:text-sky-400" />
               <div className="text-left">
-                <p className="font-semibold">{database?.courses?.title || "Certificado Académico"}</p>
+                <p className="font-semibold">{database?.courses?.title || t("explorer.academicCertificate")}</p>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">ID: #{certificate.chainId}</p>
               </div>
             </div>
             <div className="flex gap-2">
               <Badge className={certificate.isValid ? "bg-green-500" : "bg-red-500"}>
-                {certificate.isValid ? <><CheckCircle2 className="h-3 w-3 mr-1" /> Válido</> : <><XCircle className="h-3 w-3 mr-1" /> Inválido</>}
+                {certificate.isValid ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("explorer.valid")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("explorer.invalid")}</>}
               </Badge>
-              {blockchain.revoked && <Badge variant="destructive">Revocado</Badge>}
+              {blockchain.revoked && <Badge variant="destructive">{t("explorer.revoked")}</Badge>}
             </div>
           </div>
         </AccordionTrigger>
         <AccordionContent className="pt-4 space-y-3">
           {blockchain.grade && (
             <div className="flex justify-between items-center p-3 rounded-xl border bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950/50 dark:to-green-900/30 dark:border-green-900/50">
-              <span className="text-sm font-semibold text-green-800 dark:text-green-200">Calificación:</span>
+              <span className="text-sm font-semibold text-green-800 dark:text-green-200">{t("explorer.grade")}:</span>
               <span className="text-2xl font-bold text-green-600 dark:text-green-400">{blockchain.grade}</span>
             </div>
           )}
@@ -272,7 +274,7 @@ export default function PublicExplorer() {
           <div className="grid gap-3">
             {database?.student_name && (
               <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                <span className="text-sm font-semibold block mb-2">Estudiante</span>
+                <span className="text-sm font-semibold block mb-2">{t("explorer.student")}</span>
                 <p className="text-sm">{database.student_name}</p>
                 {database.student_email && <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{database.student_email}</p>}
               </div>
@@ -280,45 +282,45 @@ export default function PublicExplorer() {
 
             {database?.courses && (
               <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                <span className="text-sm font-semibold block mb-2">Curso</span>
+                <span className="text-sm font-semibold block mb-2">{t("explorer.course")}</span>
                 <p className="text-sm font-semibold">{database.courses.title}</p>
                 <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-                  Duración: {database.courses.hours}h
+                  {t("explorer.duration")}: {database.courses.hours}h
                 </p>
               </div>
             )}
 
             <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-              <span className="text-sm font-semibold block mb-2">Fecha de Graduación</span>
+              <span className="text-sm font-semibold block mb-2">{t("explorer.graduationDate")}</span>
               <p className="text-sm">{formatDate(blockchain.graduationDate)}</p>
             </div>
 
             <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-              <span className="text-sm font-semibold block mb-2">Academia</span>
-              <p className="text-sm">{database?.academies?.legal_name || "No disponible"}</p>
+              <span className="text-sm font-semibold block mb-2">{t("explorer.academy")}</span>
+              <p className="text-sm">{database?.academies?.legal_name || t("explorer.notAvailable")}</p>
               <p className="text-xs font-mono text-neutral-600 dark:text-neutral-400 mt-1">{truncateAddress(blockchain.schoolId)}</p>
             </div>
 
             <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-              <span className="text-sm font-semibold block mb-2">Wallet Estudiante</span>
+              <span className="text-sm font-semibold block mb-2">{t("explorer.studentWallet")}</span>
               <p className="text-xs font-mono break-all">{blockchain.studentWallet}</p>
             </div>
 
             <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-              <span className="text-sm font-semibold block mb-2">Bloque de Emisión</span>
+              <span className="text-sm font-semibold block mb-2">{t("explorer.issueBlock")}</span>
               <p className="text-sm">#{blockchain.issueHeight}</p>
             </div>
 
             {database?.tx_id && (
               <div className="p-3 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                <span className="text-sm font-semibold block mb-2">Transacción</span>
+                <span className="text-sm font-semibold block mb-2">{t("explorer.transaction")}</span>
                 <a
                   href={`https://explorer.hiro.so/txid/${database.tx_id}?chain=testnet`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 flex items-center gap-1"
                 >
-                  Ver en Explorer <ExternalLink className="h-3 w-3" />
+                  {t("explorer.viewInExplorer")} <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
             )}
@@ -449,17 +451,17 @@ export default function PublicExplorer() {
       <div className="container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0 mt-10">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
-            Explorador <span className="text-sky-500 dark:text-sky-400">Público</span>
+            {t("explorer.title")} <span className="text-sky-500 dark:text-sky-400">{t("explorer.titleHighlight")}</span>
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 max-w-3xl mx-auto">
-            Consulta y verifica certificados académicos almacenados en la blockchain de Stacks.
+            {t("explorer.description")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Card className="rounded-2xl border backdrop-blur-xl bg-white/80 border-neutral-200 hover:border-sky-500/50 dark:bg-neutral-900/70 dark:border-neutral-800 dark:hover:border-sky-500/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Certificados</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("explorer.totalCertificates")}</CardTitle>
               <Award className="h-5 w-5 text-sky-500 dark:text-sky-400" />
             </CardHeader>
             <CardContent>
@@ -468,13 +470,13 @@ export default function PublicExplorer() {
               ) : (
                 <div className="text-3xl font-bold">{totalCertificates}</div>
               )}
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">Certificados emitidos en el sistema</p>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{t("explorer.totalCertificatesDescription")}</p>
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl border backdrop-blur-xl bg-white/80 border-neutral-200 hover:border-sky-500/50 dark:bg-neutral-900/70 dark:border-neutral-800 dark:hover:border-sky-500/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Super Admin</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("explorer.superAdmin")}</CardTitle>
               <Shield className="h-5 w-5 text-sky-500 dark:text-sky-400" />
             </CardHeader>
             <CardContent>
@@ -483,7 +485,7 @@ export default function PublicExplorer() {
               ) : (
                 <div className="text-xs font-mono break-all">{superAdmin}</div>
               )}
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">Dirección del administrador principal</p>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{t("explorer.superAdminDescription")}</p>
             </CardContent>
           </Card>
         </div>
@@ -494,8 +496,8 @@ export default function PublicExplorer() {
               <div className="flex items-center gap-3">
                 <Users className="h-6 w-6 text-sky-500 dark:text-sky-400" />
                 <div>
-                  <CardTitle>Certificados de Estudiante</CardTitle>
-                  <CardDescription>Busca todos los certificados de un estudiante por email o wallet</CardDescription>
+                  <CardTitle>{t("explorer.studentCertificates")}</CardTitle>
+                  <CardDescription>{t("explorer.studentCertificatesDescription")}</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -503,37 +505,37 @@ export default function PublicExplorer() {
               <form onSubmit={searchStudentCertificates} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="student-email">Email del Estudiante</Label>
+                    <Label htmlFor="student-email">{t("explorer.studentEmail")}</Label>
                     <Input
                       id="student-email"
                       type="email"
-                      placeholder="estudiante@ejemplo.com"
+                      placeholder={t("explorer.studentEmailPlaceholder")}
                       value={studentEmail}
                       onChange={(e) => setStudentEmail(e.target.value)}
                       className="bg-white dark:bg-neutral-900"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="student-wallet">Wallet del Estudiante</Label>
+                    <Label htmlFor="student-wallet">{t("explorer.studentWallet")}</Label>
                     <Input
                       id="student-wallet"
-                      placeholder="ST..."
+                      placeholder={t("explorer.studentWalletPlaceholder")}
                       value={studentWallet}
                       onChange={(e) => setStudentWallet(e.target.value)}
                       className="bg-white dark:bg-neutral-900"
                       disabled={loadingWallet}
                     />
-                    {loadingWallet && <p className="text-xs text-neutral-600 dark:text-neutral-400">Buscando wallet...</p>}
+                    {loadingWallet && <p className="text-xs text-neutral-600 dark:text-neutral-400">{t("explorer.searchingWallet")}</p>}
                   </div>
                 </div>
                 <Button type="submit" disabled={!studentWallet || searchingStudent} className="w-full bg-sky-500 hover:bg-sky-600">
-                  {searchingStudent ? <>Buscando...</> : <><Search className="mr-2 h-4 w-4" />Buscar Certificados</>}
+                  {searchingStudent ? <>{t("explorer.searching")}</> : <><Search className="mr-2 h-4 w-4" />{t("explorer.searchCertificates")}</>}
                 </Button>
               </form>
 
               {studentCertificates.length > 0 && (
                 <div className="mt-6 space-y-4">
-                  <h3 className="text-lg font-semibold">{studentCertificates.length} certificado(s) encontrado(s)</h3>
+                  <h3 className="text-lg font-semibold">{studentCertificates.length} {t("explorer.certificatesFound")}</h3>
                   <Accordion type="single" collapsible className="space-y-3">
                     {studentCertificates.map((cert, index) => (
                       <CertificateAccordionItem key={cert.chainId} certificate={cert} index={index} />
@@ -549,59 +551,59 @@ export default function PublicExplorer() {
               <div className="flex items-center gap-3">
                 <School className="h-6 w-6 text-sky-500 dark:text-sky-400" />
                 <div>
-                  <CardTitle>Datos de Academia</CardTitle>
-                  <CardDescription>Consulta información y certificados emitidos por una academia</CardDescription>
+                  <CardTitle>{t("explorer.academyData")}</CardTitle>
+                  <CardDescription>{t("explorer.academyDataDescription")}</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <form onSubmit={searchSchoolData} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="school-wallet">Wallet de la Academia</Label>
+                  <Label htmlFor="school-wallet">{t("explorer.academyWallet")}</Label>
                   <Input
                     id="school-wallet"
-                    placeholder="ST..."
+                    placeholder={t("explorer.academyWalletPlaceholder")}
                     value={schoolWallet}
                     onChange={(e) => setSchoolWallet(e.target.value)}
                     className="bg-white dark:bg-neutral-900"
                   />
                 </div>
                 <Button type="submit" disabled={!schoolWallet || searchingSchool} className="w-full bg-sky-500 hover:bg-sky-600">
-                  {searchingSchool ? <>Buscando...</> : <><Search className="mr-2 h-4 w-4" />Buscar Academia</>}
+                  {searchingSchool ? <>{t("explorer.searching")}</> : <><Search className="mr-2 h-4 w-4" />{t("explorer.searchAcademy")}</>}
                 </Button>
               </form>
 
               {schoolInfo && (
                 <div className="mt-6 space-y-4">
-                  <h3 className="text-lg font-semibold">Información de la Academia</h3>
+                  <h3 className="text-lg font-semibold">{t("explorer.academyInfo")}</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                      <span className="text-sm font-semibold block mb-2">Nombre</span>
-                      <p className="text-sm">{schoolInfo.database?.legal_name || schoolInfo.blockchain?.name || "No disponible"}</p>
+                      <span className="text-sm font-semibold block mb-2">{t("explorer.name")}</span>
+                      <p className="text-sm">{schoolInfo.database?.legal_name || schoolInfo.blockchain?.name || t("explorer.notAvailable")}</p>
                     </div>
                     <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                      <span className="text-sm font-semibold block mb-2">Estado</span>
+                      <span className="text-sm font-semibold block mb-2">{t("explorer.status")}</span>
                       <div className="flex gap-2">
                         <Badge className={schoolInfo.blockchain?.active ? "bg-green-500" : "bg-red-500"}>
-                          {schoolInfo.blockchain?.active ? "Activa" : "Inactiva"}
+                          {schoolInfo.blockchain?.active ? t("explorer.active") : t("explorer.inactive")}
                         </Badge>
-                        {schoolInfo.blockchain?.verified && <Badge className="bg-blue-500">Verificada</Badge>}
+                        {schoolInfo.blockchain?.verified && <Badge className="bg-blue-500">{t("explorer.verified")}</Badge>}
                       </div>
                     </div>
                     <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                      <span className="text-sm font-semibold block mb-2">Créditos</span>
+                      <span className="text-sm font-semibold block mb-2">{t("explorer.credits")}</span>
                       <p className="text-sm">{schoolInfo.credits}</p>
                     </div>
                     {schoolInfo.database?.website && (
                       <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                        <span className="text-sm font-semibold block mb-2">Sitio Web</span>
+                        <span className="text-sm font-semibold block mb-2">{t("explorer.website")}</span>
                         <a
                           href={schoolInfo.database.website}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-sky-600 hover:text-sky-700 dark:text-sky-400 flex items-center gap-1"
                         >
-                          Visitar <ExternalLink className="h-3 w-3" />
+                          {t("explorer.visit")} <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
                     )}
@@ -609,7 +611,7 @@ export default function PublicExplorer() {
 
                   {schoolCertificates.length > 0 && (
                     <div className="mt-6">
-                      <h4 className="text-md font-semibold mb-4">{schoolCertificates.length} certificado(s) emitido(s)</h4>
+                      <h4 className="text-md font-semibold mb-4">{schoolCertificates.length} {t("explorer.certificatesIssued")}</h4>
                       <div className="grid gap-4">
                         {schoolCertificates.map((cert) => <CertificateCard key={cert.chainId} certificate={cert} />)}
                       </div>
@@ -629,19 +631,19 @@ export default function PublicExplorer() {
               <div className="flex items-start gap-4">
                 <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="text-lg font-bold mb-3 text-blue-900 dark:text-blue-100">Información del Sistema</h3>
+                  <h3 className="text-lg font-bold mb-3 text-blue-900 dark:text-blue-100">{t("explorer.systemInfo")}</h3>
                   <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                    <p><strong>Contratos:</strong> Este sistema utiliza dos contratos inteligentes:</p>
+                    <p><strong>{t("explorer.contracts")}</strong> {t("explorer.contractsDescription")}</p>
                     <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li><strong>certificate-data:</strong> Almacena los datos de certificados, academias y créditos</li>
-                      <li><strong>certificate-manager-v1:</strong> Maneja la lógica de negocio para emisión y validación</li>
+                      <li><strong>{t("explorer.certificateData")}</strong> {t("explorer.certificateDataDescription")}</li>
+                      <li><strong>{t("explorer.certificateManager")}</strong> {t("explorer.certificateManagerDescription")}</li>
                     </ul>
-                    <p className="mt-3"><strong>Validación:</strong> Los certificados se validan verificando:</p>
+                    <p className="mt-3"><strong>{t("explorer.validation")}</strong> {t("explorer.validationDescription")}</p>
                     <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>Estado de revocación</li>
-                      <li>Fecha de expiración (si aplica)</li>
-                      <li>Existencia en blockchain</li>
-                      <li>Integridad de metadatos (hash)</li>
+                      <li>{t("explorer.revocationStatus")}</li>
+                      <li>{t("explorer.expirationDate")}</li>
+                      <li>{t("explorer.blockchainExistence")}</li>
+                      <li>{t("explorer.metadataIntegrity")}</li>
                     </ul>
                   </div>
                 </div>

@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import { slideInFromBottom, slideInFromLeft } from "@/utils/motion";
 import { IconCertificate, IconShieldCheck } from "@tabler/icons-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 const Validator = () => {
+  const { t } = useTranslation();
+  
   return (
     <section className="relative w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       {/* Fondo decorativo con opacidad diferente por tema (que sí se ve en ambos) */}
@@ -22,8 +25,8 @@ const Validator = () => {
               viewport={{ once: true, amount: 0.4 }}
               variants={slideInFromBottom({ delay: 0.1 })}
             >
-              Valida tu{" "}
-              <span className="text-sky-500 dark:text-sky-400">Certificado</span>
+              {t("home.validator.title")}{" "}
+              <span className="text-sky-500 dark:text-sky-400">{t("home.validator.titleHighlight")}</span>
             </motion.h2>
 
             <motion.p
@@ -33,9 +36,7 @@ const Validator = () => {
               viewport={{ once: true, amount: 0.4 }}
               variants={slideInFromBottom({ delay: 0.25 })}
             >
-              Verifica la autenticidad de cualquier certificado emitido en nuestra
-              plataforma. Solo necesitas el ID del certificado para consultar toda
-              su información en la blockchain.
+              {t("home.validator.description")}
             </motion.p>
 
             <motion.div
@@ -49,14 +50,14 @@ const Validator = () => {
                 href="/validator"
                 className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-white bg-sky-500 hover:bg-sky-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 border-2 border-sky-500 hover:border-sky-600 relative overflow-hidden group"
               >
-                <span className="relative z-10">Validar Certificado</span>
+                <span className="relative z-10">{t("home.validator.validateButton")}</span>
                 <span className="absolute inset-0 bg-sky-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
               </Link>
               <Link
                 href="/explorer"
                 className="px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700 transition-all duration-300 border-2 border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 relative overflow-hidden group"
               >
-                <span className="relative z-10">Explorar</span>
+                <span className="relative z-10">{t("home.validator.exploreButton")}</span>
                 <span className="absolute inset-0 bg-sky-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               </Link>
             </motion.div>
@@ -79,10 +80,10 @@ const Validator = () => {
                 {/* Tabler usa currentColor si no pasas 'color' */}
                 <IconShieldCheck size={60} className="mb-4 text-sky-500 dark:text-sky-400" />
                 <h3 className="text-lg md:text-xl font-bold mb-2">
-                  Verificación Inmutable
+                  {t("home.validator.card1Title")}
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
-                  Los datos se almacenan de forma permanente en la blockchain.
+                  {t("home.validator.card1Description")}
                 </p>
               </div>
 
@@ -93,10 +94,10 @@ const Validator = () => {
                               transition-colors">
                 <IconCertificate size={60} className="mb-4 text-sky-500 dark:text-sky-400" />
                 <h3 className="text-lg md:text-xl font-bold mb-2">
-                  Acceso Público
+                  {t("home.validator.card2Title")}
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
-                  Cualquier persona puede verificar la autenticidad.
+                  {t("home.validator.card2Description")}
                 </p>
               </div>
             </motion.div>

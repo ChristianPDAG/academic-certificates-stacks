@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,14 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Registro Exitoso | Certifikurs",
-  description: "Confirma tu correo electrónico para activar tu cuenta",
-};
+import { useTranslation } from "react-i18next";
 
 export default function Page() {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -20,14 +19,13 @@ export default function Page() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                Thank you for signing up!
+                {t("auth.signupSuccess.title")}
               </CardTitle>
-              <CardDescription>Check your email to confirm</CardDescription>
+              <CardDescription>{t("auth.signupSuccess.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                You&apos;ve successfully signed up. Please check your email to
-                confirm your account before signing in.
+                {t("auth.signupSuccess.message")}
               </p>
             </CardContent>
           </Card>

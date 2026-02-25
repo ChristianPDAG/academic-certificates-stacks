@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import { School, Users, Settings } from "lucide-react";
 
@@ -11,72 +12,80 @@ interface NavigationProps {
 
 export function Navigation({ user, className }: NavigationProps & { className?: string }) {
     const pathname = usePathname();
+    const { t } = useTranslation();
 
     const navItems = [
         {
             href: "/",
-            label: "Inicio",
+            labelKey: "navbar.home",
             icon: null,
             public: true
         },
         {
             href: "/explorer",
-            label: "Explorador",
+            labelKey: "navbar.explorer",
             description: "Consultar certificados públicos",
             public: true
         },
         {
             href: "/validator",
-            label: "Validador",
+            labelKey: "navbar.validator",
             icon: null,
             description: "Validar certificados",
             public: true
         },
         {
+            href: "/blog",
+            labelKey: "navbar.blog",
+            icon: null,
+            description: "Artículos y noticias",
+            public: true
+        },
+        {
             href: "/academy",
-            label: "Academia",
+            labelKey: "navbar.academy",
             icon: School,
             description: "Emitir certificados",
             roles: ["academy"]
         },
         {
             href: "/academy/profile",
-            label: "Perfil Academia",
+            labelKey: "navbar.academyProfile",
             icon: School,
             description: "Gestionar perfil de academia",
             roles: ["academy"]
         },
         {
             href: "/academy/certificates",
-            label: "Certificados Academia",
+            labelKey: "navbar.academyCertificates",
             icon: School,
             description: "Gestionar certificados de academia",
             roles: ["academy"]
         },
         {
             href: "/academy/courses",
-            label: "Cursos Academia",
+            labelKey: "navbar.academyCourses",
             icon: School,
             description: "Gestionar cursos de academia",
             roles: ["academy"]
         },
         {
             href: "/student",
-            label: "Estudiante",
+            labelKey: "navbar.student",
             icon: Users,
             description: "Ver mis certificados",
             roles: ["student"]
         },
         {
             href: "/admin",
-            label: "Admin",
+            labelKey: "navbar.admin",
             icon: Settings,
             description: "Gestionar sistema",
             roles: ["admin"]
         },
         {
             href: "/admin/academies",
-            label: "Administrar Academias",
+            labelKey: "navbar.adminAcademies",
             icon: Settings,
             description: "Gestionar academias",
             roles: ["admin"]
@@ -117,11 +126,11 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-2 px-2 py-1.5 text-sm/6 rounded ${isActive ? "bg-black/5 dark:bg-white/10" : "hover:bg-black/5 dark:hover:bg-white/10"
+                            className={`flex items-center gap-2 px-2 py-1.5 text-sm/6 rounded ${isActive ? "bg-accent" : "hover:bg-accent"
                                 }`}
                         >
                             {Icon && <Icon className="h-4 w-4" />}
-                            {item.label}
+                            {t(item.labelKey)}
                         </Link>
                     );
                 })}
@@ -147,7 +156,7 @@ export function Navigation({ user, className }: NavigationProps & { className?: 
                     >
                         <Link href={item.href} className="flex items-center gap-2">
                             {Icon && <Icon className="h-4 w-4" />}
-                            {item.label}
+                            {t(item.labelKey)}
                         </Link>
                     </Button>
                 );

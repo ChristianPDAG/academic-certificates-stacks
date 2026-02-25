@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { Course, CourseFormData } from "@/types/course";
 import { createCourse, updateCourse } from "@/app/actions/academy/courses";
 import {
@@ -58,6 +59,7 @@ export function CourseDialog({
     course,
     onSuccess,
 }: CourseDialogProps) {
+    const { t } = useTranslation();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [error, setError] = React.useState("");
 
@@ -107,7 +109,7 @@ export function CourseDialog({
 
         try {
             if (!formData.title.trim()) {
-                throw new Error("El título del curso es obligatorio");
+                throw new Error(t("academy.courses.dialog.errorTitle"));
             }
 
             if (course) {
@@ -119,7 +121,7 @@ export function CourseDialog({
             onSuccess();
             onOpenChange(false);
         } catch (err: any) {
-            setError(err.message || "Error al guardar el curso");
+            setError(err.message || t("academy.courses.dialog.errorSaving"));
         } finally {
             setIsSubmitting(false);
         }
@@ -130,12 +132,12 @@ export function CourseDialog({
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
-                        {course ? "Editar Curso" : "Crear Nuevo Curso"}
+                        {course ? t("academy.courses.dialog.edit") : t("academy.courses.dialog.create")}
                     </DialogTitle>
                     <DialogDescription>
                         {course
-                            ? "Modifica la información del curso"
-                            : "Completa la información del nuevo curso"}
+                            ? t("academy.courses.dialog.editDescription")
+                            : t("academy.courses.dialog.createDescription")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -143,7 +145,7 @@ export function CourseDialog({
                     {/* Title */}
                     <div className="space-y-2">
                         <Label htmlFor="title">
-                            Título del Curso <span className="text-red-500">*</span>
+                            {t("academy.courses.dialog.titleRequired")}
                         </Label>
                         <Input
                             id="title"
@@ -151,42 +153,42 @@ export function CourseDialog({
                             onChange={(e) =>
                                 setFormData({ ...formData, title: e.target.value })
                             }
-                            placeholder="Ej: Introducción a Clarity"
+                            placeholder={t("academy.courses.dialog.titlePlaceholder")}
                             required
                         />
                     </div>
 
                     {/* Description */}
                     <div className="space-y-2">
-                        <Label htmlFor="description">Descripción</Label>
+                        <Label htmlFor="description">{t("academy.courses.dialog.description")}</Label>
                         <Textarea
                             id="description"
                             value={formData.description}
                             onChange={(e) =>
                                 setFormData({ ...formData, description: e.target.value })
                             }
-                            placeholder="Describe el contenido y objetivos del curso"
+                            placeholder={t("academy.courses.dialog.descriptionPlaceholder")}
                             rows={3}
                         />
                     </div>
 
                     {/* Instructor Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="instructor_name">Instructor</Label>
+                        <Label htmlFor="instructor_name">{t("academy.courses.dialog.instructor")}</Label>
                         <Input
                             id="instructor_name"
                             value={formData.instructor_name}
                             onChange={(e) =>
                                 setFormData({ ...formData, instructor_name: e.target.value })
                             }
-                            placeholder="Nombre del instructor"
+                            placeholder={t("academy.courses.dialog.instructorPlaceholder")}
                         />
                     </div>
 
                     {/* Category and Modality */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="category">Categoría</Label>
+                            <Label htmlFor="category">{t("academy.courses.dialog.category")}</Label>
                             <Select
                                 value={formData.category}
                                 onValueChange={(value) =>
@@ -194,7 +196,7 @@ export function CourseDialog({
                                 }
                             >
                                 <SelectTrigger id="category">
-                                    <SelectValue placeholder="Selecciona una categoría" />
+                                    <SelectValue placeholder={t("academy.courses.dialog.selectCategory")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {categories.map((cat) => (
@@ -207,7 +209,7 @@ export function CourseDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="modality">Modalidad</Label>
+                            <Label htmlFor="modality">{t("academy.courses.dialog.modality")}</Label>
                             <Select
                                 value={formData.modality}
                                 onValueChange={(value) =>
@@ -215,7 +217,7 @@ export function CourseDialog({
                                 }
                             >
                                 <SelectTrigger id="modality">
-                                    <SelectValue placeholder="Selecciona modalidad" />
+                                    <SelectValue placeholder={t("academy.courses.dialog.selectModality")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {modalities.map((mod) => (
@@ -230,7 +232,7 @@ export function CourseDialog({
 
                     {/* Hours */}
                     <div className="space-y-2">
-                        <Label htmlFor="hours">Horas del Curso</Label>
+                        <Label htmlFor="hours">{t("academy.courses.dialog.hours")}</Label>
                         <Input
                             id="hours"
                             type="number"
@@ -242,13 +244,13 @@ export function CourseDialog({
                                     hours: e.target.value ? parseInt(e.target.value) : undefined,
                                 })
                             }
-                            placeholder="Ej: 40"
+                            placeholder={t("academy.courses.dialog.hoursPlaceholder")}
                         />
                     </div>
 
                     {/* Skills */}
                     <div className="space-y-2">
-                        <Label>Habilidades / Tecnologías</Label>
+                        <Label>{t("academy.courses.dialog.skills")}</Label>
                         <MultiSelectSkills
                             value={formData.skills || []}
                             onChange={(skills) => setFormData({ ...formData, skills })}
@@ -257,7 +259,7 @@ export function CourseDialog({
 
                     {/* Template Image URL */}
                     <div className="space-y-2">
-                        <Label htmlFor="template_image_url">URL de Imagen del Certificado</Label>
+                        <Label htmlFor="template_image_url">{t("academy.courses.dialog.templateImage")}</Label>
                         <Input
                             id="template_image_url"
                             value={formData.template_image_url}
@@ -267,12 +269,12 @@ export function CourseDialog({
                                     template_image_url: e.target.value,
                                 })
                             }
-                            placeholder="https://ejemplo.com/imagen.png (opcional, por ahora)"
+                            placeholder={t("academy.courses.dialog.templateImagePlaceholder")}
                             disabled
                             className="opacity-50"
                         />
                         <p className="text-xs text-muted-foreground">
-                            La carga de imágenes estará disponible próximamente
+                            {t("academy.courses.dialog.templateImagePlaceholder")}
                         </p>
                     </div>
 
@@ -289,14 +291,14 @@ export function CourseDialog({
                             onClick={() => onOpenChange(false)}
                             disabled={isSubmitting}
                         >
-                            Cancelar
+                            {t("academy.courses.dialog.cancel")}
                         </Button>
                         <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting
-                                ? "Guardando..."
+                                ? t("academy.courses.dialog.saving")
                                 : course
-                                    ? "Actualizar Curso"
-                                    : "Crear Curso"}
+                                    ? t("academy.courses.dialog.save")
+                                    : t("academy.courses.dialog.create")}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { slideInFromBottom } from "@/utils/motion";
 import { getAcademyProfile, updateAcademyProfile } from "@/app/actions/academy/profile";
@@ -52,6 +53,7 @@ interface AcademyData {
 }
 
 export function AcademyProfile({ id }: AcademyProfileProps) {
+    const { t } = useTranslation();
     // ─── Form state ──────────────────────────────────────────────────────
     const [formData, setFormData] = useState<AcademyData>({
         legal_name: "",
@@ -116,7 +118,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                 }
             } catch (error) {
                 console.error("Error loading profile:", error);
-                setErrorMessage("Error al cargar el perfil de la academia");
+                setErrorMessage(t("academy.profile.errorLoadingProfile"));
             } finally {
                 setIsLoadingProfile(false);
             }
@@ -205,7 +207,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
         } catch (error: any) {
             console.error("Error updating profile:", error);
             setSaveStatus("error");
-            setErrorMessage(error?.message || "Error al actualizar el perfil");
+            setErrorMessage(error?.message || t("academy.profile.errorSavingProfile"));
             setTimeout(() => setSaveStatus("idle"), 5000);
         }
     };
@@ -223,7 +225,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                 <div className="container mx-auto max-w-6xl px-4 lg:px-0 py-16 md:py-20 flex items-center justify-center">
                     <div className="flex items-center gap-3">
                         <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
-                        <p className="text-lg">Cargando perfil...</p>
+                        <p className="text-lg">{t("academy.profile.loading")}</p>
                     </div>
                 </div>
             </main>
@@ -254,10 +256,10 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                         </div>
                     </div>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
-                        Perfil de <span className="text-sky-500 dark:text-sky-400">Academia</span>
+                        {t("academy.profile.title")} <span className="text-sky-500 dark:text-sky-400">{t("academy.profile.titleHighlight")}</span>
                     </h1>
                     <p className="text-base md:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300 max-w-3xl mx-auto">
-                        Completa y actualiza la información de tu institución académica.
+                        {t("academy.profile.description")}
                     </p>
                 </motion.div>
 
@@ -273,7 +275,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                         <div className="rounded-2xl border backdrop-blur-xl p-6 bg-white/80 border-neutral-200 dark:bg-neutral-900/70 dark:border-neutral-800">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Estado de Validación</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">{t("academy.profile.validationStatus")}</p>
                                     <div className="flex items-center gap-2">
                                         {formData.validation_status === "approved" ? (
                                             <>
@@ -294,11 +296,11 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                     </div>
                                 </div>
                                 <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Créditos Disponibles</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">{t("academy.profile.credits")}</p>
                                     <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{formData.credits}</p>
                                 </div>
                                 <div className="p-4 rounded-xl border bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Dirección de Stacks</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1">{t("academy.profile.stacksAddress")}</p>
                                     <p className="text-xs font-mono break-all text-neutral-900 dark:text-neutral-100">
                                         {formData.stacks_address}
                                     </p>
@@ -321,10 +323,10 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                 <div className="p-2 rounded-lg bg-sky-500/10">
                                     <School className="h-6 w-6 text-sky-500 dark:text-sky-400" />
                                 </div>
-                                Información de la Academia
+                                {t("academy.profile.institutionalInfo")}
                             </CardTitle>
                             <CardDescription className="text-base">
-                                Los campos marcados con * son obligatorios para el registro completo.
+                                {t("academy.profile.description")}
                             </CardDescription>
                         </CardHeader>
 
@@ -334,17 +336,17 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
                                         <FileText className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                        Información Legal
+                                        {t("academy.profile.institutionalInfo")}
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="legal_name" className="font-semibold">
-                                                Nombre Legal de la Institución *
+                                                {t("academy.profile.legalNameRequired")}
                                             </Label>
                                             <Input
                                                 id="legal_name"
                                                 name="legal_name"
-                                                placeholder="Universidad Nacional de..."
+                                                placeholder={t("academy.profile.legalNamePlaceholder")}
                                                 value={formData.legal_name}
                                                 onChange={handleChange}
                                                 required
@@ -354,12 +356,12 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="institution_type" className="font-semibold">
-                                                Tipo de Institución
+                                                {t("academy.profile.institutionType")}
                                             </Label>
                                             <Input
                                                 id="institution_type"
                                                 name="institution_type"
-                                                placeholder="Universidad, Instituto, Bootcamp..."
+                                                placeholder={t("academy.profile.institutionTypePlaceholder")}
                                                 value={formData.institution_type}
                                                 onChange={handleChange}
                                                 className="bg-white text-neutral-900 border-2 border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
@@ -368,12 +370,12 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="registration_id" className="font-semibold">
-                                                ID de Registro / RUC
+                                                {t("academy.profile.registrationId")}
                                             </Label>
                                             <Input
                                                 id="registration_id"
                                                 name="registration_id"
-                                                placeholder="20123456789"
+                                                placeholder={t("academy.profile.registrationIdPlaceholder")}
                                                 value={formData.registration_id}
                                                 onChange={handleChange}
                                                 className="bg-white text-neutral-900 border-2 border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
@@ -383,13 +385,13 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                         <div className="space-y-2">
                                             <Label htmlFor="website" className="font-semibold flex items-center gap-2">
                                                 <Globe className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                                Sitio Web
+                                                {t("academy.profile.website")}
                                             </Label>
                                             <Input
                                                 id="website"
                                                 name="website"
                                                 type="url"
-                                                placeholder="https://www.ejemplo.edu"
+                                                placeholder={t("academy.profile.websitePlaceholder")}
                                                 value={formData.website}
                                                 onChange={handleChange}
                                                 className="bg-white text-neutral-900 border-2 border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
@@ -402,17 +404,17 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
                                         <User className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                        Información de Contacto
+                                        {t("academy.profile.contactInfo")}
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="contact_person_name" className="font-semibold">
-                                                Nombre del Responsable
+                                                {t("academy.profile.contactPersonName")}
                                             </Label>
                                             <Input
                                                 id="contact_person_name"
                                                 name="contact_person_name"
-                                                placeholder="Juan Pérez"
+                                                placeholder={t("academy.profile.contactPersonNamePlaceholder")}
                                                 value={formData.contact_person_name}
                                                 onChange={handleChange}
                                                 className="bg-white text-neutral-900 border-2 border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
@@ -422,13 +424,13 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                         <div className="space-y-2">
                                             <Label htmlFor="contact_person_email" className="font-semibold flex items-center gap-2">
                                                 <Mail className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                                Email del Responsable
+                                                {t("academy.profile.contactPersonEmail")}
                                             </Label>
                                             <Input
                                                 id="contact_person_email"
                                                 name="contact_person_email"
                                                 type="email"
-                                                placeholder="responsable@ejemplo.edu"
+                                                placeholder={t("academy.profile.contactPersonEmailPlaceholder")}
                                                 value={formData.contact_person_email}
                                                 onChange={handleChange}
                                                 className="bg-white text-neutral-900 border-2 border-neutral-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/20 dark:bg-neutral-800 dark:text-neutral-100 dark:border-neutral-700"
@@ -438,13 +440,13 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="contact_academy_email" className="font-semibold flex items-center gap-2">
                                                 <Mail className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                                Email Institucional *
+                                                {t("academy.profile.academyEmailRequired")}
                                             </Label>
                                             <Input
                                                 id="contact_academy_email"
                                                 name="contact_academy_email"
                                                 type="email"
-                                                placeholder="contacto@ejemplo.edu"
+                                                placeholder={t("academy.profile.academyEmailPlaceholder")}
                                                 value={formData.contact_academy_email}
                                                 onChange={handleChange}
                                                 required
@@ -458,11 +460,11 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
                                         <MapPin className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                        Ubicación
+                                        {t("academy.profile.locationInfo")}
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">País</Label>
+                                            <Label className="font-semibold">{t("academy.profile.country")}</Label>
                                             <Combobox
                                                 options={countriesData.countries.map((country) => ({
                                                     value: String(country.id),
@@ -477,14 +479,14 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                                         city: undefined,
                                                     }))
                                                 }
-                                                placeholder="Seleccionar país"
+                                                placeholder={t("academy.profile.selectCountry")}
                                                 searchPlaceholder="Buscar país..."
                                                 emptyText="No se encontró el país"
                                             />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">Estado / Región</Label>
+                                            <Label className="font-semibold">{t("academy.profile.state")}</Label>
                                             <Combobox
                                                 options={availableStates.map((state) => ({
                                                     value: String(state.id),
@@ -498,7 +500,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                                         city: undefined,
                                                     }))
                                                 }
-                                                placeholder="Seleccionar estado"
+                                                placeholder={t("academy.profile.selectState")}
                                                 searchPlaceholder="Buscar estado..."
                                                 emptyText="No se encontró el estado"
                                                 disabled={!formData.country || availableStates.length === 0}
@@ -506,7 +508,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">Ciudad</Label>
+                                            <Label className="font-semibold">{t("academy.profile.city")}</Label>
                                             <Combobox
                                                 options={availableCities.map((city) => ({
                                                     value: String(city.id),
@@ -519,7 +521,7 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                                         city: value ? Number(value) : undefined,
                                                     }))
                                                 }
-                                                placeholder={isLoadingCities ? "Cargando..." : "Seleccionar ciudad"}
+                                                placeholder={isLoadingCities ? t("academy.profile.loadingCities") : t("academy.profile.selectCity")}
                                                 searchPlaceholder="Buscar ciudad..."
                                                 emptyText="No se encontró la ciudad"
                                                 disabled={!formData.region_state || isLoadingCities || availableCities.length === 0}
@@ -538,17 +540,17 @@ export function AcademyProfile({ id }: AcademyProfileProps) {
                                         {saveStatus === "loading" ? (
                                             <>
                                                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Guardando...
+                                                {t("academy.profile.savingProfile")}
                                             </>
                                         ) : saveStatus === "success" ? (
                                             <>
                                                 <CheckCircle2 className="mr-2 h-5 w-5" />
-                                                Guardado Exitosamente
+                                                {t("academy.profile.profileSaved")}
                                             </>
                                         ) : (
                                             <>
                                                 <Save className="mr-2 h-5 w-5" />
-                                                Guardar Cambios
+                                                {t("academy.profile.saveChanges")}
                                             </>
                                         )}
                                     </Button>

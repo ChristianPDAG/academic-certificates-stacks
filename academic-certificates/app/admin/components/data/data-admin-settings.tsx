@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface MessageType {
 }
 
 export function DataAdminSettings() {
+    const { t } = useTranslation();
     const [message, setMessage] = useState<MessageType | null>(null);
     const [loading, setLoading] = useState(false);
     const [currentSuperAdmin, setCurrentSuperAdmin] = useState<string>("");
@@ -53,12 +55,12 @@ export function DataAdminSettings() {
 
     const handleChangeSuperAdmin = async () => {
         if (!newSuperAdmin.trim()) {
-            showMessage("error", "Ingresa una dirección válida");
+            showMessage("error", t("admin.dataSettings.validAddress"));
             return;
         }
 
         if (newSuperAdmin === currentSuperAdmin) {
-            showMessage("error", "La nueva dirección debe ser diferente a la actual");
+            showMessage("error", t("admin.dataSettings.differentAddress"));
             return;
         }
 
@@ -67,13 +69,13 @@ export function DataAdminSettings() {
             await changeSuperAdminDataClient(newSuperAdmin);
             showMessage(
                 "success",
-                "Transacción enviada. El super admin será actualizado al confirmar."
+                t("admin.dataSettings.transactionSent")
             );
             setShowChangeAdminDialog(false);
             setNewSuperAdmin("");
             setTimeout(() => loadSuperAdmin(), 3000);
         } catch (error) {
-            showMessage("error", `Error: ${error}`);
+            showMessage("error", `${t("admin.dataSettings.error")}: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -103,15 +105,15 @@ export function DataAdminSettings() {
                         <div>
                             <CardTitle className="flex items-center gap-2">
                                 <Shield className="h-5 w-5" />
-                                Configuración del Super Admin (Datos)
+                                {t("admin.dataSettings.title")}
                             </CardTitle>
                             <CardDescription>
-                                Administra el super administrador del contrato certificate-data
+                                {t("admin.dataSettings.description")}
                             </CardDescription>
                         </div>
                         <Button variant="outline" size="sm" onClick={loadSuperAdmin}>
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Actualizar
+                            {t("admin.dataSettings.refresh")}
                         </Button>
                     </div>
                 </CardHeader>
@@ -120,11 +122,11 @@ export function DataAdminSettings() {
                     <div className="space-y-2">
                         <Label className="flex items-center gap-2">
                             <Shield className="h-4 w-4 text-purple-600" />
-                            Super Admin Actual del Contrato de Datos
+                            {t("admin.dataSettings.currentSuperAdmin")}
                         </Label>
                         <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
                             <p className="font-mono text-sm break-all text-purple-900">
-                                {currentSuperAdmin || "Cargando..."}
+                                {currentSuperAdmin || t("admin.dataSettings.loading")}
                             </p>
                         </div>
                     </div>
@@ -132,13 +134,13 @@ export function DataAdminSettings() {
                     {/* Información Importante */}
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
                         <p className="text-sm font-semibold text-amber-900">
-                            ⚠️ Sobre el Super Admin del Contrato de Datos:
+                            {t("admin.dataSettings.aboutTitle")}
                         </p>
                         <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
-                            <li>Controla la autorización de contratos escritores</li>
-                            <li>Puede cambiar su propia dirección a otra cuenta</li>
-                            <li>Este es el nivel de seguridad más bajo (capa de datos)</li>
-                            <li>Trabaja en conjunto con el Registry y Manager</li>
+                            <li>{t("admin.dataSettings.info1")}</li>
+                            <li>{t("admin.dataSettings.info2")}</li>
+                            <li>{t("admin.dataSettings.info3")}</li>
+                            <li>{t("admin.dataSettings.info4")}</li>
                         </ul>
                     </div>
 
@@ -149,7 +151,7 @@ export function DataAdminSettings() {
                             onClick={() => setShowChangeAdminDialog(true)}
                         >
                             <Shield className="h-4 w-4 mr-2" />
-                            Cambiar Super Admin
+                            {t("admin.dataSettings.changeSuperAdmin")}
                         </Button>
                     </div>
                 </CardContent>
@@ -159,14 +161,14 @@ export function DataAdminSettings() {
             <Dialog open={showChangeAdminDialog} onOpenChange={setShowChangeAdminDialog}>
                 <DialogContent className="max-w-xl">
                     <DialogHeader>
-                        <DialogTitle>Cambiar Super Admin del Contrato de Datos</DialogTitle>
+                        <DialogTitle>{t("admin.dataSettings.changeDialogTitle")}</DialogTitle>
                         <DialogDescription>
-                            Transferir el control del contrato certificate-data a otra dirección
+                            {t("admin.dataSettings.changeDialogDescription")}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Super Admin Actual</Label>
+                            <Label>{t("admin.dataSettings.currentAdmin")}</Label>
                             <div className="p-3 bg-muted rounded-lg">
                                 <p className="font-mono text-xs break-all">
                                     {currentSuperAdmin}
@@ -175,7 +177,7 @@ export function DataAdminSettings() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Nuevo Super Admin</Label>
+                            <Label>{t("admin.dataSettings.newAdmin")}</Label>
                             <Input
                                 placeholder="ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
                                 value={newSuperAdmin}
@@ -185,29 +187,19 @@ export function DataAdminSettings() {
 
                         <div className="p-4 bg-red-50 border border-red-200 rounded-lg space-y-2">
                             <p className="text-sm font-bold text-red-900">
-                                🚨 ADVERTENCIA CRÍTICA
+                                {t("admin.dataSettings.criticalWarningTitle")}
                             </p>
                             <ul className="text-sm text-red-800 space-y-1 list-disc list-inside">
-                                <li>
-                                    Perderás el control del contrato de datos PERMANENTEMENTE
-                                </li>
-                                <li>
-                                    El nuevo admin podrá autorizar/revocar contratos escritores
-                                </li>
-                                <li>
-                                    Solo el super admin actual puede ejecutar esta acción
-                                </li>
-                                <li>
-                                    Asegúrate de tener acceso a la nueva dirección
-                                </li>
+                                <li>{t("admin.dataSettings.warning1")}</li>
+                                <li>{t("admin.dataSettings.warning2")}</li>
+                                <li>{t("admin.dataSettings.warning3")}</li>
+                                <li>{t("admin.dataSettings.warning4")}</li>
                             </ul>
                         </div>
 
                         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p className="text-sm text-blue-800">
-                                💡 <strong>Consejo:</strong> Considera mantener el mismo super
-                                admin para Registry, Manager y Data para simplificar la
-                                administración.
+                                {t("admin.dataSettings.tip")}
                             </p>
                         </div>
                     </div>
@@ -220,14 +212,14 @@ export function DataAdminSettings() {
                             }}
                             disabled={loading}
                         >
-                            Cancelar
+                            {t("admin.dataSettings.cancel")}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={handleChangeSuperAdmin}
                             disabled={loading || !newSuperAdmin.trim()}
                         >
-                            {loading ? "Procesando..." : "Confirmar Cambio"}
+                            {loading ? t("admin.dataSettings.processing") : t("admin.dataSettings.confirmChange")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
