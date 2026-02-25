@@ -76,14 +76,16 @@
       "title": "Thank you for signing up!",
       "description": "Check your email to confirm",
       "message": "You've successfully signed up. Please check your email to confirm your account before signing in."
-    },    "updatePassword": {
+    },
+    "updatePassword": {
       "title": "Reset Your Password",
       "description": "Please enter your new password below.",
       "newPassword": "New password",
       "newPasswordPlaceholder": "New password",
       "save": "Save new password",
       "saving": "Saving..."
-    },    "error": {
+    },
+    "error": {
       "title": "Sorry, something went wrong.",
       "codeError": "Code error",
       "unspecifiedError": "An unspecified error occurred."
@@ -245,7 +247,7 @@
     "privacy": "Privacy",
     "cookies": "Cookies",
     "contact": "Contact",
-    "copyright": "Certifikurs &copy; 2025. All rights reserved."
+    "copyright": "Certifikurs © 2025. All rights reserved."
   },
   "blog": {
     "title": "Certifikurs Blog",
