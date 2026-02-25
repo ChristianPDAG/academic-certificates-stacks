@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from 'react-i18next';
 
 import { Button } from "@/components/ui/button";
@@ -68,12 +67,12 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="rounded-2xl border border-neutral-200 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-neutral-900/70 dark:border-neutral-800">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
             {t('auth.login.title')}
           </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="text-base text-neutral-600 dark:text-neutral-300">
             {t('auth.login.description')}
           </CardDescription>
         </CardHeader>
@@ -91,7 +90,7 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700 focus-visible:ring-sky-500"
                 />
               </div>
               <div className="grid gap-2">
@@ -101,7 +100,7 @@ export function LoginForm({
                   </Label>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 underline-offset-4 hover:underline transition-colors"
+                    className="ml-auto inline-block text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 underline-offset-4 hover:underline transition-colors"
                   >
                     {t('auth.login.forgotPassword')}
                   </Link>
@@ -113,7 +112,7 @@ export function LoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700 focus-visible:ring-sky-500"
                 />
               </div>
               {error && (
@@ -123,17 +122,17 @@ export function LoginForm({
               )}
               <Button
                 type="submit"
-                className="w-full h-11 text-base font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
+                className="w-full h-11 text-base font-medium bg-sky-500 hover:bg-sky-600 text-white transition-colors duration-200"
                 disabled={isLoading}
               >
                 {isLoading ? t('auth.login.loggingIn') : t('auth.login.loginButton')}
               </Button>
             </div>
-            <div className="mt-6 text-center text-sm text-muted-foreground">
+            <div className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-300">
               {t('auth.login.noAccount')}{" "}
               <Link
                 href="/auth/sign-up"
-                className="font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 underline underline-offset-4 transition-colors"
+                className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 underline underline-offset-4 transition-colors"
               >
                 {t('auth.login.signUp')}
               </Link>

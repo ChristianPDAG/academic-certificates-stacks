@@ -59,8 +59,8 @@ function Pagination({ list_page, count, type }: PaginationProps) {
         onClick={() => visitPage(1)}
         className={`h-10 w-10 rounded-lg flex items-center justify-center mx-1 cursor-pointer transition-all ${
           currentPage === 1
-            ? "bg-primary font-bold text-primary-foreground shadow-md"
-            : "bg-muted text-muted-foreground hover:bg-muted/80"
+            ? "bg-sky-500 font-bold text-white shadow-md"
+            : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
         }`}
         data-oid="euvck5h"
       >
@@ -85,8 +85,8 @@ function Pagination({ list_page, count, type }: PaginationProps) {
           onClick={() => visitPage(i)}
           className={`h-10 w-10 rounded-lg flex items-center justify-center mx-1 cursor-pointer transition-all ${
             i === currentPage
-              ? "bg-primary font-bold text-primary-foreground shadow-md"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-sky-500 font-bold text-white shadow-md"
+              : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
           }`}
           data-oid="emcv-1y"
         >
@@ -112,8 +112,8 @@ function Pagination({ list_page, count, type }: PaginationProps) {
           onClick={() => visitPage(totalPages)}
           className={`h-10 w-10 rounded-lg flex items-center justify-center mx-1 cursor-pointer transition-all ${
             currentPage === totalPages
-              ? "bg-primary font-bold text-primary-foreground shadow-md"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-sky-500 font-bold text-white shadow-md"
+              : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
           }`}
           data-oid="kkvpgux"
         >
@@ -127,14 +127,14 @@ function Pagination({ list_page, count, type }: PaginationProps) {
 
   return (
     <nav
-      className="border-t border-gray-200 px-4 flex items-center justify-center sm:px-0 pt-2 gap-x-3"
+      className="rounded-2xl border border-neutral-200 bg-white/70 px-4 py-3 flex items-center justify-center sm:px-4 gap-x-3 shadow-sm backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-900/60"
       data-oid="v50063w"
     >
       <div className="z-10" data-oid="a8nz2.a">
         <button
           onClick={previous_number}
           disabled={currentPage === 1}
-          className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed border border-border h-10 w-10 rounded-lg flex items-center justify-center transition-all"
+          className="text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-200 h-10 w-10 rounded-lg flex items-center justify-center transition-all dark:text-neutral-300 dark:hover:text-neutral-100 dark:hover:bg-neutral-800 dark:border-neutral-700"
           data-oid="c74bd7q"
         >
           <svg
@@ -169,7 +169,7 @@ function Pagination({ list_page, count, type }: PaginationProps) {
         <button
           onClick={next_number}
           disabled={currentPage === totalPages}
-          className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed border border-border h-10 w-10 rounded-lg flex items-center justify-center transition-all"
+          className="text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed border border-neutral-200 h-10 w-10 rounded-lg flex items-center justify-center transition-all dark:text-neutral-300 dark:hover:text-neutral-100 dark:hover:bg-neutral-800 dark:border-neutral-700"
           data-oid="bwgmgn3"
         >
           <svg

@@ -3,47 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { IconSearch, IconCertificate, IconShieldCheck, IconAlertCircle, IconCalendar, IconUser, IconSchool, IconAward, IconHash, IconBrandStackshare } from "@tabler/icons-react";
-import { Metadata } from "next";
 import { validateCertificateAction } from "@/app/actions/public/validate-certificate";
 import { useTranslation } from "react-i18next";
-
-export const metadata: Metadata = {
-  title: "Validar Certificado | Certifikurs",
-  description:
-    "Valida la autenticidad de certificados académicos en la blockchain de Stacks. Ingresa el ID y verifica al instante con Certifikurs.",
-  openGraph: {
-    title: "Validar Certificado | Certifikurs",
-    description:
-      "Verifica certificados académicos en la blockchain de Stacks. Ingresa el ID y consulta la validez y detalles del certificado.",
-    url: "https://certifikurs.vercel.app/validator",
-    siteName: "Certifikurs",
-    images: [
-      {
-        url: "https://certifikurs.vercel.app/og-banner.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Certifikurs - Validación de certificados",
-      },
-    ],
-    locale: "es_CO",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Validar Certificado | Certifikurs",
-    description:
-      "Valida certificados académicos en la blockchain de Stacks. Plataforma segura y transparente.",
-    creator: "@Certifikurs",
-    images: [
-      {
-        url: "https://certifikurs.vercel.app/tc-banner.jpg",
-        width: 1200,
-        height: 675,
-        alt: "Certifikurs - Validación de certificados",
-      },
-    ],
-  },
-};
 
 interface ValidationResult {
   success: boolean;
@@ -188,13 +149,9 @@ export default function ValidatorComponent() {
 
   return (
     <main className="relative min-h-screen w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-      {/* Fondo decorativo + degradado para legibilidad */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[url('/img/bg-waves-3.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white dark:from-neutral-950/60 dark:to-neutral-950" />
-      </div>
+      <div className="absolute inset-0 bg-[url('/img/bg-nodes-2.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
 
-      <div className="container mx-auto max-w-4xl py-16 md:py-20 px-4 lg:px-0">
+      <div className="relative z-10 container mx-auto max-w-4xl px-4 lg:px-0 pt-12 md:pt-16 mt-20 pb-16 md:pb-20">
         {/* Header */}
         <div className="text-center mb-10 md:mb-12">
           <div className="flex justify-center mb-6">

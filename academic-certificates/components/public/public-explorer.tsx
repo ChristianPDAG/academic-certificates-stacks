@@ -443,12 +443,9 @@ export default function PublicExplorer() {
 
   return (
     <main className="relative min-h-screen w-full bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[url('/img/bg-waves-3.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white dark:from-neutral-950/60 dark:to-neutral-950" />
-      </div>
+      <div className="absolute inset-0 bg-[url('/img/bg-nodes-2.svg')] bg-cover bg-center opacity-10 dark:opacity-20" />
 
-      <div className="container mx-auto max-w-7xl py-16 md:py-20 px-4 lg:px-0 mt-10">
+      <section className="relative z-10 container mx-auto max-w-7xl px-4 lg:px-0 pt-12 md:pt-16 mt-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-3">
             {t("explorer.title")} <span className="text-sky-500 dark:text-sky-400">{t("explorer.titleHighlight")}</span>
@@ -457,7 +454,9 @@ export default function PublicExplorer() {
             {t("explorer.description")}
           </p>
         </div>
+      </section>
 
+      <section className="relative z-10 container mx-auto max-w-7xl px-4 lg:px-0 pb-16 md:pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Card className="rounded-2xl border backdrop-blur-xl bg-white/80 border-neutral-200 hover:border-sky-500/50 dark:bg-neutral-900/70 dark:border-neutral-800 dark:hover:border-sky-500/60">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -651,7 +650,7 @@ export default function PublicExplorer() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

@@ -49,22 +49,22 @@ export function ForgotPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       {success ? (
-        <Card>
+        <Card className="rounded-2xl border border-neutral-200 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-neutral-900/70 dark:border-neutral-800">
           <CardHeader>
-            <CardTitle className="text-2xl">{t("auth.forgotPassword.successTitle")}</CardTitle>
-            <CardDescription>{t("auth.forgotPassword.successDescription")}</CardDescription>
+            <CardTitle className="text-2xl text-neutral-900 dark:text-neutral-100">{t("auth.forgotPassword.successTitle")}</CardTitle>
+            <CardDescription className="text-neutral-600 dark:text-neutral-300">{t("auth.forgotPassword.successDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
               {t("auth.forgotPassword.successMessage")}
             </p>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="rounded-2xl border border-neutral-200 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-neutral-900/70 dark:border-neutral-800">
           <CardHeader>
-            <CardTitle className="text-2xl">{t("auth.forgotPassword.title")}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-neutral-900 dark:text-neutral-100">{t("auth.forgotPassword.title")}</CardTitle>
+            <CardDescription className="text-neutral-600 dark:text-neutral-300">
               {t("auth.forgotPassword.description")}
             </CardDescription>
           </CardHeader>
@@ -80,18 +80,19 @@ export function ForgotPasswordForm({
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700 focus-visible:ring-sky-500"
                   />
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+                <Button type="submit" className="w-full h-11 bg-sky-500 hover:bg-sky-600 text-white" disabled={isLoading}>
                   {isLoading ? t("auth.forgotPassword.sending") : t("auth.forgotPassword.sendButton")}
                 </Button>
               </div>
-              <div className="mt-4 text-center text-sm">
+              <div className="mt-4 text-center text-sm text-neutral-600 dark:text-neutral-300">
                 {t("auth.forgotPassword.alreadyHaveAccount")}{" "}
                 <Link
                   href="/auth/login"
-                  className="underline underline-offset-4"
+                  className="underline underline-offset-4 text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
                 >
                   {t("auth.forgotPassword.login")}
                 </Link>

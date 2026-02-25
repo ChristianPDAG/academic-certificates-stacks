@@ -15,11 +15,11 @@ const BlogCard = ({ url, title, date, imageURL }: BlogCardProps) => {
   return (
     <Link href={`/blog/${url}`} className="z-10 group" data-oid="su8lwaq">
       <div
-        className="rounded-xl w-80 overflow-hidden bg-card border border-border shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-[1.02]"
+        className="rounded-2xl w-80 overflow-hidden border border-neutral-200 bg-white/80 shadow-lg backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:border-sky-400/50 dark:border-neutral-800 dark:bg-neutral-900/70 dark:group-hover:border-sky-500/50"
         data-oid="m._.xcz"
       >
         <div
-          className="bg-muted w-full h-40 z-10 relative overflow-hidden"
+          className="bg-neutral-100 dark:bg-neutral-800 w-full h-40 z-10 relative overflow-hidden"
           data-oid="c9p-_kc"
         >
           <Image
@@ -33,13 +33,13 @@ const BlogCard = ({ url, title, date, imageURL }: BlogCardProps) => {
         </div>
         <div className="p-4 rounded-xl relative z-20" data-oid="moj:mk1">
           <div
-            className="px-4 py-2 text-primary-foreground font-bold bg-primary w-fit mx-auto mb-3 rounded-lg absolute inset-x-0 -top-5 shadow-md"
+            className="px-4 py-2 text-white font-bold bg-sky-500 dark:bg-sky-600 w-fit mx-auto mb-3 rounded-lg absolute inset-x-0 -top-5 shadow-md"
             data-oid="nf._1rk"
           >
             {date}
           </div>
           <div
-            className="text-xs text-muted-foreground flex gap-x-1 items-center justify-center mb-2 mt-5"
+            className="text-xs text-neutral-600 dark:text-neutral-400 flex gap-x-1 items-center justify-center mb-2 mt-5"
             data-oid="2jgto0."
           >
             <svg
@@ -79,7 +79,7 @@ const BlogCard = ({ url, title, date, imageURL }: BlogCardProps) => {
             </svg>
             {t("blog.author")}
           </div>
-          <h4 className="text-lg font-bold text-card-foreground mb-3 line-clamp-2" data-oid="zpi-3w8">
+          <h4 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-3 line-clamp-2" data-oid="zpi-3w8">
             {title}
           </h4>
         </div>
