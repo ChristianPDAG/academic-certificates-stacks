@@ -3,7 +3,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Inicia Sesión | Certifikurs",
+  title: "Inicia Sesión",
   description: "Accede a tu cuenta para gestionar tus certificados académicos",
 };
 

@@ -349,7 +349,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                     className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
                                 >
                                     {isProcessing ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4" />
                                     ) : (
                                         <>
                                             {fundingType === "credits" ? (
@@ -398,7 +398,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                             }`}
                     >
                         {isProcessing ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4" />
                         ) : isActive ? (
                             <PowerOff className="mr-2 h-4 w-4" />
                         ) : (
@@ -416,7 +416,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                 className="bg-green-500 hover:bg-green-600 text-white"
                             >
                                 {isProcessing ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4" />
                                 ) : (
                                     <CheckCircle2 className="mr-2 h-4 w-4" />
                                 )}
@@ -428,7 +428,7 @@ export function AcademyCard({ academy, onUpdate }: AcademyCardProps) {
                                 className="bg-red-500 hover:bg-red-600 text-white"
                             >
                                 {isProcessing ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4" />
                                 ) : (
                                     <XCircle className="mr-2 h-4 w-4" />
                                 )}

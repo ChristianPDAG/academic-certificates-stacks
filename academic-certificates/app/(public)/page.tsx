@@ -25,7 +25,7 @@ const FAQSection = dynamic(() => import("@/components/home/FAQSection"), {
 });
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Inicio | Certifikurs",
+  title: "Inicio",
   description:
     "Certifikurs permite emitir, validar y explorar certificados académicos en la blockchain de Stacks con verificación segura y transparente.",
   path: "/",

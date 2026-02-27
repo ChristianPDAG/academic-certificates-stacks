@@ -64,17 +64,17 @@ export function CourseInfoForm({
   const isDisabled = !selectedCourseId;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Course Selector */}
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="course">
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="course" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.selectCourseRequired")}
         </Label>
 
         <Select value={selectedCourseId} onValueChange={onCourseSelect}>
           <SelectTrigger
             id="course"
-            className="bg-white dark:bg-neutral-800 border-2"
+            className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           >
             <SelectValue
               placeholder={t("academy.createCertificate.selectCoursePlaceholder")}
@@ -117,19 +117,14 @@ export function CourseInfoForm({
           </SelectContent>
         </Select>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           {t("academy.createCertificate.courseInfoNote")}
-        </p>
-
-        <p className="text-xs text-muted-foreground">
-          La información del curso se guardará como JSON en el storage y se hasheará
-          para la blockchain.
         </p>
       </div>
 
       {/* Course Title */}
-      <div className="space-y-2">
-        <Label htmlFor="courseTitle">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseTitle" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseTitle")}
         </Label>
         <Input
@@ -137,14 +132,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseTitlePlaceholder")}
           value={courseTitle}
           onChange={(e) => setCourseTitle(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>
 
       {/* Course Description */}
-      <div className="space-y-2">
-        <Label htmlFor="courseDesc">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseDesc" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseDescription")}
         </Label>
         <Textarea
@@ -152,14 +147,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseDescriptionPlaceholder")}
           value={courseDescription}
           onChange={(e) => setCourseDescription(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2 min-h-[80px]"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 min-h-[80px]"
           disabled={isDisabled}
         />
       </div>
 
       {/* Category */}
-      <div className="space-y-2">
-        <Label htmlFor="courseCategory">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseCategory" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseCategory")}
         </Label>
         <Input
@@ -167,14 +162,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseCategoryPlaceholder")}
           value={courseCategory}
           onChange={(e) => setCourseCategory(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>
 
       {/* Instructor */}
-      <div className="space-y-2">
-        <Label htmlFor="courseInstructor">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseInstructor" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseInstructor")}
         </Label>
         <Input
@@ -182,14 +177,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseInstructorPlaceholder")}
           value={courseInstructor}
           onChange={(e) => setCourseInstructor(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>
 
       {/* Hours */}
-      <div className="space-y-2">
-        <Label htmlFor="courseHours">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseHours" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseHours")}
         </Label>
         <Input
@@ -199,14 +194,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseHoursPlaceholder")}
           value={courseHours}
           onChange={(e) => setCourseHours(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>
 
       {/* Modality */}
-      <div className="space-y-2">
-        <Label htmlFor="courseModality">
+      <div className="space-y-1.5">
+        <Label htmlFor="courseModality" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseModality")}
         </Label>
         <Input
@@ -214,14 +209,14 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseModalityPlaceholder")}
           value={courseModality}
           onChange={(e) => setCourseModality(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>
 
       {/* Skills */}
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="courseSkills">
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="courseSkills" className="text-xs font-medium text-slate-700 dark:text-slate-300">
           {t("academy.createCertificate.courseSkills")}
         </Label>
         <Input
@@ -229,7 +224,7 @@ export function CourseInfoForm({
           placeholder={t("academy.createCertificate.courseSkillsPlaceholder")}
           value={courseSkills}
           onChange={(e) => setCourseSkills(e.target.value)}
-          className="bg-white dark:bg-neutral-800 border-2"
+          className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           disabled={isDisabled}
         />
       </div>

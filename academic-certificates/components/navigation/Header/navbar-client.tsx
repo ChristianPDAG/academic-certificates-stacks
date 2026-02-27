@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useScroll, useMotionValueEvent } from "framer-motion";
 import { IconMenu2 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -13,17 +12,42 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { Navigation } from "@/components/navigation/navigation-fixed";
 import LanguageSelector from "@/components/LanguageSelector";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export function FloatingNavClient() {
   const { t } = useTranslation();
-  const { scrollYProgress } = useScroll();
+  const router = useRouter();
 
-  const [visible, setVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const routes = [
+      "/",
+      "/explorer",
+      "/validator",
+      "/blog",
+      "/auth/login",
+      "/auth/sign-up",
+      "/auth/sign-up-academy",
+      "/academy",
+      "/student",
+      "/admin",
+    ];
+    routes.forEach((route) => router.prefetch(route));
+  }, [router]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 30);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     // Supabase (si lo reactivas)
@@ -49,49 +73,22 @@ export function FloatingNavClient() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", (current) => {
-    if (typeof current !== "number") return;
-
-    const prev = scrollYProgress.getPrevious() ?? 0;
-    const direction = current - prev;
-
-    // “scrolled” si baja un poco
-    setScrolled(current > 0.05);
-
-    // visible: muestra arriba, oculta cuando bajas, vuelve cuando subes
-    if (current < 0.05) {
-      setVisible(true);
-    } else {
-      setVisible(direction < 0); // si sube (direction negativo) mostrar
-    }
-  });
-
   const user = userEmail ? { email: userEmail, role: userRole } : null;
 
   return (
     <header
-      className={`fixed inset-x-0 top-3 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl border shadow-sm transition-all duration-300 ease-in-out
-        ${
-          visible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-3 pointer-events-none"
-        }
-        ${
-          scrolled
-            ? "bg-background/95 border-border backdrop-blur-md"
-            : "bg-background/80 border-border/50 backdrop-blur-sm"
+      className={`fixed inset-x-0 top-3 z-50 mx-auto w-[calc(100%-2rem)] max-w-6xl rounded-2xl border shadow-sm transition-colors duration-150
+        ${scrolled
+          ? "bg-background/95 border-border"
+          : "bg-background/90 border-border/60"
         }
       `}
-      style={{
-        WebkitBackdropFilter: "blur(8px) saturate(180%)",
-        backdropFilter: "blur(8px) saturate(180%)",
-      }}
     >
       <nav className="py-2.5 px-4 flex items-center justify-between">
         {/* Left: logo */}
         <div className="flex items-center gap-x-5">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logos/logo.png" alt="logo" width={50} height={30} />
+            <Image src="/logos/certifikurs.png" alt="logo" width={50} height={30} />
           </Link>
         </div>
 
@@ -99,30 +96,27 @@ export function FloatingNavClient() {
         <div className="flex items-center gap-x-2">
           {/* Desktop */}
           <div className="hidden lg:flex items-center gap-2">
-            {!isLoading && (
-              <>
-                <Navigation user={user} />
-                <LanguageSelector />
+            <Navigation user={user} />
+            <LanguageSelector />
 
-                {user ? (
-                  <LogoutButton />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Button asChild size="sm" variant="secondary">
-                      <Link href="/auth/sign-up-academy">
-                        {t("navbar.academySignUp")}
-                      </Link>
-                    </Button>
-                    <Button asChild size="sm" variant="outline">
-                      <Link href="/auth/login">{t("navbar.login")}</Link>
-                    </Button>
-                    <Button asChild size="sm">
-                      <Link href="/auth/sign-up">{t("navbar.signUp")}</Link>
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
+            {!isLoading &&
+              (user ? (
+                <LogoutButton />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button asChild size="sm" variant="secondary">
+                    <Link href="/auth/sign-up-academy">
+                      {t("navbar.academySignUp")}
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/auth/login">{t("navbar.login")}</Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/auth/sign-up">{t("navbar.signUp")}</Link>
+                  </Button>
+                </div>
+              ))}
           </div>
 
           {/* Mobile */}
@@ -139,21 +133,21 @@ export function FloatingNavClient() {
                 className="w-56 origin-top-right mt-3 rounded-lg z-[60] border border-border shadow-lg bg-background/95 backdrop-blur-md p-1 text-sm/6 transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
               >
                 {/* Nav links */}
-                {!isLoading && (
-                  <div className="py-1">
-                    <Navigation user={user} className="MenuItems" />
-                  </div>
-                )}
+                <div className="py-1">
+                  <Navigation user={user} className="MenuItems" />
+                </div>
 
                 <div className="my-1 h-px bg-border" />
 
                 {/* Language */}
                 <div className="py-1">
-                  <MenuItem>
-                    <div className="px-2 py-1.5">
-                      <LanguageSelector />
-                    </div>
-                  </MenuItem>
+                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+                  <div
+                    className="px-2 py-1.5"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <LanguageSelector />
+                  </div>
                 </div>
 
                 <div className="my-1 h-px bg-border" />

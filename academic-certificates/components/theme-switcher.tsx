@@ -12,7 +12,11 @@ import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-const ThemeSwitcher = () => {
+const ThemeSwitcher = ({
+  side = "bottom",
+}: {
+  side?: "top" | "bottom" | "left" | "right";
+}) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -30,7 +34,7 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={"sm"}>
+        <Button variant="ghost" size="sm">
           {theme === "light" ? (
             <Sun
               key="light"
@@ -52,7 +56,16 @@ const ThemeSwitcher = () => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-content" align="start">
+      <DropdownMenuContent
+        align="end"
+        side={side}
+        sideOffset={8}
+        collisionPadding={8}
+        avoidCollisions
+        className="w-44"
+        // clave: esto ayuda muchísimo cuando hay header fixed/backdrop
+        style={{ position: "fixed" }}
+      >
         <DropdownMenuRadioGroup
           value={theme}
           onValueChange={(e) => setTheme(e)}

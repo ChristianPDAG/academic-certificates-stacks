@@ -4,7 +4,7 @@ import ValidatorComponent from "@/components/public/ValidatorComponent";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Validador de Certificados | Certifikurs",
+  title: "Validador de Certificados",
   description:
     "Verifica la autenticidad de certificados académicos emitidos en blockchain. Ingresa un ID o txid y valida en segundos con Certifikurs.",
   path: "/validator",

@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { login } from "@/app/actions/login";
+import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm({
   className,
@@ -31,35 +32,35 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const supabase = createClient();
+    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
       // Comentado Supabase temporalmente
-      // const { error: signInError } = await supabase.auth.signInWithPassword({
-      //   email,
-      //   password,
-      // });
-      // if (signInError) throw signInError;
-      // const data = await login();
-      // if (data.role === 'admin') {
-      //   router.push("/admin");
-      // }
-      // if (data.role === 'student') {
-      //   router.push("/student");
-      // }
-      // if (data.role === 'academy') {
-      //   router.push("/academy");
-      //   return;
-      // }
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) throw signInError;
+      const data = await login();
+      if (data.role === 'admin') {
+        router.push("/admin");
+      }
+      if (data.role === 'student') {
+        router.push("/student");
+      }
+      if (data.role === 'academy') {
+        router.push("/academy");
+        return;
+      }
 
       // Simular login exitoso y redirigir a student
-      setTimeout(() => {
-        router.push("/student");
-      }, 1000);
+      //setTimeout(() => {
+      //  router.push("/student");
+      //}, 1000);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("auth.error.unspecifiedError"));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +87,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="correo@ejemplo.com"
+                  placeholder={t("auth.login.emailPlaceholder")}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -108,7 +109,7 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Ingresa tu contraseña"
+                  placeholder={t("auth.login.passwordPlaceholder")}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

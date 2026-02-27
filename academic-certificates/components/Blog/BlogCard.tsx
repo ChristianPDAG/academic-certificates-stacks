@@ -23,7 +23,7 @@ const BlogCard = ({ url, title, date, imageURL }: BlogCardProps) => {
           data-oid="c9p-_kc"
         >
           <Image
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageURL}`}
+            src={`${imageURL}`}
             fill
             alt={title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"

@@ -3,7 +3,7 @@ import FAQPageContent from "@/components/public/faq-page";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Preguntas Frecuentes | Certifikurs",
+  title: "Preguntas Frecuentes",
   description:
     "Resuelve dudas sobre emisión, validación y verificación de certificados académicos en blockchain con Certifikurs.",
   path: "/faq",

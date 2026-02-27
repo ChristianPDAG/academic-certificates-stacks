@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CertificatesTable, CertificateRow } from "@/components/academy/certificates-table";
+import { CertificatesTable, CertificateRow } from "@/app/(dashboard)/academy/_components/certificates/certificates-table";
 import {
     Award,
     Search,
@@ -63,7 +62,7 @@ interface MetadataCache {
 }
 
 export default function CertificatesPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const router = useRouter();
     const [userId, setUserId] = useState<string>("");
     const [certificates, setCertificates] = useState<CertificateRow[]>([]);
@@ -125,7 +124,7 @@ export default function CertificatesPage() {
                 ...cert,
                 courses: Array.isArray(cert.courses) && cert.courses.length > 0
                     ? cert.courses[0]
-                    : { title: 'Sin título', category: null }
+                    : { title: t("academy.certificates.table.noTitle"), category: null }
             }));
             setCertificates(transformedData);
 
@@ -137,11 +136,11 @@ export default function CertificatesPage() {
             sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
         } catch (error) {
             console.error("Error loading certificates:", error);
-            alert("Error al cargar los certificados");
+            alert(t("academy.certificates.errorLoading"));
         } finally {
             setLoading(false);
         }
-    }, [userId]);
+    }, [userId, t]);
 
     useEffect(() => {
         if (userId) {
@@ -240,10 +239,10 @@ export default function CertificatesPage() {
             await revokeCertificateAction(userId, chainCertId);
             await updateCertificateStatus(certId, "revoked");
             await loadCertificates(true);
-            alert("✅ Certificado revocado exitosamente");
+            alert(`✅ ${t("academy.certificates.successRevoked")}`);
         } catch (error: any) {
             console.error("Error revoking certificate:", error);
-            alert(`❌ Error al revocar: ${error.message}`);
+            alert(`❌ ${t("academy.certificates.errorRevoke")}: ${error.message}`);
         } finally {
             setProcessing(false);
         }
@@ -255,10 +254,10 @@ export default function CertificatesPage() {
             await reactivateCertificateAction(userId, chainCertId);
             await updateCertificateStatus(certId, "issued");
             await loadCertificates(true);
-            alert("✅ Certificado reactivado exitosamente");
+            alert(`✅ ${t("academy.certificates.successReactivated")}`);
         } catch (error: any) {
             console.error("Error reactivating certificate:", error);
-            alert(`❌ Error al reactivar: ${error.message}`);
+            alert(`❌ ${t("academy.certificates.errorReactivate")}: ${error.message}`);
         } finally {
             setProcessing(false);
         }
@@ -270,14 +269,14 @@ export default function CertificatesPage() {
             if (result.updated) {
                 await loadCertificates(true);
                 alert(
-                    `✅ Sincronizado: Estado en blockchain es "${result.blockchainStatus}". Base de datos actualizada.`
+                    `✅ ${t("academy.certificates.successSynced")} (${result.blockchainStatus})`
                 );
             } else {
-                alert(`✅ Ya está sincronizado: Estado "${result.blockchainStatus}"`);
+                alert(`✅ ${t("academy.certificates.alreadySynced")} (${result.blockchainStatus})`);
             }
         } catch (error: any) {
             console.error("Error syncing certificate:", error);
-            alert(`❌ Error al sincronizar: ${error.message}`);
+            alert(`❌ ${t("academy.certificates.errorSync")}: ${error.message}`);
         }
     };
 
@@ -296,7 +295,7 @@ export default function CertificatesPage() {
                 .filter((id): id is number => id !== null && id !== undefined);
 
             if (certIdsToProcess.length === 0) {
-                alert("No hay certificados válidos seleccionados");
+                alert(t("academy.certificates.noValidSelected"));
                 return;
             }
 
@@ -319,14 +318,14 @@ export default function CertificatesPage() {
 
             if (result.failed > 0) {
                 alert(
-                    `✅ ${result.success} certificados procesados\n❌ ${result.failed} fallaron\n\nErrores:\n${result.errors.join("\n")}`
+                    `✅ ${t("academy.certificates.bulkProcessed", { count: result.success })}\n❌ ${t("academy.certificates.bulkFailed", { count: result.failed })}\n\n${t("academy.certificates.bulkErrors")}:\n${result.errors.join("\n")}`
                 );
             } else {
-                alert(`✅ ${result.success} certificados procesados exitosamente`);
+                alert(`✅ ${t("academy.certificates.bulkProcessed", { count: result.success })}`);
             }
         } catch (error: any) {
             console.error("Error in bulk action:", error);
-            alert(`❌ Error: ${error.message}`);
+            alert(`❌ ${t("academy.certificates.bulkError")}: ${error.message}`);
         } finally {
             setProcessing(false);
         }
@@ -334,18 +333,20 @@ export default function CertificatesPage() {
 
     // Export to CSV
     const handleExport = () => {
+        const locale = i18n.language?.startsWith("en") ? "en-US" : "es-ES";
         const csvData = filteredAndSortedCertificates.map((cert) => ({
-            ID: cert.chain_cert_id || "N/A",
-            Estudiante: cert.student_name,
-            Email: cert.student_email || "N/A",
-            Wallet: cert.student_wallet,
-            Curso: cert.id_course?.title || "N/A",
-            Calificación: cert.grade || "N/A",
-            Estado: cert.status,
-            Fecha: new Date(cert.created_at).toLocaleDateString("es-ES"),
-            TX_ID: cert.tx_id || "N/A",
+            [t("academy.certificates.exportHeaders.id")]: cert.chain_cert_id || t("academy.certificates.table.notAvailable"),
+            [t("academy.certificates.exportHeaders.student")]: cert.student_name,
+            [t("academy.certificates.exportHeaders.email")]: cert.student_email || t("academy.certificates.table.notAvailable"),
+            [t("academy.certificates.exportHeaders.wallet")]: cert.student_wallet,
+            [t("academy.certificates.exportHeaders.course")]: cert.id_course?.title || t("academy.certificates.table.notAvailable"),
+            [t("academy.certificates.exportHeaders.grade")]: cert.grade || t("academy.certificates.table.notAvailable"),
+            [t("academy.certificates.exportHeaders.status")]: cert.status,
+            [t("academy.certificates.exportHeaders.date")]: new Date(cert.created_at).toLocaleDateString(locale),
+            [t("academy.certificates.exportHeaders.txId")]: cert.tx_id || t("academy.certificates.table.notAvailable"),
         }));
 
+        if (csvData.length === 0) return;
         const headers = Object.keys(csvData[0]).join(",");
         const rows = csvData.map((row) => Object.values(row).join(","));
         const csv = [headers, ...rows].join("\n");
@@ -354,7 +355,7 @@ export default function CertificatesPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `certificados_${new Date().toISOString().split("T")[0]}.csv`;
+        a.download = `${t("academy.certificates.exportFilePrefix")}_${new Date().toISOString().split("T")[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -369,222 +370,190 @@ export default function CertificatesPage() {
     };
 
     return (
-        <div className="container mx-auto max-w-7xl py-8 px-4">
-            <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                    <Award className="h-8 w-8 text-sky-500" />
-                    <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
-                        {t("academy.certificates.title")} <span className="text-sky-500">{t("academy.certificates.titleHighlight")}</span>
-                    </h1>
-                </div>
-                <p className="text-neutral-600 dark:text-neutral-400">
-                    {t("academy.certificates.description")}
-                </p>
-            </div>
+        <div className="space-y-6">
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            {certificates.length}
+            {/* ── Header ──────────────────────────────────────────────── */}
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100 dark:bg-sky-500/10">
+                            <Award className="h-4 w-4 text-sky-600 dark:text-sky-400" />
                         </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.total")}</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="text-2xl font-bold text-green-600">
-                            {certificates.filter((c) => c.status === "issued").length}
-                        </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.issued")}</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="text-2xl font-bold text-red-600">
-                            {certificates.filter((c) => c.status === "revoked").length}
-                        </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.revoked")}</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="text-2xl font-bold text-amber-600">
-                            {certificates.filter((c) => c.status === "draft").length}
-                        </div>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("academy.certificates.stats.drafts")}</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Filters and Actions */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                            <CardTitle className="flex items-center gap-2">
-                                <Filter className="h-5 w-5" />
-                                {t("academy.certificates.filters.search")}
-                            </CardTitle>
-                            <CardDescription>
-                                {t("academy.certificates.description")}
-                            </CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button variant="outline" onClick={() => loadCertificates(true)} disabled={loading}>
-                                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                                {t("academy.certificates.table.sync")}
-                            </Button>
-                            <Button variant="outline" onClick={handleExport} disabled={filteredAndSortedCertificates.length === 0}>
-                                <Download className="h-4 w-4 mr-2" />
-                                {t("academy.certificates.export")}
-                            </Button>
-                        </div>
+                        <span className="text-xs font-semibold uppercase tracking-widest text-sky-600 dark:text-sky-400">
+                            {t("academy.certificates.title")}
+                        </span>
                     </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {/* Search and filters row */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-2">
-                            <Label htmlFor="search">{t("academy.certificates.filters.search")}</Label>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                                <Input
-                                    id="search"
-                                    placeholder={t("academy.certificates.filters.search")}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <Label htmlFor="status-filter">{t("academy.certificates.filters.status")}</Label>
-                            <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-                                <SelectTrigger id="status-filter">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        {t("academy.certificates.titleHighlight")}
+                    </h1>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        {t("academy.certificates.description")}
+                    </p>
+                </div>
+                <div className="flex gap-2 self-start sm:self-auto">
+                    <Button variant="outline" size="sm" className="gap-1.5" onClick={() => loadCertificates(true)} disabled={loading}>
+                        <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+                        {t("academy.certificates.table.sync")}
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-1.5" onClick={handleExport} disabled={filteredAndSortedCertificates.length === 0}>
+                        <Download className="h-3.5 w-3.5" />
+                        {t("academy.certificates.export")}
+                    </Button>
+                </div>
+            </div>
+
+            {/* ── Stat cards ──────────────────────────────────────────── */}
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                    <div className="absolute inset-x-0 top-0 h-0.5 bg-sky-500" />
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{t("academy.certificates.stats.total")}</p>
+                    <div className="flex items-end justify-between">
+                        <p className="text-3xl font-bold tabular-nums text-slate-900 dark:text-white">{certificates.length}</p>
+                        <Award className="h-5 w-5 text-sky-400 mb-0.5" />
+                    </div>
+                </div>
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                    <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500" />
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{t("academy.certificates.stats.issued")}</p>
+                    <div className="flex items-end justify-between">
+                        <p className="text-3xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{certificates.filter((c) => c.status === "issued").length}</p>
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500 mb-0.5" />
+                    </div>
+                </div>
+                <div className="relative overflow-hidden rounded-2xl border border-red-200 bg-red-50 p-5 dark:border-red-500/20 dark:bg-red-500/10">
+                    <div className="absolute inset-x-0 top-0 h-0.5 bg-red-500" />
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{t("academy.certificates.stats.revoked")}</p>
+                    <div className="flex items-end justify-between">
+                        <p className="text-3xl font-bold tabular-nums text-red-600 dark:text-red-400">{certificates.filter((c) => c.status === "revoked").length}</p>
+                        <XCircle className="h-5 w-5 text-red-500 mb-0.5" />
+                    </div>
+                </div>
+                <div className="relative overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-500/20 dark:bg-amber-500/10">
+                    <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-500" />
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">{t("academy.certificates.stats.drafts")}</p>
+                    <div className="flex items-end justify-between">
+                        <p className="text-3xl font-bold tabular-nums text-amber-600 dark:text-amber-400">{certificates.filter((c) => c.status === "draft").length}</p>
+                        <Filter className="h-5 w-5 text-amber-500 mb-0.5" />
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Toolbar ─────────────────────────────────────────────── */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <Input
+                        id="search"
+                        placeholder={t("academy.certificates.filters.search")}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-sm"
+                    />
+                </div>
+                <div className="flex gap-1.5">
+                    {(["all", "issued", "revoked", "draft"] as const).map((s) => (
+                        <button
+                            key={s}
+                            type="button"
+                            onClick={() => setStatusFilter(s)}
+                            className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                                statusFilter === s
+                                    ? "bg-sky-600 text-white shadow-sm"
+                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                            }`}
+                        >
+                            {t(`academy.certificates.filters.${s}`)}
+                        </button>
+                    ))}
+                </div>
+                {filteredAndSortedCertificates.length > 0 && (
+                    <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                        {t("academy.certificates.results", { count: filteredAndSortedCertificates.length })}
+                    </span>
+                )}
+            </div>
+
+            {/* ── Bulk actions ────────────────────────────────────────── */}
+            {selectedIds.size > 0 && (
+                <div className="flex items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 dark:border-sky-800/50 dark:bg-sky-950/30">
+                    <span className="text-xs font-semibold text-sky-700 dark:text-sky-300">
+                        {selectedIds.size} {t("academy.certificates.bulkActions.selected")}
+                    </span>
+                    <div className="flex gap-2 ml-auto">
+                        <Button size="sm" variant="destructive" className="h-7 gap-1 text-xs" onClick={() => setBulkAction("revoke")} disabled={processing}>
+                            <XCircle className="h-3 w-3" />
+                            {t("academy.certificates.dialogs.revoke")}
+                        </Button>
+                        <Button size="sm" className="h-7 gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setBulkAction("reactivate")} disabled={processing}>
+                            <CheckCircle2 className="h-3 w-3" />
+                            {t("academy.certificates.dialogs.reactivate")}
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelectedIds(new Set())}>
+                            {t("academy.certificates.dialogs.cancel")}
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Table card ──────────────────────────────────────────── */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                <div className="h-0.5 w-full bg-sky-500" />
+                <CertificatesTable
+                    certificates={paginatedCertificates}
+                    selectedIds={selectedIds}
+                    onSelectChange={handleSelectChange}
+                    onSelectAll={handleSelectAll}
+                    onRevoke={handleRevoke}
+                    onReactivate={handleReactivate}
+                    onSync={handleSync}
+                    loading={loading}
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                />
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="items-per-page" className="text-xs text-slate-500 dark:text-slate-400">
+                                {t("academy.certificates.pagination.itemsPerPage")}
+                            </Label>
+                            <Select
+                                value={itemsPerPage.toString()}
+                                onValueChange={(val) => setItemsPerPage(parseInt(val))}
+                            >
+                                <SelectTrigger id="items-per-page" className="h-7 w-16 text-xs">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t("academy.certificates.filters.all")}</SelectItem>
-                                    <SelectItem value="issued">{t("academy.certificates.filters.issued")}</SelectItem>
-                                    <SelectItem value="revoked">{t("academy.certificates.filters.revoked")}</SelectItem>
-                                    <SelectItem value="draft">{t("academy.certificates.filters.draft")}</SelectItem>
+                                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                                        <SelectItem key={option} value={option.toString()} className="text-xs">
+                                            {option}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                                {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, filteredAndSortedCertificates.length)} {t("academy.certificates.pagination.of")} {filteredAndSortedCertificates.length}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <Button variant="outline" size="sm" className="h-7 w-7 p-0"
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                                <ChevronLeft className="h-3.5 w-3.5" />
+                            </Button>
+                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 px-1">
+                                {currentPage} / {totalPages}
+                            </span>
+                            <Button variant="outline" size="sm" className="h-7 w-7 p-0"
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Button>
                         </div>
                     </div>
-
-                    {/* Bulk actions */}
-                    {selectedIds.size > 0 && (
-                        <div className="flex items-center gap-3 p-4 bg-sky-50 dark:bg-sky-950/20 rounded-lg border border-sky-200 dark:border-sky-900">
-                            <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                                {selectedIds.size} {t("academy.certificates.bulkActions.selected")}
-                            </span>
-                            <div className="flex gap-2 ml-auto">
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => setBulkAction("revoke")}
-                                    disabled={processing}
-                                >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    {t("academy.certificates.dialogs.revoke")}
-                                </Button>
-                                <Button
-                                    variant="default"
-                                    size="sm"
-                                    onClick={() => setBulkAction("reactivate")}
-                                    disabled={processing}
-                                    className="bg-green-600 hover:bg-green-700"
-                                >
-                                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                                    {t("academy.certificates.dialogs.reactivate")}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSelectedIds(new Set())}
-                                >
-                                    {t("academy.certificates.dialogs.cancel")}
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Table */}
-            <Card>
-                <CardContent className="pt-6">
-                    <CertificatesTable
-                        certificates={paginatedCertificates}
-                        selectedIds={selectedIds}
-                        onSelectChange={handleSelectChange}
-                        onSelectAll={handleSelectAll}
-                        onRevoke={handleRevoke}
-                        onReactivate={handleReactivate}
-                        onSync={handleSync}
-                        loading={loading}
-                        sortField={sortField}
-                        sortDirection={sortDirection}
-                        onSort={handleSort}
-                    />
-
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-                            <div className="flex items-center gap-2">
-                                <Label htmlFor="items-per-page" className="text-sm">
-                                    {t("academy.certificates.pagination.itemsPerPage")}
-                                </Label>
-                                <Select
-                                    value={itemsPerPage.toString()}
-                                    onValueChange={(val) => setItemsPerPage(parseInt(val))}
-                                >
-                                    <SelectTrigger id="items-per-page" className="w-20">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-                                            <SelectItem key={option} value={option.toString()}>
-                                                {option}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                                    {t("academy.certificates.pagination.showing")} {(currentPage - 1) * itemsPerPage + 1} {t("academy.certificates.pagination.to")}{" "}
-                                    {Math.min(currentPage * itemsPerPage, filteredAndSortedCertificates.length)} {t("academy.certificates.pagination.of")}{" "}
-                                    {filteredAndSortedCertificates.length}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                                    disabled={currentPage === 1}
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </Button>
-                                <span className="text-sm font-medium">
-                                    Página {currentPage} {t("academy.certificates.pagination.of")} {totalPages}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                                    disabled={currentPage === totalPages}
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                )}
+            </div>
 
             {/* Bulk Action Confirmation Dialog */}
             <AlertDialog open={!!bulkAction} onOpenChange={(open) => !open && setBulkAction(null)}>

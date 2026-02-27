@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getAcademyIdByUserId } from "@/app/actions/academy/credentials";
-import { CoursesContent } from "@/components/academy/courses-content";
+import { CoursesContent } from "@/app/(dashboard)/academy/_components/courses/courses-content";
 
 export default async function CoursesPage() {
     const supabase = await createClient();
@@ -9,9 +9,7 @@ export default async function CoursesPage() {
         data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-        redirect("/auth/login");
-    }
+    if (!user) redirect("/auth/login");
 
     const academyId = await getAcademyIdByUserId(user.id);
 

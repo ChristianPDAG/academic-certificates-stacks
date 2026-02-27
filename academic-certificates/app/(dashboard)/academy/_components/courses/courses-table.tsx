@@ -55,7 +55,7 @@ export function CoursesTable({
     sortDirection,
     onSort,
 }: CoursesTableProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
@@ -85,7 +85,7 @@ export function CoursesTable({
 
     const SortableHeader = ({ field, children }: { field: keyof Course; children: React.ReactNode }) => (
         <th
-            className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-2">
@@ -97,34 +97,34 @@ export function CoursesTable({
 
     const getStatusBadge = (isActive: boolean) => {
         return isActive ? (
-            <Badge className="bg-green-500 hover:bg-green-600 text-white">{t("academy.courses.table.active")}</Badge>
+            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">{t("academy.courses.table.active")}</Badge>
         ) : (
-            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">{t("academy.courses.table.inactive")}</Badge>
+            <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">{t("academy.courses.table.inactive")}</Badge>
         );
     };
 
     return (
         <>
-            <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
-                <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
-                    <thead className="bg-neutral-50 dark:bg-neutral-900/50">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-800">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50">
                         <tr>
                             <SortableHeader field="title">{t("academy.courses.table.course")}</SortableHeader>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                                 {t("academy.courses.table.category")}
                             </th>
                             <SortableHeader field="instructor_name">{t("academy.courses.table.instructor")}</SortableHeader>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                                 {t("academy.courses.table.details")}
                             </th>
                             <SortableHeader field="is_active">{t("academy.courses.table.status")}</SortableHeader>
                             <SortableHeader field="created_at">{t("academy.courses.table.createdAt")}</SortableHeader>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                                 {t("academy.courses.table.actions")}
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-neutral-950 divide-y divide-neutral-200 dark:divide-neutral-800">
+                        <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
                         {loading ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-8 text-center">
@@ -146,7 +146,7 @@ export function CoursesTable({
                             courses.map((course) => (
                                 <tr
                                     key={course.id_course}
-                                    className="hover:bg-neutral-50 dark:hover:bg-neutral-900/30 transition-colors"
+                                    className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
                                 >
                                     {/* Título y descripción */}
                                     <td className="px-4 py-3">
@@ -169,14 +169,14 @@ export function CoursesTable({
                                                 {course.category}
                                             </Badge>
                                         ) : (
-                                            <span className="text-xs text-neutral-400">N/A</span>
+                                            <span className="text-xs text-neutral-400">{t("academy.courses.table.notAvailable")}</span>
                                         )}
                                     </td>
 
                                     {/* Instructor */}
                                     <td className="px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100">
                                         {course.instructor_name || (
-                                            <span className="text-neutral-400">N/A</span>
+                                            <span className="text-neutral-400">{t("academy.courses.table.notAvailable")}</span>
                                         )}
                                     </td>
 
@@ -223,7 +223,7 @@ export function CoursesTable({
 
                                     {/* Fecha */}
                                     <td className="px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
-                                        {new Date(course.created_at).toLocaleDateString("es-ES", {
+                                        {new Date(course.created_at).toLocaleDateString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", {
                                             year: "numeric",
                                             month: "short",
                                             day: "numeric",

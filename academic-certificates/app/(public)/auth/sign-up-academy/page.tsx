@@ -3,7 +3,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Registro de Academia | Certifikurs",
+  title: "Registro de Academia",
   description: "Regístrate como academia para emitir y gestionar certificados académicos",
 };
 

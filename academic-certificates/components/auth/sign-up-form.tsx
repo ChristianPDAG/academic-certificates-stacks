@@ -62,14 +62,14 @@ export function SignUpForm({
 
       if (error) throw error;
       if (!data?.user?.id) {
-        throw new Error("Sign up failed: no user returned");
+        throw new Error(t("auth.signup.noUserReturned"));
       }
 
       await signup({ id: data.user.id, email, role, nombre: name });
 
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : t("auth.error.unspecifiedError"));
     } finally {
       setIsLoading(false);
     }

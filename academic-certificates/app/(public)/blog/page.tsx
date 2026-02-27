@@ -7,7 +7,7 @@ import { buildPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
-    title: "Blog | Certifikurs",
+    title: "Blog",
     description:
       "Artículos y guías sobre certificación académica, blockchain, verificación y uso de Certifikurs.",
     path: "/blog",

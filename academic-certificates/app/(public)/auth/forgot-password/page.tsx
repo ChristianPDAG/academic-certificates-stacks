@@ -3,7 +3,7 @@ import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Recuperar Contraseña | Certifikurs",
+  title: "Recuperar Contraseña",
   description: "Recupera el acceso a tu cuenta",
 };
 

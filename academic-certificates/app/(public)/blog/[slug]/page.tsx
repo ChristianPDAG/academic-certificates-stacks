@@ -19,7 +19,7 @@ export async function generateMetadata(
       : undefined;
 
     return buildPageMetadata({
-      title: `${post?.title || "Post"} | Blog Certifikurs`,
+      title: `${post?.title || "Post"} | Blog`,
       description:
         post?.description?.slice(0, 160) ||
         "Artículo del blog de Certifikurs sobre certificados académicos y blockchain.",
@@ -29,7 +29,7 @@ export async function generateMetadata(
     });
   } catch {
     return buildPageMetadata({
-      title: "Post | Blog Certifikurs",
+      title: "Post | Blog",
       description:
         "Artículo del blog de Certifikurs sobre certificados académicos y blockchain.",
       path: `/blog/${slug}`,

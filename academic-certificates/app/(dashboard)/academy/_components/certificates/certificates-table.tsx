@@ -123,19 +123,19 @@ export function CertificatesTable({
     switch (status) {
       case "issued":
         return (
-          <Badge className="bg-green-600 hover:bg-green-700 text-white">
+          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
             {t("academy.certificates.table.active")}
           </Badge>
         );
       case "revoked":
         return (
-          <Badge className="bg-red-500 hover:bg-red-600 text-white">
+          <Badge className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">
             {t("academy.certificates.table.revoked")}
           </Badge>
         );
       case "draft":
         return (
-          <Badge variant="outline" className="text-amber-600 border-amber-600">
+          <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
             {t("academy.certificates.table.draft")}
           </Badge>
         );
@@ -161,7 +161,7 @@ export function CertificatesTable({
     children: React.ReactNode;
   }) => (
     <th
-      className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
       onClick={() => onSort(field)}
       role="button"
       tabIndex={0}
@@ -178,9 +178,9 @@ export function CertificatesTable({
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
-        <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
-          <thead className="bg-neutral-50 dark:bg-neutral-900/50">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-800">
+          <thead className="bg-slate-50 dark:bg-slate-800/50">
             <tr>
               <th className="px-4 py-3 text-left">
                 <Checkbox
@@ -201,7 +201,7 @@ export function CertificatesTable({
                 {t("academy.certificates.table.student")}
               </SortableHeader>
 
-              <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 {t("academy.certificates.table.course")}
               </th>
 
@@ -213,13 +213,13 @@ export function CertificatesTable({
                 {t("academy.certificates.table.status")}
               </SortableHeader>
 
-              <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 {t("academy.certificates.table.actions")}
               </th>
             </tr>
           </thead>
 
-          <tbody className="bg-white dark:bg-neutral-950 divide-y divide-neutral-200 dark:divide-neutral-800">
+          <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
             {loading ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center">
@@ -242,7 +242,7 @@ export function CertificatesTable({
               certificates.map((cert) => (
                 <tr
                   key={cert.id_certificate}
-                  className="hover:bg-neutral-50 dark:hover:bg-neutral-900/30 transition-colors"
+                  className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
                 >
                   <td className="px-4 py-3">
                     <Checkbox
@@ -251,7 +251,7 @@ export function CertificatesTable({
                         onSelectChange(cert.id_certificate, !!checked)
                       }
                       aria-label={t("academy.certificates.table.selectOne", {
-                        id: cert.chain_cert_id ?? "N/A",
+                        id: cert.chain_cert_id ?? t("academy.certificates.table.notAvailable"),
                       })}
                       disabled={!cert.chain_cert_id}
                     />

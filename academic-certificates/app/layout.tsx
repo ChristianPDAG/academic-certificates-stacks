@@ -21,6 +21,15 @@ export const metadata: Metadata = {
     "verificación de certificados",
     "Certifikurs",
   ],
+  icons: {
+    icon: [
+      { url: "/logos/certifikurs.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/logos/certifikurs.png", type: "image/png" },
+    ],
+    shortcut: "/logos/certifikurs.png",
+  },
   robots: {
     index: true,
     follow: true,

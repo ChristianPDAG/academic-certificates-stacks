@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import StudentDashboard from "@/components/student-dashboard";
+import { StudentOverview } from "@/app/(dashboard)/student/_components/student-overview";
 
 export default async function StudentPage() {
   const supabase = await createClient();
@@ -15,5 +15,5 @@ export default async function StudentPage() {
     id: data.user.id as string,
     email: data.user.email as string,
   }
-  return <StudentDashboard user={dataUser} />;
+  return <StudentOverview email={dataUser.email} />;
 }

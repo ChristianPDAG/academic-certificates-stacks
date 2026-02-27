@@ -15,7 +15,7 @@ interface MultiSelectSkillsProps {
 export function MultiSelectSkills({
     value,
     onChange,
-    placeholder = "Escribe una habilidad y presiona Enter",
+    placeholder,
 }: MultiSelectSkillsProps) {
     const { t } = useTranslation();
     const [inputValue, setInputValue] = React.useState("");
@@ -65,7 +65,7 @@ export function MultiSelectSkills({
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={value.length === 0 ? placeholder : ""}
+                    placeholder={value.length === 0 ? (placeholder || t("academy.courses.dialog.skillsPlaceholder")) : ""}
                     className="flex-1 min-w-[120px] border-0 shadow-none focus-visible:ring-0 px-0"
                 />
             </div>

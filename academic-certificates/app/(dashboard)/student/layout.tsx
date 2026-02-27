@@ -1,16 +1,43 @@
-export default function ProtectedLayout({
+import { StudentShell } from "@/app/(dashboard)/student/_components/student-shell";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+
+export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
-        <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-          {children}
-        </div>
+  const supabase = await createClient();
+  const [{ data: userDataResponse }, { data: claimsData }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.auth.getClaims(),
+  ]);
+  const user = userDataResponse.user;
 
-      </div>
-    </main>
-  );
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const claims = claimsData?.claims as
+    | { app_metadata?: { role?: string }; user_metadata?: { role?: string } }
+    | undefined;
+  const roleFromClaims = claims?.app_metadata?.role || claims?.user_metadata?.role;
+
+  if (roleFromClaims) {
+    if (roleFromClaims !== "student") {
+      redirect("/");
+    }
+  } else {
+    const { data: userData } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id_user", user.id)
+      .single();
+
+    if (userData?.role !== "student") {
+      redirect("/");
+    }
+  }
+
+  return <StudentShell>{children}</StudentShell>;
 }

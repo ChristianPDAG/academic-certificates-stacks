@@ -34,22 +34,22 @@ interface CourseDialogProps {
 }
 
 const categories = [
-    "Tecnología",
-    "Finanzas",
-    "Marketing",
-    "Diseño",
-    "Negocios",
-    "Blockchain",
-    "Desarrollo Web",
-    "Ciencia de Datos",
-    "Otro",
+    { value: "Tecnología", key: "technology" },
+    { value: "Finanzas", key: "finance" },
+    { value: "Marketing", key: "marketing" },
+    { value: "Diseño", key: "design" },
+    { value: "Negocios", key: "business" },
+    { value: "Blockchain", key: "blockchain" },
+    { value: "Desarrollo Web", key: "webDevelopment" },
+    { value: "Ciencia de Datos", key: "dataScience" },
+    { value: "Otro", key: "other" },
 ];
 
 const modalities = [
-    "Online - Sincrónico",
-    "Online - Asincrónico",
-    "Presencial",
-    "Híbrido",
+    { value: "Online - Sincrónico", key: "onlineSync" },
+    { value: "Online - Asincrónico", key: "onlineAsync" },
+    { value: "Presencial", key: "inPerson" },
+    { value: "Híbrido", key: "hybrid" },
 ];
 
 export function CourseDialog({
@@ -200,8 +200,8 @@ export function CourseDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {categories.map((cat) => (
-                                        <SelectItem key={cat} value={cat}>
-                                            {cat}
+                                        <SelectItem key={cat.value} value={cat.value}>
+                                            {t(`academy.courses.dialog.categories.${cat.key}`)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -221,8 +221,8 @@ export function CourseDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {modalities.map((mod) => (
-                                        <SelectItem key={mod} value={mod}>
-                                            {mod}
+                                        <SelectItem key={mod.value} value={mod.value}>
+                                            {t(`academy.courses.dialog.modalities.${mod.key}`)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -279,8 +279,9 @@ export function CourseDialog({
                     </div>
 
                     {error && (
-                        <div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-400">
-                            {error}
+                        <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs dark:border-red-800/50 dark:bg-red-950/30">
+                            <span className="mt-0.5 shrink-0 text-red-600 dark:text-red-400">⚠</span>
+                            <p className="text-red-700 dark:text-red-300">{error}</p>
                         </div>
                     )}
 

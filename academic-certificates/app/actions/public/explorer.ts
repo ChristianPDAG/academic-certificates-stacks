@@ -11,7 +11,7 @@ export async function getStudentWalletByEmail(email: string) {
 
         const { data, error } = await supabase
             .from("users")
-            .select("stacks_address, id_user, nombre")
+            .select("stacks_address, id_user, full_name")
             .eq("role", "student")
             .eq("email", email)
             .maybeSingle();
@@ -31,8 +31,8 @@ export async function getStudentWalletByEmail(email: string) {
 /**
  * Get all certificates for a student by wallet address
  */
-import type { CertificateType } from "@/components/student-dashboard";
-export async function getCertificatesByStudentWallet(studentWallet: string): Promise<CertificateType[]> {
+import type { StudentCertificate } from "@/app/(dashboard)/student/_components/types";
+export async function getCertificatesByStudentWallet(studentWallet: string): Promise<StudentCertificate[]> {
     try {
         const supabase = await createClient();
 
@@ -73,7 +73,7 @@ export async function getCertificatesByStudentWallet(studentWallet: string): Pro
             academies: Array.isArray(cert.academies) ? cert.academies[0] : cert.academies
         })) || [];
 
-        return transformedData as CertificateType[];
+        return transformedData as StudentCertificate[];
     } catch (error) {
         console.error("Error in getCertificatesByStudentWallet:", error);
         return [];

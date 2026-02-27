@@ -1,16 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
 import BlogCard from "./BlogCard";
-import { fetchPostsPage } from "@/utils/fetch";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { Post } from "@/types/blog";
 
-interface Blog {
-  slug: string;
-  title: string;
-  thumbnail: string;
-  published: string;
-}
 const SectionTitle = ({
   title,
   paragraph,
@@ -48,43 +41,14 @@ const SectionTitle = ({
     </>
   );
 };
-const Blog = () => {
-  const [posts, setPosts] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+
+interface BlogProps {
+  posts: Post[];
+}
+
+const Blog = ({ posts }: BlogProps) => {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchLatestPosts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchPostsPage(1);
-        // Mostrar solo los primeros 3 posts para la sección del home
-        setPosts(data.results.posts.slice(0, 3));
-        setLoading(false);
-      } catch (error) {
-        console.error("An error occurred:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchLatestPosts();
-  }, []);
-
-  if (loading) {
-    return (
-      <section
-        id="blog"
-        className="bg-gray-light dark:bg-bg-color-dark py-16 md:py-20 lg:py-28"
-        data-oid="01c8oc_"
-      >
-        <div className="container" data-oid="0wv3jql">
-          <p className="text-center" data-oid="_crfh20">
-            Cargando...
-          </p>
-        </div>
-      </section>
-    );
-  }
   return (
     <section
       id="blog"
@@ -106,14 +70,14 @@ const Blog = () => {
           {posts && posts.length > 0 ? (
             posts.map((post, index) => (
               <div
-                key={index}
+                key={post.id}
                 className="flex justify-center"
                 data-oid="m52dns5"
               >
                 <BlogCard
-                  url={post.slug}
-                  title={post.title}
-                  imageURL={post.thumbnail}
+                  url={post.slug || "#"}
+                  title={post.title || "Untitled"}
+                  imageURL={post.thumbnail || "/img/blog/default.jpg"}
                   date={new Date(post.published).toLocaleDateString("es-ES", {
                     year: "numeric",
                     month: "numeric",
